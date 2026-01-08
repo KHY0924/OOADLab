@@ -45,3 +45,20 @@ CREATE TABLE IF NOT EXISTS session_students (
     student_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
     PRIMARY KEY (session_id, student_id)
 );
+
+-- Table to link an Evaluator to a Submission 
+CREATE TABLE IF NOT EXISTS evaluator_assignments (
+    assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE
+);
+
+--  Table to store the Grades you submit
+CREATE TABLE IF NOT EXISTS evaluations (
+    evaluation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE,
+    evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    score INT,
+    comments TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
