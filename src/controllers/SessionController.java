@@ -1,11 +1,18 @@
 package controllers;
 
-import models.Session;
-import java.util.List;
+import database.SessionDAO;
+import java.sql.SQLException;
 
 public class SessionController {
+    private SessionDAO sessionDAO = new SessionDAO();
 
     public void getSessionInformation(String studentId) {
-        List<Session> sessionList = Session.findSessionsByStudent(studentId);
+        try {
+            // Just printing for now as void return, but confirms DB access
+            sessionDAO.findSessionsByStudent(studentId);
+            System.out.println("Retrieved session info for " + studentId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

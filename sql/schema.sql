@@ -60,5 +60,9 @@ CREATE TABLE IF NOT EXISTS evaluations (
     evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
     score INT,
     comments TEXT,
+    problem_clarity INT,
+    methodology INT,
+    results INT,
+    presentation INT,
     created_at TIMESTAMP DEFAULT NOW()
 );

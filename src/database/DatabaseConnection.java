@@ -38,17 +38,16 @@ public class DatabaseConnection {
     }
 
     public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            try {
-                Class.forName("org.postgresql.Driver");
-                String url = "jdbc:postgresql://" + getEnv("DB_HOST") + ":" + getEnv("DB_PORT") + "/"
-                        + getEnv("DB_NAME");
-                connection = DriverManager.getConnection(url, getEnv("DB_USER"), getEnv("DB_PASSWORD"));
-            } catch (ClassNotFoundException e) {
-                throw new SQLException("PostgreSQL JDBC Driver not found.", e);
-            }
+        // Changed to always return a new connection to avoid issues with closing the
+        // singleton
+        try {
+            Class.forName("org.postgresql.Driver");
+            String url = "jdbc:postgresql://" + getEnv("DB_HOST") + ":" + getEnv("DB_PORT") + "/"
+                    + getEnv("DB_NAME");
+            return DriverManager.getConnection(url, getEnv("DB_USER"), getEnv("DB_PASSWORD"));
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("PostgreSQL JDBC Driver not found.", e);
         }
-        return connection;
     }
 
     public static void closeConnection() {

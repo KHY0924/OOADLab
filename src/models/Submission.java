@@ -3,6 +3,7 @@ package models;
 import java.time.LocalDateTime;
 
 public class Submission {
+    private String submissionId;
     private String seminarId;
     private String studentId;
     private String title;
@@ -12,8 +13,10 @@ public class Submission {
     private String filePath;
     private LocalDateTime deadline;
 
-    public Submission(String seminarId, String studentId, String title, String abstractText, String supervisor,
+    public Submission(String submissionId, String seminarId, String studentId, String title, String abstractText,
+            String supervisor,
             String presentationType) {
+        this.submissionId = submissionId;
         this.seminarId = seminarId;
         this.studentId = studentId;
         this.title = title;
@@ -21,6 +24,11 @@ public class Submission {
         this.supervisor = supervisor;
         this.presentationType = presentationType;
         this.deadline = LocalDateTime.now().plusDays(2);
+    }
+
+    public Submission(String submissionId, String title) {
+        this.submissionId = submissionId;
+        this.title = title;
     }
 
     public static Submission findByStudentId(String studentId) {
@@ -42,6 +50,10 @@ public class Submission {
     public void saveUpdatedSubmission(String title, String abstractText) {
         this.title = title;
         this.abstractText = abstractText;
+    }
+
+    public String getSubmissionId() {
+        return submissionId;
     }
 
     public String getSeminarId() {
