@@ -1,6 +1,5 @@
 package views;
 
-import javax.management.openmbean.OpenDataException;
 import javax.swing.*;
 import java.awt.event.*;
 
@@ -10,6 +9,14 @@ public class EvaluatorFrame extends JFrame {
         setSize(400,600);
         setLocationRelativeTo(null);
 
-        // Has evaluate page (includes comments and marks)
+        JTabbedPane evaluatorPane = new JTabbedPane();
+        evaluatorPane.setBounds(450,200,600,400);
+        this.add(evaluatorPane);
+
+        // Evaluation page (includes comments and marks)
+        JPanel panel1 = new JPanel();
+        evaluatorPane.add("Presentation", panel1);
+
+        
     }
 }
