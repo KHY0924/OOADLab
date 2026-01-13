@@ -1,7 +1,6 @@
 package views;
 
 import javax.swing.*;
-import java.awt.event.*;
 
 public class CoordinatorFrame extends JFrame {
     public CoordinatorFrame () {

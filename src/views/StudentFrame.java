@@ -2,7 +2,6 @@
 package views;
 
 import javax.swing.*;
-import java.awt.event.*;
 
 
 public class StudentFrame extends JFrame {
