@@ -13,6 +13,14 @@ public class Evaluation {
     private int totalScore;
     private String comments;
 
+    public Evaluation(String id, String submissionId, String evaluatorId, int totalScore, String comments) {
+        // Full constructor for retrieval/saving
+        this.submissionId = submissionId;
+        this.evaluatorId = evaluatorId;
+        this.totalScore = totalScore;
+        this.comments = comments;
+    }
+
     public Evaluation(String submissionId, String evaluatorId) {
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
@@ -24,6 +32,26 @@ public class Evaluation {
         this.methodologyScore = method;
         this.resultsScore = results;
         this.presentationScore = presentation;
+        calculateTotal();
+    }
+
+    public void setProblemClarityScore(int score) {
+        this.problemClarityScore = score;
+        calculateTotal();
+    }
+
+    public void setMethodologyScore(int score) {
+        this.methodologyScore = score;
+        calculateTotal();
+    }
+
+    public void setResultsScore(int score) {
+        this.resultsScore = score;
+        calculateTotal();
+    }
+
+    public void setPresentationScore(int score) {
+        this.presentationScore = score;
         calculateTotal();
     }
 
