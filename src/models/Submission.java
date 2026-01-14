@@ -56,6 +56,10 @@ public class Submission {
         return submissionId;
     }
 
+    public String getId() {
+        return submissionId;
+    }
+
     public String getSeminarId() {
         return seminarId;
     }

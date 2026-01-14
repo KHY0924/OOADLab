@@ -71,4 +71,15 @@ public class Theme {
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
+
+    public static void styleTable(javax.swing.JTable table) {
+        table.setFont(STANDARD_FONT);
+        table.setRowHeight(30);
+        table.setGridColor(new Color(230, 230, 230));
+        table.setShowVerticalLines(false);
+        table.getTableHeader().setFont(BOLD_FONT);
+        table.getTableHeader().setBackground(BG_COLOR);
+        table.getTableHeader().setForeground(TEXT_SECONDARY);
+        table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
+    }
 }

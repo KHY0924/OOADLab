@@ -1,19 +1,51 @@
 package views;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import models.User;
+import models.Session;
+import models.Material;
+import database.SubmissionDAO;
+import database.SessionDAO;
+import database.EvaluationDAO;
+import database.MaterialDAO;
 
 public class StudentPanel extends JPanel {
     private MainFrame mainFrame;
     private JTextField titleField;
     private JTextArea abstractArea;
-    private JTextField supervisorField;
+    private JComboBox<String> supervisorField;
     private JComboBox<String> typeCombo;
-    private JLabel uploadedFileLabel;
-    private JLabel statusLabel;
+    private JComboBox<String> sessionCombo;
+
+    // Status Components
+    private JTable statusTable;
+    private DefaultTableModel statusModel;
+
+    // Material Components
+    private JTable materialTable;
+    private DefaultTableModel materialModel;
+
+    // Data Access Objects
+    private SubmissionDAO submissionDAO;
+    private SessionDAO sessionDAO;
+    private EvaluationDAO evaluationDAO;
+    private MaterialDAO materialDAO;
+    private List<Session> availableSessions;
 
     public StudentPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
+        this.submissionDAO = new SubmissionDAO();
+        this.sessionDAO = new SessionDAO();
+        this.evaluationDAO = new EvaluationDAO();
+        this.materialDAO = new MaterialDAO();
+
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
 
@@ -32,13 +64,34 @@ public class StudentPanel extends JPanel {
         logoutButton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
         logoutButton.addActionListener(e -> mainFrame.showPanel(MainFrame.LOGIN_PANEL));
 
+        JButton profileButton = new JButton("Profile");
+        Theme.styleSecondaryButton(profileButton);
+        profileButton.setBackground(Theme.PRIMARY_DARK);
+        profileButton.setForeground(Color.WHITE);
+        profileButton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        profileButton.addActionListener(e -> mainFrame.showPanel(MainFrame.PROFILE_PANEL));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(Theme.PRIMARY_COLOR);
+        buttonPanel.add(profileButton);
+        buttonPanel.add(logoutButton);
+
         headerPanel.add(title, BorderLayout.WEST);
-        headerPanel.add(logoutButton, BorderLayout.EAST);
+        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(Theme.SUBHEADER_FONT);
         tabbedPane.setBackground(Theme.BG_COLOR);
+
+        tabbedPane.addChangeListener(e -> {
+            int selected = tabbedPane.getSelectedIndex();
+            if (selected == 1) {
+                refreshMaterials();
+            } else if (selected == 2) {
+                refreshStatus();
+            }
+        });
 
         tabbedPane.addTab("Registration", createRegistrationPanel());
         tabbedPane.addTab("Upload Materials", createUploadPanel());
@@ -60,6 +113,13 @@ public class StudentPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
+        JLabel sessionLabel = new JLabel("Select Session");
+        Theme.styleLabel(sessionLabel, false);
+        sessionCombo = new JComboBox<>();
+        sessionCombo.setFont(Theme.STANDARD_FONT);
+        sessionCombo.setBackground(Color.WHITE);
+        loadSessions();
+
         JLabel titleLabel = new JLabel("Research Title");
         Theme.styleLabel(titleLabel, false);
         titleField = new JTextField(25);
@@ -72,11 +132,21 @@ public class StudentPanel extends JPanel {
         abstractArea.setLineWrap(true);
         abstractArea.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         JScrollPane scrollPane = new JScrollPane(abstractArea);
+        scrollPane.setPreferredSize(new Dimension(400, 100)); // Explicit height to prevent collapsing
 
         JLabel supervisorLabel = new JLabel("Supervisor Name");
         Theme.styleLabel(supervisorLabel, false);
-        supervisorField = new JTextField(25);
+        // Mock Data for Supervisor Selection (Malaysian Names)
+        String[] supervisors = {
+                "Dr. Ahmad Albab",
+                "Prof. Tan Mei Ling",
+                "Dr. Siti Nurhaliza",
+                "Mr. Muthusamy",
+                "Dr. Wong Wei Hong"
+        };
+        supervisorField = new JComboBox<>(supervisors);
         supervisorField.setFont(Theme.STANDARD_FONT);
+        supervisorField.setBackground(Color.WHITE);
 
         JLabel typeLabel = new JLabel("Presentation Type");
         Theme.styleLabel(typeLabel, false);
@@ -87,17 +157,46 @@ public class StudentPanel extends JPanel {
 
         JButton submitButton = new JButton("Submit Registration");
         Theme.styleButton(submitButton);
+
         submitButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Registration Submitted Successfully!");
-            titleField.setText("");
-            abstractArea.setText("");
-            supervisorField.setText("");
-            statusLabel.setText("Status: Registered (" + typeCombo.getSelectedItem() + ")");
-            statusLabel.setForeground(new Color(0, 150, 0));
+            User user = mainFrame.getCurrentUser();
+            if (user == null) {
+                JOptionPane.showMessageDialog(this, "Session expired. Please login again.");
+                return;
+            }
+
+            int sessionIndex = sessionCombo.getSelectedIndex();
+            if (sessionIndex < 0 || availableSessions.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select a valid session.");
+                return;
+            }
+            String sessionId = availableSessions.get(sessionIndex).getSessionId();
+
+            try {
+                submissionDAO.createSubmission(
+                        sessionId,
+                        user.getUserId(),
+                        titleField.getText(),
+                        abstractArea.getText(),
+                        (String) supervisorField.getSelectedItem(),
+                        (String) typeCombo.getSelectedItem());
+                JOptionPane.showMessageDialog(this, "Registration Submitted Successfully!");
+                titleField.setText("");
+                abstractArea.setText("");
+                supervisorField.setSelectedIndex(0);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error submitting registration: " + ex.getMessage());
+            }
         });
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        card.add(sessionLabel, gbc);
+        gbc.gridy++;
+        card.add(sessionCombo, gbc);
+
+        gbc.gridy++;
         card.add(titleLabel, gbc);
         gbc.gridy++;
         card.add(titleField, gbc);
@@ -125,68 +224,171 @@ public class StudentPanel extends JPanel {
         return wrapper;
     }
 
+    private void loadSessions() {
+        sessionDAO.seedMockData(); // Ensure mock data exists
+        availableSessions = sessionDAO.getAllSessions();
+        sessionCombo.removeAllItems();
+        for (Session s : availableSessions) {
+            sessionCombo.addItem(s.getLocation());
+        }
+    }
+
     private JPanel createUploadPanel() {
-        JPanel wrapper = new JPanel(new GridBagLayout());
+        JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(Theme.BG_COLOR);
+        wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel card = new JPanel(new GridBagLayout());
-        card.setBackground(Theme.CARD_BG);
-        card.setBorder(Theme.createCardBorder());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-
-        JLabel icon = new JLabel("\uD83D\uDCC2");
-        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
-        card.add(icon, gbc);
-
-        gbc.gridy++;
-        JLabel instruction = new JLabel("Upload your slides (PPT/PDF) or Poster image.");
-        Theme.styleLabel(instruction, false);
-        card.add(instruction, gbc);
-
-        gbc.gridy++;
-        uploadedFileLabel = new JLabel("No file selected");
-        Theme.styleLabel(uploadedFileLabel, false);
-        uploadedFileLabel.setForeground(Color.GRAY);
-        card.add(uploadedFileLabel, gbc);
-
-        gbc.gridy++;
-        gbc.insets = new Insets(30, 20, 10, 20);
-        JButton uploadButton = new JButton("Choose File...");
-        Theme.styleButton(uploadButton);
-        uploadButton.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            int option = fileChooser.showOpenDialog(this);
-            if (option == JFileChooser.APPROVE_OPTION) {
-                String filename = fileChooser.getSelectedFile().getName();
-                uploadedFileLabel.setText("Selected: " + filename);
-                uploadedFileLabel.setForeground(new Color(0, 100, 0));
-                JOptionPane.showMessageDialog(this, "File uploaded: " + filename);
+        // Table Model
+        String[] columns = { "File Name", "Format", "Date Uploaded", "Path" };
+        materialModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
             }
-        });
-        card.add(uploadButton, gbc);
+        };
 
-        wrapper.add(card);
+        materialTable = new JTable(materialModel);
+        Theme.styleTable(materialTable);
+        // Enable sorting
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(materialModel);
+        materialTable.setRowSorter(sorter);
+
+        JScrollPane scrollPane = new JScrollPane(materialTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(Theme.BG_COLOR);
+
+        JButton uploadButton = new JButton("Upload New Material");
+        Theme.styleButton(uploadButton);
+        uploadButton.addActionListener(e -> handleFileUpload());
+
+        buttonPanel.add(uploadButton);
+
+        wrapper.add(scrollPane, BorderLayout.CENTER);
+        wrapper.add(buttonPanel, BorderLayout.SOUTH);
         return wrapper;
     }
 
+    private void handleFileUpload() {
+        User user = mainFrame.getCurrentUser();
+        if (user == null) {
+            JOptionPane.showMessageDialog(this, "Session expired.");
+            return;
+        }
+
+        try {
+            // First getting submission ID
+            ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
+            if (rs.next()) {
+                String subId = rs.getString("submission_id");
+
+                JFileChooser fileChooser = new JFileChooser();
+                int option = fileChooser.showOpenDialog(this);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    String filename = file.getName();
+                    String path = file.getAbsolutePath();
+                    String extension = "";
+
+                    int i = filename.lastIndexOf('.');
+                    if (i > 0) {
+                        extension = filename.substring(i + 1).toUpperCase();
+                    }
+
+                    materialDAO.addMaterial(subId, filename, extension, path);
+                    JOptionPane.showMessageDialog(this, "File Uploaded Successfully!");
+                    refreshMaterials();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please register for a session first.");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error uploading file.");
+        }
+    }
+
+    private void refreshMaterials() {
+        User user = mainFrame.getCurrentUser();
+        if (user == null)
+            return;
+
+        materialModel.setRowCount(0);
+
+        try {
+            ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
+            if (rs.next()) {
+                String subId = rs.getString("submission_id");
+                List<Material> materials = materialDAO.getMaterialsBySubmissionId(subId);
+
+                for (Material m : materials) {
+                    materialModel.addRow(new Object[] {
+                            m.getFileName(),
+                            m.getFileType(),
+                            m.getUploadDate(),
+                            m.getFilePath()
+                    });
+                }
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private JPanel createStatusPanel() {
-        JPanel wrapper = new JPanel(new GridBagLayout());
+        JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(Theme.BG_COLOR);
+        wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel card = new JPanel(new GridBagLayout());
-        card.setBackground(Theme.CARD_BG);
-        card.setBorder(Theme.createCardBorder());
+        // Table Model
+        String[] columns = { "Registration ID", "Research Title", "Supervisor", "Presentation Type", "Status" };
+        statusModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Immutable
+            }
+        };
 
-        statusLabel = new JLabel("Status: Not Registered");
-        statusLabel.setFont(Theme.HEADER_FONT);
-        statusLabel.setForeground(Theme.TEXT_SECONDARY);
+        statusTable = new JTable(statusModel);
+        Theme.styleTable(statusTable);
+        // Enable sorting
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(statusModel);
+        statusTable.setRowSorter(sorter);
 
-        card.add(statusLabel);
-        wrapper.add(card);
+        JScrollPane scrollPane = new JScrollPane(statusTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        wrapper.add(scrollPane, BorderLayout.CENTER);
         return wrapper;
+    }
+
+    private void refreshStatus() {
+        User user = mainFrame.getCurrentUser();
+        if (user == null)
+            return;
+
+        statusModel.setRowCount(0); // Clear table
+
+        try {
+            ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
+            while (rs.next()) {
+                String subId = rs.getString("submission_id");
+                String title = rs.getString("title");
+                String supervisor = rs.getString("supervisor");
+                String type = rs.getString("presentation_type");
+
+                boolean isEvaluated = evaluationDAO.isEvaluated(subId);
+                String status = isEvaluated ? "Graded \u2705" : "Pending \u23F3"; // Checkmark or Hourglass
+
+                statusModel.addRow(new Object[] { subId, title, supervisor, type, status });
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching status data.");
+        }
     }
 }

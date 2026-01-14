@@ -2,13 +2,16 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import services.AuthService;
+import models.User;
 
 public class LoginPanel extends JPanel {
     private MainFrame mainFrame;
+    private AuthService authService;
 
     public LoginPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
+        this.authService = new AuthService();
         setLayout(new GridBagLayout());
         setBackground(Theme.BG_COLOR);
 
@@ -36,21 +39,6 @@ public class LoginPanel extends JPanel {
         gbc.gridy++;
         gbc.insets = new Insets(20, 5, 5, 5);
 
-        JLabel roleLabel = new JLabel("I am a:");
-        roleLabel.setFont(Theme.BOLD_FONT);
-        roleLabel.setForeground(Theme.TEXT_PRIMARY);
-        card.add(roleLabel, gbc);
-
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 5, 15, 5);
-        String[] roles = { "Student", "Coordinator", "Evaluator" };
-        JComboBox<String> roleCombo = new JComboBox<>(roles);
-        roleCombo.setBackground(Color.WHITE);
-        roleCombo.setFont(Theme.STANDARD_FONT);
-        card.add(roleCombo, gbc);
-
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 5, 5, 5);
         JLabel userLabel = new JLabel("Username");
         userLabel.setFont(Theme.BOLD_FONT);
         userLabel.setForeground(Theme.TEXT_PRIMARY);
@@ -81,21 +69,43 @@ public class LoginPanel extends JPanel {
         Theme.styleButton(loginButton);
         card.add(loginButton, gbc);
 
-        loginButton.addActionListener((ActionEvent e) -> {
-            String role = (String) roleCombo.getSelectedItem();
-            if (role != null) {
+        gbc.gridy++;
+        gbc.insets = new Insets(5, 5, 10, 5);
+        JButton registerButton = new JButton("Create Account");
+        Theme.styleSecondaryButton(registerButton);
+        registerButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // flatter
+        card.add(registerButton, gbc);
+
+        loginButton.addActionListener(e -> {
+            String username = userField.getText();
+            String password = new String(passField.getPassword());
+
+            User user = authService.login(username, password);
+
+            if (user != null) {
+                mainFrame.setCurrentUser(user);
+                // Route based on role
+                String role = user.getRole() != null ? user.getRole().toLowerCase() : "";
                 switch (role) {
-                    case "Student":
+                    case "student":
                         mainFrame.showPanel(MainFrame.STUDENT_PANEL);
                         break;
-                    case "Coordinator":
+                    case "coordinator":
                         mainFrame.showPanel(MainFrame.COORDINATOR_PANEL);
                         break;
-                    case "Evaluator":
+                    case "evaluator":
                         mainFrame.showPanel(MainFrame.EVALUATOR_PANEL);
                         break;
+                    default:
+                        JOptionPane.showMessageDialog(this, "Unknown role: " + role);
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid credentials");
             }
+        });
+
+        registerButton.addActionListener(e -> {
+            mainFrame.showPanel(MainFrame.REGISTER_PANEL);
         });
 
         add(card);

@@ -3,6 +3,12 @@ package views;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
+import models.User;
+import models.Submission;
+import models.Evaluation;
+import database.AssignmentDAO;
+import database.EvaluationDAO;
 
 public class EvaluatorPanel extends JPanel {
     private MainFrame mainFrame;
@@ -13,8 +19,15 @@ public class EvaluatorPanel extends JPanel {
     private JSlider presentationSlider;
     private JTextArea commentArea;
 
+    private AssignmentDAO assignmentDAO;
+    private EvaluationDAO evaluationDAO;
+    private List<Submission> currentAssignments;
+
     public EvaluatorPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
+        this.assignmentDAO = new AssignmentDAO();
+        this.evaluationDAO = new EvaluationDAO();
+
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
 
@@ -37,11 +50,28 @@ public class EvaluatorPanel extends JPanel {
         headerPanel.add(logoutButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
+        JPanel content = new JPanel(new BorderLayout());
+        content.setBackground(Theme.BG_COLOR);
+
+        // Refresh Button
+        JButton refreshButton = new JButton("Refresh Assignments");
+        Theme.styleButton(refreshButton);
+        refreshButton.setFont(Theme.STANDARD_FONT);
+        refreshButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        refreshButton.addActionListener(e -> loadAssignments());
+
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topBar.setBackground(Theme.BG_COLOR);
+        topBar.add(refreshButton);
+        content.add(topBar, BorderLayout.NORTH);
+
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createListPanel(), createEvaluationForm());
         splitPane.setDividerLocation(350);
         splitPane.setBackground(Theme.BG_COLOR);
         splitPane.setBorder(null);
-        add(splitPane, BorderLayout.CENTER);
+        content.add(splitPane, BorderLayout.CENTER);
+
+        add(content, BorderLayout.CENTER);
     }
 
     private JPanel createListPanel() {
@@ -58,12 +88,8 @@ public class EvaluatorPanel extends JPanel {
         header.setForeground(Theme.PRIMARY_COLOR);
         header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        String[] columns = { "ID", "Student", "Type" };
-        Object[][] data = {
-                { "S01", "Alice", "Oral" },
-                { "S02", "Bob", "Poster" }
-        };
-        assignedStudentModel = new DefaultTableModel(data, columns);
+        String[] columns = { "Submission ID", "Title" };
+        assignedStudentModel = new DefaultTableModel(new Object[][] {}, columns);
         JTable table = new JTable(assignedStudentModel);
         table.setRowHeight(30);
         table.setFont(Theme.STANDARD_FONT);
@@ -94,9 +120,13 @@ public class EvaluatorPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        JLabel studentInfo = new JLabel("Evaluating: Alice (Oral)");
+        JLabel studentInfo = new JLabel("Select a submission to evaluate (Enter ID below)");
         studentInfo.setFont(Theme.HEADER_FONT);
         studentInfo.setForeground(Theme.PRIMARY_COLOR);
+
+        JLabel idLabel = new JLabel("Submission ID:");
+        Theme.styleLabel(idLabel, false);
+        JTextField idField = new JTextField(20);
 
         problemSlider = createSlider();
         methodSlider = createSlider();
@@ -113,20 +143,48 @@ public class EvaluatorPanel extends JPanel {
         JButton submitButton = new JButton("Submit Evaluation");
         Theme.styleButton(submitButton);
         submitButton.addActionListener(e -> {
-            int total = problemSlider.getValue() + methodSlider.getValue() +
-                    resultsSlider.getValue() + presentationSlider.getValue();
-            JOptionPane.showMessageDialog(this,
-                    "Evaluation Submitted!\nTotal Score: " + total + "/40");
+            User user = mainFrame.getCurrentUser();
+            String subId = idField.getText().trim();
+            if (user == null || subId.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please login and enter a valid Submission ID.");
+                return;
+            }
+
+            // Create Evaluation Object
+            Evaluation eval = new Evaluation(
+                    java.util.UUID.randomUUID().toString(), // Helper for ID generation if needed, or DB handles
+                    subId,
+                    user.getUserId(),
+                    problemSlider.getValue() + methodSlider.getValue() + resultsSlider.getValue()
+                            + presentationSlider.getValue(),
+                    commentArea.getText());
+            // Set rubric scores (requires updating Evaluation model or DAO to handle
+            // individual scores if not already matched)
+            eval.setProblemClarityScore(problemSlider.getValue());
+            eval.setMethodologyScore(methodSlider.getValue());
+            eval.setResultsScore(resultsSlider.getValue());
+            eval.setPresentationScore(presentationSlider.getValue());
+
+            evaluationDAO.saveEvaluation(eval);
+            JOptionPane.showMessageDialog(this, "Evaluation Submitted!");
+
+            // Reset
             problemSlider.setValue(5);
             methodSlider.setValue(5);
             resultsSlider.setValue(5);
             presentationSlider.setValue(5);
             commentArea.setText("");
+            idField.setText("");
         });
 
         gbc.gridx = 0;
         gbc.gridy = 0;
         formContent.add(studentInfo, gbc);
+
+        gbc.gridy++;
+        formContent.add(idLabel, gbc);
+        gbc.gridy++;
+        formContent.add(idField, gbc);
 
         gbc.gridy++;
         formContent.add(createSliderPanel("Problem Clarity (0-10)", problemSlider), gbc);
@@ -151,6 +209,17 @@ public class EvaluatorPanel extends JPanel {
         panel.add(scrollWrapper, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private void loadAssignments() {
+        User user = mainFrame.getCurrentUser();
+        if (user != null) {
+            assignedStudentModel.setRowCount(0);
+            currentAssignments = assignmentDAO.getAssignmentsForEvaluator(user.getUserId());
+            for (Submission s : currentAssignments) {
+                assignedStudentModel.addRow(new Object[] { s.getId(), s.getTitle() });
+            }
+        }
     }
 
     private JSlider createSlider() {
