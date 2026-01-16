@@ -9,6 +9,20 @@ public class Seminar {
   private LocalDateTime seminarDT;
   private String location;
 
+  public String getSeminarId() {
+    return seminarId;
+  }
   
+  public String getSeminarDate() {
+    return seminarDT.date;
+  }
+  
+  public LocalDateTime getSeminarTime() {
+    return seminarDT.time;
+  }
+
+  public String getLocation() {
+    return location;
+  }
 
 }
