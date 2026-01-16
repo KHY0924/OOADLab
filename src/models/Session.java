@@ -7,10 +7,10 @@ import java.util.List;
 public class Session {
     private String sessionId;
     private String location;
-    private LocalDateTime date;
+    private DateAndTime sessionDT;
     private List<String> studentIds;
 
-    public Session(String sessionId, String location, LocalDateTime date) {
+    public session(String sessionId, String location, DateAndTime sessionDT) {
         this.sessionId = sessionId;
         this.location = location;
         this.date = date;
@@ -45,4 +45,7 @@ public class Session {
     public String toString() {
         return "Session " + sessionId + " at " + location;
     }
+
+
+    
 }
