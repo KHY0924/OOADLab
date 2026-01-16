@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Seminar {
-  public void 
+  private String seminarId;
+  private LocalDateTime seminarDT;
+  private String location;
+
+  
 
 }
