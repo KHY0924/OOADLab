@@ -6,19 +6,29 @@ import java.util.List;
 
 public class Seminar {
   private String seminarId;
-  private LocalDateTime seminarDT;
+  private DateAndTime seminarDT;
   private String location;
+
+  public class DateAndTime {
+    public static void dateInput(int year, int month, int day){
+        LocalDate date = LocalDate.of(year, month, day);
+    }
+
+    public static void timeInput(int hour, int minute){
+        LocalTime time = LocalTime.of(hour, minute);
+    }
+  }
 
   public String getSeminarId() {
     return seminarId;
   }
   
-  public String getSeminarDate() {
-    return seminarDT.date;
+  public LocalDate getSeminarDate() {
+    return seminarDT.dateInput;
   }
   
-  public LocalDateTime getSeminarTime() {
-    return seminarDT.time;
+  public LocalTime getSeminarTime() {
+    return seminarDT.timeInput;
   }
 
   public String getLocation() {
