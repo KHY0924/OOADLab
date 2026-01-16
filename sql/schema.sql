@@ -31,6 +31,14 @@ CREATE TABLE IF NOT EXISTS submissions (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Seminars table
+CREATE TABLE IF NOT EXISTS Seminars (
+    seminar_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    location VARCHAR(100),
+    seminar_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Sessions table
 CREATE TABLE IF NOT EXISTS sessions (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
