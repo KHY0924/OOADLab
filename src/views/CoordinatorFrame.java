@@ -29,7 +29,9 @@ public class CoordinatorFrame extends JFrame {
        
         // Oversees award nomination for Best Oral, Best Poster, and People’s Choice
         JPanel panel4 = new JPanel();
-        coordinatorPane.add("Award nomination", panel4);        
+        coordinatorPane.add("Award nomination", panel4);      
+        
+        
     }
 
     public static void main(String[] args) {
