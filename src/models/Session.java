@@ -1,49 +1,60 @@
 package models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Session {
-    private String sessionId;
+    private String sessionID;
+    private String sessionType;
     private String location;
     private DateAndTime sessionDT;
-    private List<String> studentIds;
+    private List<String> studentIDs;
 
-    public session(String sessionId, String location, DateAndTime sessionDT) {
-        this.sessionId = sessionId;
+    public Session(String sessionID, String location, DateAndTime sessionDT, String sessionType) {
+        this.sessionID = sessionID;
         this.location = location;
-        this.date = date;
-        this.studentIds = new ArrayList<>();
+        this.sessionDT = sessionDT;
+        this.sessionType = sessionType;
+        this.studentIDs = new ArrayList<>();
     }
 
     public void addStudent(String studentId) {
-        this.studentIds.add(studentId);
+        this.studentIDs.add(studentId);
     }
 
     public static List<Session> findSessionsByStudent(String studentId) {
         return new ArrayList<>();
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public String getSessionID() {
+        return sessionID;
+    }
+
+    public String getSessionType() {
+        return sessionType;
     }
 
     public String getLocation() {
         return location;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDate getSessionDate() {
+        return sessionDT.date;
     }
 
-    public List<String> getStudentIds() {
-        return studentIds;
+    public LocalTime getSessionTime() {
+        return sessionDT.time;
+    }
+
+    public List<String> getStudentIDs() {
+        return studentIDs;
     }
 
     @Override
     public String toString() {
-        return "Session " + sessionId + " at " + location;
+        return "Session " + sessionID + " at " + location;
     }
 
 
