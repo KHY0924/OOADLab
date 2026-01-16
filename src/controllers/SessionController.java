@@ -1,7 +1,15 @@
 package controllers;
 
 import database.SessionDAO;
+import models.DateAndTime;
+import models.Seminar;
+import models.Session;
+
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class SessionController {
     private SessionDAO sessionDAO = new SessionDAO();
@@ -16,20 +24,38 @@ public class SessionController {
         }
     }
     
+    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute){
+        LocalDate date = DateAndTime.dateInput(year, month, day);
+        LocalTime time = DateAndTime.timeInput(hour, minute);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        Timestamp timestamp = Timestamp.valueOf(dateTime);
+        DateAndTime dateAndTime = new DateAndTime(date, time);
+        Seminar seminar = new Seminar(seminarID, location, dateAndTime);
+        try {
+            sessionDAO.createSeminar(seminarID, location, timestamp);
+            System.out.println("Seminar created in database: " + seminarID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type){
+        LocalDate date = DateAndTime.dateInput(year, month, day);
+        LocalTime time = DateAndTime.timeInput(hour, minute);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        Timestamp timestamp = Timestamp.valueOf(dateTime);
+        DateAndTime dateAndTime = new DateAndTime(date, time);
+        Session session = new Session(sessionID, location, dateAndTime, type);
+        try {
+            sessionDAO.createSession(sessionID, location, timestamp, type);
+            System.out.println("Session created in database: " + sessionID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void viewSession(String sessionID){
+        
+    }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
