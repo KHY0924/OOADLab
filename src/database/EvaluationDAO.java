@@ -37,4 +37,18 @@ public class EvaluationDAO {
             System.err.println("Error: Failed to save evaluation to DB.");
         }
     }
+
+    public boolean isEvaluated(String submissionId) {
+        String sql = "SELECT 1 FROM evaluations WHERE submission_id = ?::uuid";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, submissionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
