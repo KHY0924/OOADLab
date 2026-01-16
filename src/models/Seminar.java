@@ -1,24 +1,40 @@
 package models;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Seminar {
-  private String seminarId;
+  private String seminarID;
   private DateAndTime seminarDT;
   private String location;
+  private List<String> sessionIDs;
+
+  public Seminar(String seminarID, String location, DateAndTime seminarDT) {
+    this.seminarID = seminarID;
+    this.location = location;
+    this.seminarDT = seminarDT;
+    this.sessionIDs = new ArrayList<>();
+  }
+
+  public List<String> getSessionIDs() {
+    return sessionIDs;
+  }
+
+  public void addSession(String sessionID) {
+    this.sessionIDs.add(sessionID);
+  }
 
   public String getSeminarId() {
-    return seminarId;
+    return seminarID;
   }
-  
+
   public LocalDate getSeminarDate() {
-    return seminarDT.dateInput;
+    return seminarDT.date;
   }
-  
+
   public LocalTime getSeminarTime() {
-    return seminarDT.timeInput;
+    return seminarDT.time;
   }
 
   public String getLocation() {
