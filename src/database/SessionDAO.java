@@ -40,6 +40,7 @@ public class SessionDAO {
         }
     }
 
+    // CREATE SEMINAR DATABASE 
     public void createSeminar(String seminarId, String location, Timestamp date) throws SQLException {
         String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date) VALUES (?::uuid, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -82,6 +83,17 @@ public class SessionDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, sessionId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updateSession(String sessionID, String location, Timestamp date, String type) throws SQLException {
+        String sql = "UPDATE session SET location = ?, session_date = ?, type = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, location);
+            stmt.setTimestamp(2, date);
+            stmt.setString(3, type);
             stmt.executeUpdate();
         }
     }
