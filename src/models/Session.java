@@ -56,7 +56,5 @@ public class Session {
     public String toString() {
         return "Session " + sessionID + " at " + location;
     }
-
-
     
 }
