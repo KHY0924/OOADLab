@@ -24,6 +24,7 @@ public class SessionController {
         }
     }
     
+    // CREATE SEMINAR CONTROLLER
     public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute){
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
@@ -55,7 +56,35 @@ public class SessionController {
     }
 
     public void viewSession(String sessionID){
+        try {
+            sessionDAO.findBySessionId(sessionID);
+            System.out.println("Session: " + sessionID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }   
+
+    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type){
+        try {
+            sessionDAO.updateSession(sessionID, );
+            System.out.println("Session: " + sessionID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void assignEvaluator(String sessionID){
         
     }
+
+    public void deleteSession(String sessionID){
+
+    }
+
+    public void sessionSchedule(){
+
+    }
+    
+
     
 }
