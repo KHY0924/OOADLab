@@ -94,7 +94,7 @@ public class StudentPanel extends JPanel {
         });
 
         tabbedPane.addTab("Registration", createRegistrationPanel());
-        tabbedPane.addTab("Upload Materials", createUploadPanel());
+        tabbedPane.addTab("Seminar Submission", createUploadPanel());
         tabbedPane.addTab("My Status", createStatusPanel());
 
         add(tabbedPane, BorderLayout.CENTER);
@@ -113,12 +113,12 @@ public class StudentPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        JLabel sessionLabel = new JLabel("Select Session");
+        JLabel sessionLabel = new JLabel("Select Semester");
         Theme.styleLabel(sessionLabel, false);
-        sessionCombo = new JComboBox<>();
+        String[] semesters = { "Semester 1", "Semester 2", "Semester 3" };
+        sessionCombo = new JComboBox<>(semesters);
         sessionCombo.setFont(Theme.STANDARD_FONT);
         sessionCombo.setBackground(Color.WHITE);
-        loadSessions();
 
         JLabel titleLabel = new JLabel("Research Title");
         Theme.styleLabel(titleLabel, false);
@@ -165,16 +165,15 @@ public class StudentPanel extends JPanel {
                 return;
             }
 
-            int sessionIndex = sessionCombo.getSelectedIndex();
-            if (sessionIndex < 0 || availableSessions.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please select a valid session.");
+            String selectedSemester = (String) sessionCombo.getSelectedItem();
+            if (selectedSemester == null || selectedSemester.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select a valid semester.");
                 return;
             }
-            String sessionId = availableSessions.get(sessionIndex).getSessionId();
 
             try {
                 submissionDAO.createSubmission(
-                        sessionId,
+                        selectedSemester,
                         user.getUserId(),
                         titleField.getText(),
                         abstractArea.getText(),
@@ -224,14 +223,7 @@ public class StudentPanel extends JPanel {
         return wrapper;
     }
 
-    private void loadSessions() {
-        sessionDAO.seedMockData(); // Ensure mock data exists
-        availableSessions = sessionDAO.getAllSessions();
-        sessionCombo.removeAllItems();
-        for (Session s : availableSessions) {
-            sessionCombo.addItem(s.getLocation());
-        }
-    }
+    // Semester options are now hardcoded in createRegistrationPanel()
 
     private JPanel createUploadPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());

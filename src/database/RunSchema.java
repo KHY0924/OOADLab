@@ -7,6 +7,10 @@ import java.sql.Statement;
 
 public class RunSchema {
     public static void main(String[] args) {
+        run();
+    }
+
+    public static void run() {
         String schemaPath = "sql/schema.sql";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
