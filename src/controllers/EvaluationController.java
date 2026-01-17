@@ -40,4 +40,15 @@ public class EvaluationController {
 
         System.out.println("Controller: Evaluation submitted for " + submissionId);
     }
+
+
+    public void viewEvaluation(String sessionID){
+
+    }
+
+    public void generateAward(String submissionID){
+        highestOralMarks(submissionID);
+        highestPosterMarks(submissionID);
+        highestOverallMarks(submissionID);
+    }
 }
