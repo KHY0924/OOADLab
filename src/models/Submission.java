@@ -3,96 +3,96 @@ package models;
 import java.time.LocalDateTime;
 
 public class Submission {
-    private String submissionId;
-    private String seminarId;
-    private String studentId;
-    private String title;
-    private String abstractText;
-    private String supervisor;
-    private String presentationType;
-    private String filePath;
-    private LocalDateTime deadline;
+    private String sid;
+    private String semId;
+    private String stId;
+    private String titl;
+    private String abtxt;
+    private String sup;
+    private String pType;
+    private String fPath;
+    private LocalDateTime dl;
 
-    public Submission(String submissionId, String seminarId, String studentId, String title, String abstractText,
-            String supervisor,
-            String presentationType) {
-        this.submissionId = submissionId;
-        this.seminarId = seminarId;
-        this.studentId = studentId;
-        this.title = title;
-        this.abstractText = abstractText;
-        this.supervisor = supervisor;
-        this.presentationType = presentationType;
-        this.deadline = LocalDateTime.now().plusDays(2);
+    public Submission(String sid, String semId, String stId, String titl, String abtxt,
+            String sup,
+            String pType) {
+        this.sid = sid;
+        this.semId = semId;
+        this.stId = stId;
+        this.titl = titl;
+        this.abtxt = abtxt;
+        this.sup = sup;
+        this.pType = pType;
+        this.dl = LocalDateTime.now().plusDays(2);
     }
 
-    public Submission(String submissionId, String title) {
-        this.submissionId = submissionId;
-        this.title = title;
+    public Submission(String sid, String titl) {
+        this.sid = sid;
+        this.titl = titl;
     }
 
-    public static Submission findByStudentId(String studentId) {
+    public static Submission findByStudentId(String stId) {
         return null;
     }
 
-    public boolean validateUpload(String filePath) {
-        return filePath.endsWith(".pdf") || filePath.endsWith(".ppt");
+    public boolean validateUpload(String fPath) {
+        return fPath.endsWith(".pdf") || fPath.endsWith(".ppt");
     }
 
-    public void saveFilePath(String filePath) {
-        this.filePath = filePath;
+    public void saveFilePath(String fPath) {
+        this.fPath = fPath;
     }
 
     public boolean checkDeadline() {
-        return LocalDateTime.now().isBefore(this.deadline);
+        return LocalDateTime.now().isBefore(this.dl);
     }
 
-    public void saveUpdatedSubmission(String title, String abstractText) {
-        this.title = title;
-        this.abstractText = abstractText;
+    public void saveUpdatedSubmission(String titl, String abtxt) {
+        this.titl = titl;
+        this.abtxt = abtxt;
     }
 
     public String getSubmissionId() {
-        return submissionId;
+        return sid;
     }
 
     public String getId() {
-        return submissionId;
+        return sid;
     }
 
     public String getSeminarId() {
-        return seminarId;
+        return semId;
     }
 
     public String getStudentId() {
-        return studentId;
+        return stId;
     }
 
     public String getTitle() {
-        return title;
+        return titl;
     }
 
     public String getAbstractText() {
-        return abstractText;
+        return abtxt;
     }
 
     public String getSupervisor() {
-        return supervisor;
+        return sup;
     }
 
     public String getPresentationType() {
-        return presentationType;
+        return pType;
     }
 
     public String getFilePath() {
-        return filePath;
+        return fPath;
     }
 
     public LocalDateTime getDeadline() {
-        return deadline;
+        return dl;
     }
 
     public String getDetails() {
-        return "Title: " + title + ", Abstract: " + abstractText;
+        return "Title: " + titl + ", Abstract: " + abtxt;
     }
 }

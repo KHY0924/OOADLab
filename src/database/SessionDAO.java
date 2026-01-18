@@ -20,7 +20,8 @@ public class SessionDAO {
                 String loc = rs.getString("location");
                 Timestamp date = rs.getTimestamp("session_date");
                 String type = rs.getString("type");
-                sessions.add(new Session(id, loc, new models.DateAndTime(date.toLocalDateTime().toLocalDate(), date.toLocalDateTime().toLocalTime()), type));
+                sessions.add(new Session(id, loc, new models.DateAndTime(date.toLocalDateTime().toLocalDate(),
+                        date.toLocalDateTime().toLocalTime()), type));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -40,7 +41,6 @@ public class SessionDAO {
         }
     }
 
-    // CREATE SEMINAR DATABASE 
     public void createSeminar(String seminarId, String location, Timestamp date) throws SQLException {
         String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date) VALUES (?::uuid, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -98,5 +98,4 @@ public class SessionDAO {
         }
     }
 
-    
 }

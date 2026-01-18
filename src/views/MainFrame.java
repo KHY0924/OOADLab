@@ -39,8 +39,6 @@ public class MainFrame extends JFrame {
         loginPanel = new LoginPanel(this);
         registerPanel = new RegisterPanel(this);
 
-        // Panels that depend on user data specific loading might need lazy load or
-        // refresh
         studentPanel = new StudentPanel(this);
         coordinatorPanel = new CoordinatorPanel(this);
         evaluatorPanel = new EvaluatorPanel(this);

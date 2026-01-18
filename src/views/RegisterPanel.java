@@ -74,7 +74,6 @@ public class RegisterPanel extends JPanel {
         passField.setFont(Theme.STANDARD_FONT);
         card.add(passField, gbc);
 
-        // Student Specific Fields
         gbc.gridy++;
         gbc.insets = new Insets(0, 5, 5, 5);
         JLabel nameLabel = new JLabel("Full Name");
@@ -111,7 +110,6 @@ public class RegisterPanel extends JPanel {
         backButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         card.add(backButton, gbc);
 
-        // Actions
         roleCombo.addActionListener(e -> {
             boolean isStudent = "Student".equals(roleCombo.getSelectedItem());
             nameLabel.setVisible(isStudent);
@@ -132,8 +130,7 @@ public class RegisterPanel extends JPanel {
                 return;
             }
 
-            // Register
-            boolean success = authService.register(user, pass, role, name, email, "N/A"); // major N/A for now
+            boolean success = authService.register(user, pass, role, name, email, "N/A");
             if (success) {
                 JOptionPane.showMessageDialog(this, "Registration Successful! Please login.");
                 mainFrame.showPanel(MainFrame.LOGIN_PANEL);

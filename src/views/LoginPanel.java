@@ -73,7 +73,7 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(5, 5, 10, 5);
         JButton registerButton = new JButton("Create Account");
         Theme.styleSecondaryButton(registerButton);
-        registerButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // flatter
+        registerButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         card.add(registerButton, gbc);
 
         loginButton.addActionListener(e -> {
@@ -84,7 +84,6 @@ public class LoginPanel extends JPanel {
 
             if (user != null) {
                 mainFrame.setCurrentUser(user);
-                // Route based on role
                 String role = user.getRole() != null ? user.getRole().toLowerCase() : "";
                 switch (role) {
                     case "student":

@@ -1,6 +1,5 @@
 package services;
 
-// RubricService.java  (Rubric lifeline: loadActiveRubrics)
 import java.util.Arrays;
 import java.util.List;
 

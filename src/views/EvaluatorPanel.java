@@ -53,7 +53,6 @@ public class EvaluatorPanel extends JPanel {
         JPanel content = new JPanel(new BorderLayout());
         content.setBackground(Theme.BG_COLOR);
 
-        // Refresh Button
         JButton refreshButton = new JButton("Refresh Assignments");
         Theme.styleButton(refreshButton);
         refreshButton.setFont(Theme.STANDARD_FONT);
@@ -150,16 +149,14 @@ public class EvaluatorPanel extends JPanel {
                 return;
             }
 
-            // Create Evaluation Object
             Evaluation eval = new Evaluation(
-                    java.util.UUID.randomUUID().toString(), // Helper for ID generation if needed, or DB handles
+                    java.util.UUID.randomUUID().toString(),
                     subId,
                     user.getUserId(),
                     problemSlider.getValue() + methodSlider.getValue() + resultsSlider.getValue()
                             + presentationSlider.getValue(),
                     commentArea.getText());
-            // Set rubric scores (requires updating Evaluation model or DAO to handle
-            // individual scores if not already matched)
+
             eval.setProblemClarityScore(problemSlider.getValue());
             eval.setMethodologyScore(methodSlider.getValue());
             eval.setResultsScore(resultsSlider.getValue());
@@ -168,7 +165,6 @@ public class EvaluatorPanel extends JPanel {
             evaluationDAO.saveEvaluation(eval);
             JOptionPane.showMessageDialog(this, "Evaluation Submitted!");
 
-            // Reset
             problemSlider.setValue(5);
             methodSlider.setValue(5);
             resultsSlider.setValue(5);

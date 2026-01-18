@@ -32,16 +32,15 @@ public class ProfilePanel extends JPanel {
 
         JButton backButton = new JButton("Back");
         Theme.styleSecondaryButton(backButton);
-        backButton.setBackground(Theme.PRIMARY_DARK); // Darker background for contrast on header
+        backButton.setBackground(Theme.PRIMARY_DARK);
         backButton.setForeground(Color.WHITE);
         backButton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-        backButton.addActionListener(e -> mainFrame.showPanel(MainFrame.STUDENT_PANEL)); // Default back to Student
+        backButton.addActionListener(e -> mainFrame.showPanel(MainFrame.STUDENT_PANEL));
 
         headerPanel.add(title, BorderLayout.WEST);
         headerPanel.add(backButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Form
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BG_COLOR);
 

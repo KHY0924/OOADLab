@@ -24,15 +24,12 @@ public class StudentPanel extends JPanel {
     private JComboBox<String> typeCombo;
     private JComboBox<String> sessionCombo;
 
-    // Status Components
     private JTable statusTable;
     private DefaultTableModel statusModel;
 
-    // Material Components
     private JTable materialTable;
     private DefaultTableModel materialModel;
 
-    // Data Access Objects
     private SubmissionDAO submissionDAO;
     private SessionDAO sessionDAO;
     private EvaluationDAO evaluationDAO;
@@ -132,11 +129,11 @@ public class StudentPanel extends JPanel {
         abstractArea.setLineWrap(true);
         abstractArea.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         JScrollPane scrollPane = new JScrollPane(abstractArea);
-        scrollPane.setPreferredSize(new Dimension(400, 100)); // Explicit height to prevent collapsing
+        scrollPane.setPreferredSize(new Dimension(400, 100));
 
         JLabel supervisorLabel = new JLabel("Supervisor Name");
         Theme.styleLabel(supervisorLabel, false);
-        // Mock Data for Supervisor Selection (Malaysian Names)
+
         String[] supervisors = {
                 "Dr. Ahmad Albab",
                 "Prof. Tan Mei Ling",
@@ -225,7 +222,7 @@ public class StudentPanel extends JPanel {
     }
 
     private void loadSessions() {
-        sessionDAO.seedMockData(); // Ensure mock data exists
+        sessionDAO.seedMockData();
         availableSessions = sessionDAO.getAllSessions();
         sessionCombo.removeAllItems();
         for (Session s : availableSessions) {
@@ -238,7 +235,6 @@ public class StudentPanel extends JPanel {
         wrapper.setBackground(Theme.BG_COLOR);
         wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Table Model
         String[] columns = { "File Name", "Format", "Date Uploaded", "Path" };
         materialModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -249,7 +245,7 @@ public class StudentPanel extends JPanel {
 
         materialTable = new JTable(materialModel);
         Theme.styleTable(materialTable);
-        // Enable sorting
+
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(materialModel);
         materialTable.setRowSorter(sorter);
 
@@ -278,7 +274,7 @@ public class StudentPanel extends JPanel {
         }
 
         try {
-            // First getting submission ID
+
             ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
             if (rs.next()) {
                 String subId = rs.getString("submission_id");
@@ -343,18 +339,17 @@ public class StudentPanel extends JPanel {
         wrapper.setBackground(Theme.BG_COLOR);
         wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Table Model
         String[] columns = { "Registration ID", "Research Title", "Supervisor", "Presentation Type", "Status" };
         statusModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Immutable
+                return false;
             }
         };
 
         statusTable = new JTable(statusModel);
         Theme.styleTable(statusTable);
-        // Enable sorting
+
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(statusModel);
         statusTable.setRowSorter(sorter);
 
@@ -370,7 +365,7 @@ public class StudentPanel extends JPanel {
         if (user == null)
             return;
 
-        statusModel.setRowCount(0); // Clear table
+        statusModel.setRowCount(0);
 
         try {
             ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
@@ -381,7 +376,7 @@ public class StudentPanel extends JPanel {
                 String type = rs.getString("presentation_type");
 
                 boolean isEvaluated = evaluationDAO.isEvaluated(subId);
-                String status = isEvaluated ? "Graded \u2705" : "Pending \u23F3"; // Checkmark or Hourglass
+                String status = isEvaluated ? "Graded \u2705" : "Pending \u23F3";
 
                 statusModel.addRow(new Object[] { subId, title, supervisor, type, status });
             }

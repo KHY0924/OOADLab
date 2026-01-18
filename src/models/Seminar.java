@@ -9,8 +9,7 @@ public class Seminar {
   private DateAndTime seminarDT;
   private String location;
   private List<String> sessionIDs;
-  
-  // SEMINAR MODEL
+
   public Seminar(String seminarID, String location, DateAndTime seminarDT) {
     this.seminarID = seminarID;
     this.location = location;

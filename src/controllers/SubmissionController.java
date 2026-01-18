@@ -18,7 +18,7 @@ public class SubmissionController {
 
     public void uploadPresentation(String filePath, String seminarId, String studentId) {
         try {
-            // Validate file path (Mock logic)
+
             if (filePath == null || !filePath.endsWith(".pdf")) {
                 System.out.println("Invalid file format.");
                 return;
@@ -32,7 +32,7 @@ public class SubmissionController {
 
     public void editSubmission(String studentId, String newTitle, String newAbstract) {
         try {
-            // Check deadline logic can be added here (fetching submission first)
+
             submissionDAO.updateSubmission(studentId, newTitle, newAbstract);
             System.out.println("Submission updated.");
         } catch (SQLException e) {

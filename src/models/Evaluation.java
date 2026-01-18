@@ -1,10 +1,9 @@
 package models;
 
 public class Evaluation {
-    private String submissionId; // String for UUID
-    private String evaluatorId; // String for UUID
+    private String submissionId;
+    private String evaluatorId;
 
-    // Rubric Scores (Required by your Lab PDF)
     private int problemClarityScore;
     private int methodologyScore;
     private int resultsScore;
@@ -14,7 +13,7 @@ public class Evaluation {
     private String comments;
 
     public Evaluation(String id, String submissionId, String evaluatorId, int totalScore, String comments) {
-        // Full constructor for retrieval/saving
+
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
         this.totalScore = totalScore;
@@ -26,7 +25,6 @@ public class Evaluation {
         this.evaluatorId = evaluatorId;
     }
 
-    // Setters for the Rubric (Call this from your UI)
     public void setRubricScores(int problem, int method, int results, int presentation) {
         this.problemClarityScore = problem;
         this.methodologyScore = method;
@@ -63,7 +61,6 @@ public class Evaluation {
         this.comments = comments;
     }
 
-    // Getters
     public String getSubmissionId() {
         return submissionId;
     }
@@ -80,7 +77,6 @@ public class Evaluation {
         return comments;
     }
 
-    // New Getters for Rubrics
     public int getProblemClarityScore() {
         return problemClarityScore;
     }

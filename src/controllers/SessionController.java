@@ -16,16 +16,15 @@ public class SessionController {
 
     public void getSessionInformation(String studentId) {
         try {
-            // Just printing for now as void return, but confirms DB access
+
             sessionDAO.findSessionsByStudent(studentId);
             System.out.println("Retrieved session info for " + studentId);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
-    // CREATE SEMINAR CONTROLLER
-    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute){
+
+    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -40,7 +39,8 @@ public class SessionController {
         }
     }
 
-    public void createSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type){
+    public void createSession(String sessionID, String location, int year, int month, int day, int hour, int minute,
+            String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -55,14 +55,14 @@ public class SessionController {
         }
     }
 
-    public void viewSession(String sessionID){
+    public void viewSession(String sessionID) {
         try {
             sessionDAO.findBySessionId(sessionID);
             System.out.println("Session: " + sessionID);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }   
+    }
 
     public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type){
         try {
@@ -73,18 +73,16 @@ public class SessionController {
         }
     }
 
-    public void assignEvaluator(String sessionID){
-        
-    }
-
-    public void deleteSession(String sessionID){
+    public void assignEvaluator(String sessionID) {
 
     }
 
-    public void sessionSchedule(){
+    public void deleteSession(String sessionID) {
 
     }
-    
 
-    
+    public void sessionSchedule() {
+
+    }
+
 }

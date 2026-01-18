@@ -21,9 +21,7 @@ public class RunSchema {
             StringBuilder sqlBuilder = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
-                // Ignore comments and empty lines for simpler parsing,
-                // but usually reading the whole file string is fine if ; is handled or executed
-                // as one block
+
                 if (line.startsWith("--") || line.trim().isEmpty()) {
                     continue;
                 }
@@ -31,9 +29,6 @@ public class RunSchema {
             }
 
             String sql = sqlBuilder.toString();
-            // Split by semicolon to execute multiple statements if needed,
-            // OR execute as one block if DB supports it.
-            // PostgreSQL supports executing multiple statements in one go often.
 
             System.out.println("Executing SQL...");
             stmt.execute(sql);

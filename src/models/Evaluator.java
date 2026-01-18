@@ -1,7 +1,7 @@
 package models;
 
 public class Evaluator extends User {
-    private String evaluatorId; // Changed from int to String for UUID
+    private String evaluatorId;
     private boolean isAssigned;
 
     public Evaluator(String evaluatorId, String name, String email, String password) {

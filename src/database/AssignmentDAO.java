@@ -11,7 +11,6 @@ public class AssignmentDAO {
     public List<Submission> getAssignmentsForEvaluator(String evaluatorId) {
         List<Submission> list = new ArrayList<>();
 
-        // Join tables to get assignments
         String sql = "SELECT s.* FROM submissions s " +
                 "JOIN evaluator_assignments ea ON s.submission_id = ea.submission_id " +
                 "WHERE ea.evaluator_id = ?::uuid";

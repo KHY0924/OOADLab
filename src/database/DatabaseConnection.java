@@ -38,8 +38,7 @@ public class DatabaseConnection {
     }
 
     public static Connection getConnection() throws SQLException {
-        // Changed to always return a new connection to avoid issues with closing the
-        // singleton
+
         try {
             Class.forName("org.postgresql.Driver");
             String url = "jdbc:postgresql://" + getEnv("DB_HOST") + ":" + getEnv("DB_PORT") + "/"
