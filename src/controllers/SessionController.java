@@ -70,9 +70,14 @@ public class SessionController {
     }
 
     public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type){
+        LocalDate date = DateAndTime.dateInput(year, month, day);
+        LocalTime time = DateAndTime.timeInput(hour, minute);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        Timestamp timestamp = Timestamp.valueOf(dateTime);
+        DateAndTime dateAndTime = new DateAndTime(date, time);
         try {
-            sessionDAO.updateSession(sessionID, );
-            System.out.println("Session: " + sessionID);
+            sessionDAO.updateSession(sessionID, location, dateAndTime, type);
+            System.out.println("Session has been updated: " + sessionID);
         } catch (SQLException e) {
             e.printStackTrace();
         }
