@@ -98,4 +98,43 @@ public class SessionDAO {
         }
     }
 
+    public void assignEvaluator(String evaluatorID, String studentID) throws SQLException {
+        // Check if evaluator is already assigned
+        String checkSql = "SELECT 1 FROM evaluator_assignments WHERE evaluator_id = ?::uuid";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+        checkStmt.setString(1, evaluatorID);
+        ResultSet rs = checkStmt.executeQuery();
+        if (rs.next()) {
+            // Already assigned
+            rs.close();
+            checkStmt.close();
+            throw new SQLException("Evaluator already assigned");
+        }
+        rs.close();
+        checkStmt.close();
+
+        // Find submission for student
+        String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
+        PreparedStatement subStmt = conn.prepareStatement(subSql);
+        subStmt.setString(1, studentID);
+        ResultSet subRs = subStmt.executeQuery();
+        if (subRs.next()) {
+            String submissionId = subRs.getString("submission_id");
+            // Assign
+            String assignSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid)";
+            PreparedStatement assignStmt = conn.prepareStatement(assignSql);
+            assignStmt.setString(1, evaluatorID);
+            assignStmt.setString(2, submissionId);
+            assignStmt.executeUpdate();
+            assignStmt.close();
+        } else {
+            subRs.close();
+            subStmt.close();
+            throw new SQLException("No submission found for student");
+        }
+        subRs.close();
+        subStmt.close();
+    }
+
 }
