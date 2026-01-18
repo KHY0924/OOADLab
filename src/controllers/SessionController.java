@@ -1,11 +1,16 @@
 package controllers;
 
 import database.SessionDAO;
+import database.SubmissionDAO;
+import database.AssignmentDAO;
+import database.UserDAO;
 import models.DateAndTime;
 import models.Seminar;
 import models.Session;
+import models.Evaluator;
 
 import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,8 +78,35 @@ public class SessionController {
         }
     }
 
-    public void assignEvaluator(String sessionID) {
-
+    public void assignEvaluator(String sessionID, String evaluatorID, String studentID) {
+        try {
+            // check evaluator assigned or not
+            AssignmentDAO assignmentDAO = new AssignmentDAO();
+            if (assignmentDAO.getAssignmentsForEvaluator(evaluatorID).isEmpty()) {
+                // find submission by that student
+                SubmissionDAO submissionDAO = new SubmissionDAO();
+                ResultSet rs = submissionDAO.findByStudentId(studentID);
+                if (rs.next()) {
+                    String submissionId = rs.getString("submission_id");
+                    // assign evaluator to the student's submission
+                    String sql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid)";
+                    java.sql.Connection conn = database.DatabaseConnection.getConnection();
+                    java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setString(1, evaluatorID);
+                    stmt.setString(2, submissionId);
+                    stmt.executeUpdate();
+                    stmt.close();
+                    System.out.println("Evaluator " + evaluatorID + " assigned to student " + studentID);
+                } else {
+                    System.out.println("No submission found for student " + studentID);
+                }
+                rs.close();
+            } else {
+                System.out.println("Evaluator " + evaluatorID + " is already assigned");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteSession(String sessionID) {
