@@ -88,7 +88,12 @@ public class SessionController {
     }
 
     public void deleteSession(String sessionID) {
-
+        try {
+            sessionDAO.deleteSession(sessionID);
+            System.out.println("Session " + sessionID + "has been deleted");
+        } catch (Exception e) {
+            System.out.println("Error deleting the session: " + e.getMessage());
+        }
     }
 
     public void sessionSchedule() {
