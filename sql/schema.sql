@@ -74,3 +74,40 @@ CREATE TABLE IF NOT EXISTS evaluations (
     presentation INT,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Presentation Boards Table
+CREATE TABLE IF NOT EXISTS presentation_boards (
+    board_id SERIAL PRIMARY KEY,
+    board_name VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
+    max_presentations INT NOT NULL,
+    current_presentations INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Poster Presentations Table
+CREATE TABLE IF NOT EXISTS poster_presentations (
+    presentation_id SERIAL PRIMARY KEY,
+    board_id INT NOT NULL,
+    submission_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    session_id INT NOT NULL,
+    status VARCHAR(50) DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (board_id) REFERENCES presentation_boards(board_id),
+    FOREIGN KEY (submission_id) REFERENCES submissions(submission_id),
+    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+);
+
+-- Evaluation Criteria Table
+CREATE TABLE IF NOT EXISTS evaluation_criteria (
+    criteria_id SERIAL PRIMARY KEY,
+    presentation_id INT NOT NULL,
+    criteria_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    max_score INT NOT NULL,
+    weight INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (presentation_id) REFERENCES poster_presentations(presentation_id)
+);
