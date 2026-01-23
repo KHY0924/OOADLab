@@ -8,6 +8,8 @@ import models.DateAndTime;
 import models.Seminar;
 import models.Session;
 import models.Evaluator;
+import models.ScheduleItem;
+import java.util.List;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -102,7 +104,12 @@ public class SessionController {
     }
 
     public void sessionSchedule() {
-
+        List<ScheduleItem> schedule = sessionDAO.getSessionSchedule();
+        System.out.println("Session Schedule:");
+        System.out.println("-----------------");
+        for (ScheduleItem item : schedule) {
+            System.out.println(item.toString());
+        }
     }
 
 }
