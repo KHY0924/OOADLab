@@ -96,3 +96,4 @@ public class Submission {
         return "Title: " + titl + ", Abstract: " + abtxt;
     }
 }
+
