@@ -78,7 +78,7 @@ public class SessionController {
         Timestamp timestamp = Timestamp.valueOf(dateTime);
         DateAndTime dateAndTime = new DateAndTime(date, time);
         try {
-            sessionDAO.updateSession(sessionID, location, dateAndTime, type);
+            sessionDAO.updateSession(sessionID, location, timestamp, type);
             System.out.println("Session has been updated: " + sessionID);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,7 +98,7 @@ public class SessionController {
         try {
             sessionDAO.deleteSession(sessionID);
             System.out.println("Session " + sessionID + "has been deleted");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error deleting the session: " + e.getMessage());
         }
     }
