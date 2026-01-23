@@ -89,10 +89,10 @@ CREATE TABLE IF NOT EXISTS presentation_boards (
 CREATE TABLE IF NOT EXISTS poster_presentations (
     presentation_id SERIAL PRIMARY KEY,
     board_id INT NOT NULL,
-    submission_id INT NOT NULL,
+    submission_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    session_id INT NOT NULL,
+    session_id UUID NOT NULL,
     status VARCHAR(50) DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (board_id) REFERENCES presentation_boards(board_id),
