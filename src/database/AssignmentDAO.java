@@ -1,18 +1,24 @@
 package database;
 
-import models.Submission;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import database.DatabaseConnection;
-import java.sql.*;
-import java.util.*;
+import models.Submission;
 
 public class AssignmentDAO {
 
     public List<Submission> getAssignmentsForEvaluator(String evaluatorId) {
         List<Submission> list = new ArrayList<>();
 
-        String sql = "SELECT s.* FROM submissions s " +
+        // Join tables to get assignments
+        // Join tables to get assignments
+        String sql = "SELECT s.*, u.username as student_name FROM submissions s " +
                 "JOIN evaluator_assignments ea ON s.submission_id = ea.submission_id " +
+                "JOIN users u ON s.student_id = u.user_id " +
                 "WHERE ea.evaluator_id = ?::uuid";
 
         try {
@@ -25,7 +31,11 @@ public class AssignmentDAO {
             while (rs.next()) {
                 String subId = rs.getString("submission_id");
                 String title = rs.getString("title");
-                list.add(new Submission(subId, title));
+                String studentName = rs.getString("student_name");
+
+                Submission sub = new Submission(subId, title);
+                sub.setStudentName(studentName);
+                list.add(sub);
             }
 
             rs.close();

@@ -1,20 +1,39 @@
 package views;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import models.User;
-import models.Session;
-import models.Material;
-import database.SubmissionDAO;
-import database.SessionDAO;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+
 import database.EvaluationDAO;
 import database.MaterialDAO;
+import database.SessionDAO;
+import database.SubmissionDAO;
+import models.Material;
+import models.Session;
+import models.User;
 
 public class StudentPanel extends JPanel {
     private MainFrame mainFrame;
@@ -91,7 +110,7 @@ public class StudentPanel extends JPanel {
         });
 
         tabbedPane.addTab("Registration", createRegistrationPanel());
-        tabbedPane.addTab("Upload Materials", createUploadPanel());
+        tabbedPane.addTab("Seminar Submission", createUploadPanel());
         tabbedPane.addTab("My Status", createStatusPanel());
 
         add(tabbedPane, BorderLayout.CENTER);
@@ -110,12 +129,12 @@ public class StudentPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        JLabel sessionLabel = new JLabel("Select Session");
+        JLabel sessionLabel = new JLabel("Select Semester");
         Theme.styleLabel(sessionLabel, false);
-        sessionCombo = new JComboBox<>();
+        String[] semesters = { "Semester 1", "Semester 2", "Semester 3" };
+        sessionCombo = new JComboBox<>(semesters);
         sessionCombo.setFont(Theme.STANDARD_FONT);
         sessionCombo.setBackground(Color.WHITE);
-        loadSessions();
 
         JLabel titleLabel = new JLabel("Research Title");
         Theme.styleLabel(titleLabel, false);
@@ -162,16 +181,15 @@ public class StudentPanel extends JPanel {
                 return;
             }
 
-            int sessionIndex = sessionCombo.getSelectedIndex();
-            if (sessionIndex < 0 || availableSessions.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please select a valid session.");
+            String selectedSemester = (String) sessionCombo.getSelectedItem();
+            if (selectedSemester == null || selectedSemester.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select a valid semester.");
                 return;
             }
-            String sessionId = availableSessions.get(sessionIndex).getSessionId();
 
             try {
                 submissionDAO.createSubmission(
-                        sessionId,
+                        selectedSemester,
                         user.getUserId(),
                         titleField.getText(),
                         abstractArea.getText(),
@@ -221,14 +239,7 @@ public class StudentPanel extends JPanel {
         return wrapper;
     }
 
-    private void loadSessions() {
-        sessionDAO.seedMockData();
-        availableSessions = sessionDAO.getAllSessions();
-        sessionCombo.removeAllItems();
-        for (Session s : availableSessions) {
-            sessionCombo.addItem(s.getLocation());
-        }
-    }
+    // Semester options are now hardcoded in createRegistrationPanel()
 
     private JPanel createUploadPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());

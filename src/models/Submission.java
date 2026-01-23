@@ -3,15 +3,16 @@ package models;
 import java.time.LocalDateTime;
 
 public class Submission {
-    private String sid;
-    private String semId;
-    private String stId;
-    private String titl;
-    private String abtxt;
-    private String sup;
-    private String pType;
-    private String fPath;
-    private LocalDateTime dl;
+    private String submissionId;
+    private String seminarId;
+    private String studentId;
+    private String studentName; // Added for display purposes
+    private String title;
+    private String abstractText;
+    private String supervisor;
+    private String presentationType;
+    private String filePath;
+    private LocalDateTime deadline;
 
     public Submission(String sid, String semId, String stId, String titl, String abtxt,
             String sup,
@@ -94,5 +95,13 @@ public class Submission {
 
     public String getDetails() {
         return "Title: " + titl + ", Abstract: " + abtxt;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 }
