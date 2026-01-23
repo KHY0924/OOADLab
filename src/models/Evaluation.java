@@ -1,6 +1,9 @@
 package models;
 
+import java.sql.Timestamp;
+
 public class Evaluation {
+    private String evaluationId;
     private String submissionId;
     private String evaluatorId;
 
@@ -11,13 +14,20 @@ public class Evaluation {
 
     private int totalScore;
     private String comments;
+    private Timestamp createdAt;
 
-    public Evaluation(String id, String submissionId, String evaluatorId, int totalScore, String comments) {
-
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int totalScore, String comments,
+                      int problemClarity, int methodology, int results, int presentation, Timestamp createdAt) {
+        this.evaluationId = evaluationId;
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
         this.totalScore = totalScore;
         this.comments = comments;
+        this.problemClarityScore = problemClarity;
+        this.methodologyScore = methodology;
+        this.resultsScore = results;
+        this.presentationScore = presentation;
+        this.createdAt = createdAt;
     }
 
     public Evaluation(String submissionId, String evaluatorId) {
@@ -91,5 +101,13 @@ public class Evaluation {
 
     public int getPresentationScore() {
         return presentationScore;
+    }
+
+    public String getEvaluationId() {
+        return evaluationId;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 }
