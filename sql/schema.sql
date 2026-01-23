@@ -98,3 +98,4 @@ CREATE TABLE IF NOT EXISTS schedule (
     venue VARCHAR(100),
     created_at TIMESTAMP DEFAULT NOW()
 );
+
