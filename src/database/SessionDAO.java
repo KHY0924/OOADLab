@@ -91,7 +91,7 @@ public class SessionDAO {
     }
 
     public void updateSession(String sessionID, String location, Timestamp date, String type) throws SQLException {
-        String sql = "UPDATE session SET location = ?, session_date = ?, type = ?";
+        String sql = "UPDATE sessions SET location = ?, session_date = ?, type = ? WHERE session_id = ?::uuid";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, location);
