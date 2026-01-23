@@ -3,8 +3,11 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import models.Session;
 import models.Seminar;
+import models.ScheduleItem;
 
 public class SessionDAO {
 
@@ -135,6 +138,33 @@ public class SessionDAO {
         }
         subRs.close();
         subStmt.close();
+    }
+
+    public List<ScheduleItem> getSessionSchedule() {
+        List<ScheduleItem> schedule = new ArrayList<>();
+        String sql = "SELECT s.session_id, s.session_date, s.location, ss.student_id, ea.evaluator_id " +
+                     "FROM sessions s " +
+                     "JOIN session_students ss ON s.session_id = ss.session_id " +
+                     "JOIN submissions sub ON ss.student_id = sub.student_id " +
+                     "JOIN evaluator_assignments ea ON sub.submission_id = ea.submission_id";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String sessionID = rs.getString("session_id");
+                Timestamp sessionDate = rs.getTimestamp("session_date");
+                LocalDate date = sessionDate.toLocalDateTime().toLocalDate();
+                LocalTime time = sessionDate.toLocalDateTime().toLocalTime();
+                String venue = rs.getString("location");
+                String evaluatorID = rs.getString("evaluator_id");
+                String studentID = rs.getString("student_id");
+                schedule.add(new ScheduleItem(sessionID, date, time, venue, evaluatorID, studentID));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return schedule;
     }
 
 }
