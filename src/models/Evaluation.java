@@ -1,64 +1,24 @@
 package models;
 
 public class Evaluation {
+    private String evaluationId;
     private String submissionId;
     private String evaluatorId;
-
-    private int problemClarityScore;
-    private int methodologyScore;
-    private int resultsScore;
-    private int presentationScore;
-
-    private int totalScore;
+    private int score; // 1-10
+    private String presentationType; 
     private String comments;
 
-    public Evaluation(String id, String submissionId, String evaluatorId, int totalScore, String comments) {
-
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId,
+                     int score, String presentationType) {
+        this.evaluationId = evaluationId;
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
-        this.totalScore = totalScore;
-        this.comments = comments;
+        this.score = score;
+        this.presentationType = presentationType;
     }
 
-    public Evaluation(String submissionId, String evaluatorId) {
-        this.submissionId = submissionId;
-        this.evaluatorId = evaluatorId;
-    }
-
-    public void setRubricScores(int problem, int method, int results, int presentation) {
-        this.problemClarityScore = problem;
-        this.methodologyScore = method;
-        this.resultsScore = results;
-        this.presentationScore = presentation;
-        calculateTotal();
-    }
-
-    public void setProblemClarityScore(int score) {
-        this.problemClarityScore = score;
-        calculateTotal();
-    }
-
-    public void setMethodologyScore(int score) {
-        this.methodologyScore = score;
-        calculateTotal();
-    }
-
-    public void setResultsScore(int score) {
-        this.resultsScore = score;
-        calculateTotal();
-    }
-
-    public void setPresentationScore(int score) {
-        this.presentationScore = score;
-        calculateTotal();
-    }
-
-    private void calculateTotal() {
-        this.totalScore = problemClarityScore + methodologyScore + resultsScore + presentationScore;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
+    public String getEvaluationId() {
+        return evaluationId;
     }
 
     public String getSubmissionId() {
@@ -69,27 +29,42 @@ public class Evaluation {
         return evaluatorId;
     }
 
-    public int getTotalScore() {
-        return totalScore;
+    public int getScore() {
+        return score;
+    }
+
+    public String getPresentationType() {
+        return presentationType;
     }
 
     public String getComments() {
         return comments;
     }
 
-    public int getProblemClarityScore() {
-        return problemClarityScore;
+    // Setters
+    public void setScore(int score) {
+        if (score >= 1 && score <= 10) {
+            this.score = score;
+        }
     }
 
-    public int getMethodologyScore() {
-        return methodologyScore;
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
-    public int getResultsScore() {
-        return resultsScore;
+    public void setProblemClarityScore(int score) {
+        setScore(score);
     }
 
-    public int getPresentationScore() {
-        return presentationScore;
+    public void setMethodologyScore(int score) {
+        setScore(score);
+    }
+
+    public void setResultsScore(int score) {
+        setScore(score);
+    }
+
+    public void setPresentationScore(int score) {
+        setScore(score);
     }
 }

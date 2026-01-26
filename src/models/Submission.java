@@ -14,87 +14,86 @@ public class Submission {
     private String filePath;
     private LocalDateTime deadline;
 
-    public Submission(String sid, String semId, String stId, String titl, String abtxt,
-            String sup,
-            String pType) {
-        this.sid = sid;
-        this.semId = semId;
-        this.stId = stId;
-        this.titl = titl;
-        this.abtxt = abtxt;
-        this.sup = sup;
-        this.pType = pType;
-        this.dl = LocalDateTime.now().plusDays(2);
+    public Submission(String submissionId, String seminarId, String studentId, String title, String abstractText,
+            String supervisor, String presentationType) {
+        this.submissionId = submissionId;
+        this.seminarId = seminarId;
+        this.studentId = studentId;
+        this.title = title;
+        this.abstractText = abstractText;
+        this.supervisor = supervisor;
+        this.presentationType = presentationType;
+        this.deadline = LocalDateTime.now().plusDays(2);
     }
 
-    public Submission(String sid, String titl) {
-        this.sid = sid;
-        this.titl = titl;
+    public Submission(String submissionId, String title) {
+        this.submissionId = submissionId;
+        this.title = title;
     }
 
-    public static Submission findByStudentId(String stId) {
+    public static Submission findByStudentId(String studentId) {
         return null;
     }
 
-    public boolean validateUpload(String fPath) {
-        return fPath.endsWith(".pdf") || fPath.endsWith(".ppt");
+    public boolean validateUpload(String filePath) {
+        return filePath != null && (filePath.endsWith(".pdf") || filePath.endsWith(".ppt"));
     }
 
-    public void saveFilePath(String fPath) {
-        this.fPath = fPath;
+    public void saveFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public boolean checkDeadline() {
-        return LocalDateTime.now().isBefore(this.dl);
+        return LocalDateTime.now().isBefore(this.deadline);
     }
 
-    public void saveUpdatedSubmission(String titl, String abtxt) {
-        this.titl = titl;
-        this.abtxt = abtxt;
+    public void saveUpdatedSubmission(String title, String abstractText) {
+        this.title = title;
+        this.abstractText = abstractText;
     }
 
     public String getSubmissionId() {
-        return sid;
+        return submissionId;
     }
 
     public String getId() {
-        return sid;
+        return submissionId;
     }
 
     public String getSeminarId() {
-        return semId;
+        return seminarId;
     }
 
     public String getStudentId() {
-        return stId;
+        return studentId;
     }
 
     public String getTitle() {
-        return titl;
+        return title;
     }
 
     public String getAbstractText() {
-        return abtxt;
+        return abstractText;
     }
 
     public String getSupervisor() {
-        return sup;
+        return supervisor;
     }
 
     public String getPresentationType() {
-        return pType;
+        return presentationType;
     }
 
     public String getFilePath() {
-        return fPath;
+        return filePath;
     }
 
     public LocalDateTime getDeadline() {
-        return dl;
+        return deadline;
     }
 
     public String getDetails() {
-        return "Title: " + titl + ", Abstract: " + abtxt;
+        return "Title: " + title + ", Abstract: " + abstractText;
     }
 
     public String getStudentName() {
@@ -103,5 +102,15 @@ public class Submission {
 
     public void setStudentName(String studentName) {
         this.studentName = studentName;
+    }
+
+    @Override
+    public String toString() {
+        return "Submission{" +
+                "submissionId='" + submissionId + '\'' +
+                ", title='" + title + '\'' +
+                ", studentName='" + studentName + '\'' +
+                ", presentationType='" + presentationType + '\'' +
+                '}';
     }
 }
