@@ -1,6 +1,7 @@
 package models;
 
 import java.util.UUID;
+import java.sql.Timestamp;
 
 public class Evaluation {
     private String evaluationId;
@@ -12,10 +13,10 @@ public class Evaluation {
     private int presentation;
     private int overallScore;
     private String comments;
+    private Timestamp createdAt;
 
-    public Evaluation(String evaluationId, String submissionId, String evaluatorId,
-            int problemClarity, int methodology, int results, int presentation,
-            int overallScore, String comments) {
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int overallScore, String comments,
+            int problemClarity, int methodology, int results, int presentation, Timestamp createdAt) {
         this.evaluationId = evaluationId;
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
@@ -25,6 +26,15 @@ public class Evaluation {
         this.presentation = presentation;
         this.overallScore = overallScore;
         this.comments = comments;
+        this.createdAt = createdAt;
+    }
+
+    // Comprehensive constructor without Timestamp (for new evaluations)
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId,
+            int problemClarity, int methodology, int results, int presentation,
+            int overallScore, String comments) {
+        this(evaluationId, submissionId, evaluatorId, overallScore, comments,
+                problemClarity, methodology, results, presentation, new Timestamp(System.currentTimeMillis()));
     }
 
     public Evaluation(String submissionId, String evaluatorId) {
@@ -123,5 +133,9 @@ public class Evaluation {
 
     public int getPresentationScore() {
         return presentation;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 }

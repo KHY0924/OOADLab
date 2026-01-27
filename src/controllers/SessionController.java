@@ -8,6 +8,8 @@ import models.DateAndTime;
 import models.Seminar;
 import models.Session;
 import models.Evaluator;
+import models.ScheduleItem;
+import java.util.List;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -76,7 +78,7 @@ public class SessionController {
         Timestamp timestamp = Timestamp.valueOf(dateTime);
         DateAndTime dateAndTime = new DateAndTime(date, time);
         try {
-            sessionDAO.updateSession(sessionID, location, dateAndTime, type);
+            sessionDAO.updateSession(sessionID, location, timestamp, type);
             System.out.println("Session has been updated: " + sessionID);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -96,13 +98,18 @@ public class SessionController {
         try {
             sessionDAO.deleteSession(sessionID);
             System.out.println("Session " + sessionID + "has been deleted");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error deleting the session: " + e.getMessage());
         }
     }
 
     public void sessionSchedule() {
-
+        List<ScheduleItem> schedule = sessionDAO.getSessionSchedule();
+        System.out.println("Session Schedule:");
+        System.out.println("-----------------");
+        for (ScheduleItem item : schedule) {
+            System.out.println(item.toString());
+        }
     }
 
 }

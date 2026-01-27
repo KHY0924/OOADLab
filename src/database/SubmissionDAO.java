@@ -1,6 +1,9 @@
 package database;
 
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+import models.Submission;
 
 public class SubmissionDAO {
 
@@ -62,5 +65,28 @@ public class SubmissionDAO {
         Connection conn = DatabaseConnection.getConnection();
         Statement stmt = conn.createStatement();
         return stmt.executeQuery(sql);
+    }
+
+    public List<Submission> getAllSubmissionsList() {
+        List<Submission> submissions = new ArrayList<>();
+        String sql = "SELECT * FROM submissions";
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String submissionId = rs.getString("submission_id");
+                String seminarId = rs.getString("seminar_id");
+                String studentId = rs.getString("student_id");
+                String title = rs.getString("title");
+                String abstractText = rs.getString("abstract_text");
+                String supervisor = rs.getString("supervisor");
+                String presentationType = rs.getString("presentation_type");
+                submissions.add(new Submission(submissionId, seminarId, studentId, title, abstractText, supervisor,
+                        presentationType));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return submissions;
     }
 }

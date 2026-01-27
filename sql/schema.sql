@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS student_profiles (
 -- Submissions table (FIXED: status column added here)
 CREATE TABLE IF NOT EXISTS submissions (
     submission_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    seminar_id VARCHAR(50) NOT NULL,
+    seminar_id UUID REFERENCES Seminars(seminar_id) ON DELETE CASCADE,
     student_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
     title VARCHAR(255),
     abstract_text TEXT,
@@ -29,6 +29,17 @@ CREATE TABLE IF NOT EXISTS submissions (
     file_path VARCHAR(500),
     status VARCHAR(50) DEFAULT 'SUBMITTED',
     deadline TIMESTAMP DEFAULT (NOW() + INTERVAL '2 days'),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Materials table
+CREATE TABLE IF NOT EXISTS materials (
+    material_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE,
+    file_name VARCHAR(255),
+    file_type VARCHAR(50),
+    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    file_path VARCHAR(500),
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -112,4 +123,16 @@ CREATE TABLE IF NOT EXISTS evaluation_criteria (
     weight INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (presentation_id) REFERENCES poster_presentations(presentation_id)
+);
+
+-- Schedule table to store session schedules
+CREATE TABLE IF NOT EXISTS schedule (
+    schedule_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID REFERENCES sessions(session_id) ON DELETE CASCADE,
+    student_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    scheduled_date DATE,
+    scheduled_time TIME,
+    venue VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW()
 );

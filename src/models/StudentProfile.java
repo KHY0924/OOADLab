@@ -41,3 +41,4 @@ public class StudentProfile {
         return "Profile [Name=" + fullName + ", Major=" + major + "]";
     }
 }
+
