@@ -1,20 +1,34 @@
 package models;
 
+import java.util.UUID;
+
 public class Evaluation {
     private String evaluationId;
     private String submissionId;
     private String evaluatorId;
-    private int score;
-    private String presentationType; 
+    private int problemClarity;
+    private int methodology;
+    private int results;
+    private int presentation;
+    private int overallScore;
     private String comments;
 
     public Evaluation(String evaluationId, String submissionId, String evaluatorId,
-                     int score, String presentationType) {
+            int problemClarity, int methodology, int results, int presentation,
+            int overallScore, String comments) {
         this.evaluationId = evaluationId;
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
-        this.score = score;
-        this.presentationType = presentationType;
+        this.problemClarity = problemClarity;
+        this.methodology = methodology;
+        this.results = results;
+        this.presentation = presentation;
+        this.overallScore = overallScore;
+        this.comments = comments;
+    }
+
+    public Evaluation(String submissionId, String evaluatorId) {
+        this(UUID.randomUUID().toString(), submissionId, evaluatorId, 0, 0, 0, 0, 0, "");
     }
 
     public String getEvaluationId() {
@@ -29,42 +43,85 @@ public class Evaluation {
         return evaluatorId;
     }
 
-    public int getScore() {
-        return score;
+    public int getProblemClarity() {
+        return problemClarity;
     }
 
-    public String getPresentationType() {
-        return presentationType;
+    public int getMethodology() {
+        return methodology;
+    }
+
+    public int getResults() {
+        return results;
+    }
+
+    public int getPresentation() {
+        return presentation;
+    }
+
+    public int getOverallScore() {
+        return overallScore;
     }
 
     public String getComments() {
         return comments;
     }
 
-    // Setters
-    public void setScore(int score) {
-        if (score >= 1 && score <= 10) {
-            this.score = score;
-        }
+    public void setProblemClarity(int s) {
+        this.problemClarity = s;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setMethodology(int s) {
+        this.methodology = s;
     }
 
-    public void setProblemClarityScore(int score) {
-        setScore(score);
+    public void setResults(int s) {
+        this.results = s;
     }
 
-    public void setMethodologyScore(int score) {
-        setScore(score);
+    public void setPresentation(int s) {
+        this.presentation = s;
     }
 
-    public void setResultsScore(int score) {
-        setScore(score);
+    public void setOverallScore(int s) {
+        this.overallScore = s;
     }
 
-    public void setPresentationScore(int score) {
-        setScore(score);
+    public void setComments(String c) {
+        this.comments = c;
+    }
+
+    // Helper to set all at once from EvaluatorPanel
+    public void setRubricScores(int s1, int s2, int s3, int s4) {
+        this.problemClarity = s1;
+        this.methodology = s2;
+        this.results = s3;
+        this.presentation = s4;
+        this.overallScore = (s1 + s2 + s3 + s4) / 4; // Or keep separate overall if needed
+    }
+
+    // Legacy support for other components
+    public int getScore() {
+        return overallScore;
+    }
+
+    public int getTotalScore() {
+        return overallScore;
+    }
+
+    public int getProblemClarityScore() {
+        return problemClarity;
+    }
+
+    public int getMethodologyScore() {
+        return methodology;
+    }
+
+    public int getResultsScore() {
+        return results;
+    }
+
+    public int getPresentationScore() {
+        return presentation;
     }
 }

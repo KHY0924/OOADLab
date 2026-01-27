@@ -56,4 +56,11 @@ public class SubmissionDAO {
             stmt.executeUpdate();
         }
     }
+
+    public ResultSet getAllSubmissions() throws SQLException {
+        String sql = "SELECT s.*, u.username as student_name FROM submissions s JOIN users u ON s.student_id = u.user_id";
+        Connection conn = DatabaseConnection.getConnection();
+        Statement stmt = conn.createStatement();
+        return stmt.executeQuery(sql);
+    }
 }

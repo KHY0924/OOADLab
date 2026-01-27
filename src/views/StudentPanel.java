@@ -350,7 +350,8 @@ public class StudentPanel extends JPanel {
         wrapper.setBackground(Theme.BG_COLOR);
         wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        String[] columns = { "Registration ID", "Research Title", "Supervisor", "Presentation Type", "Status" };
+        String[] columns = { "Registration ID", "Research Title", "Supervisor", "Type", "Venue", "Time", "Board",
+                "Status" };
         statusModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -386,10 +387,23 @@ public class StudentPanel extends JPanel {
                 String supervisor = rs.getString("supervisor");
                 String type = rs.getString("presentation_type");
 
+                // Get Session Info
+                String venue = "Not Assigned";
+                String time = "-";
+                try (ResultSet rsSess = sessionDAO.findSessionsByStudent(user.getUserId())) {
+                    if (rsSess.next()) {
+                        venue = rsSess.getString("location");
+                        time = rsSess.getTimestamp("session_date").toString();
+                    }
+                }
+
+                // Get Board ID (dummy logic or from DB if column added)
+                String board = type.contains("Poster") ? "TBD" : "-";
+
                 boolean isEvaluated = evaluationDAO.isEvaluated(subId);
                 String status = isEvaluated ? "Graded \u2705" : "Pending \u23F3";
 
-                statusModel.addRow(new Object[] { subId, title, supervisor, type, status });
+                statusModel.addRow(new Object[] { subId, title, supervisor, type, venue, time, board, status });
             }
             rs.close();
         } catch (SQLException e) {

@@ -24,4 +24,12 @@ public class UserDAO {
         pst.setString(1, uname);
         return pst.executeQuery();
     }
+
+    public ResultSet getUsersByRole(String role) throws SQLException {
+        String q = "SELECT * FROM users WHERE role = ?";
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement pst = con.prepareStatement(q);
+        pst.setString(1, role);
+        return pst.executeQuery();
+    }
 }

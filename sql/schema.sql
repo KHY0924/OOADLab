@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location VARCHAR(100),
     session_date TIMESTAMP,
+    session_type VARCHAR(50) DEFAULT 'Oral Presentation',
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -67,11 +68,11 @@ CREATE TABLE IF NOT EXISTS evaluations (
     evaluation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE,
     evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
-    score INT,
     comments TEXT,
-    originality INT,
-    clarity INT,
-    content INT,
+    problem_clarity INT,
+    methodology INT,
+    results INT,
+    presentation INT,
     overall_score INT,
     created_at TIMESTAMP DEFAULT NOW()
 );

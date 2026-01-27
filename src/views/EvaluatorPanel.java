@@ -186,7 +186,7 @@ public class EvaluatorPanel extends JPanel {
         gbc.gridy++;
         formContent.add(createSliderPanel("Results (0-10)", resultsSlider), gbc);
         gbc.gridy++;
-        formContent.add(createSliderPanel("Presentation Quality (0-10)", presentationSlider), gbc);
+        formContent.add(createSliderPanel("Presentation (0-10)", presentationSlider), gbc);
 
         gbc.gridy++;
         JLabel commentLabel = new JLabel("Comments");
@@ -217,14 +217,13 @@ public class EvaluatorPanel extends JPanel {
                     java.util.UUID.randomUUID().toString(),
                     currentSubmissionId,
                     user.getUserId(),
-                    problemSlider.getValue() + methodSlider.getValue() + resultsSlider.getValue()
-                            + presentationSlider.getValue(),
+                    problemSlider.getValue(),
+                    methodSlider.getValue(),
+                    resultsSlider.getValue(),
+                    presentationSlider.getValue(),
+                    (problemSlider.getValue() + methodSlider.getValue() + resultsSlider.getValue()
+                            + presentationSlider.getValue()) / 4,
                     commentArea.getText());
-
-            eval.setProblemClarityScore(problemSlider.getValue());
-            eval.setMethodologyScore(methodSlider.getValue());
-            eval.setResultsScore(resultsSlider.getValue());
-            eval.setPresentationScore(presentationSlider.getValue());
 
             evaluationDAO.saveEvaluation(eval);
 

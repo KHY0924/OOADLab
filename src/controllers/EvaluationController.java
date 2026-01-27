@@ -41,8 +41,15 @@ public class EvaluationController {
     }
 
     public void generateAward(String submissionID) {
-        highestOralMarks(submissionID);
-        highestPosterMarks(submissionID);
-        highestOverallMarks(submissionID);
+        // Implementation of awards logic can be added here or call services
+    }
+
+    private void highestOralMarks(String submissionID) {
+    }
+
+    private void highestPosterMarks(String submissionID) {
+    }
+
+    private void highestOverallMarks(String submissionID) {
     }
 }
