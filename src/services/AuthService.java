@@ -11,22 +11,26 @@ public class AuthService {
     private StudentProfileDAO pDao = new StudentProfileDAO();
 
     public User login(String username, String password) {
+        System.out.println("[AuthService] Attempting login for user: " + username);
         String q = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try {
-            Connection con = DatabaseConnection.getConnection();
-            PreparedStatement pst = con.prepareStatement(q);
+        try (Connection con = DatabaseConnection.getConnection();
+                PreparedStatement pst = con.prepareStatement(q)) {
+
             pst.setString(1, username);
             pst.setString(2, password);
-            ResultSet res = pst.executeQuery();
-            if (res.next()) {
-                String uid = res.getString("user_id");
-                String un = res.getString("username");
-                String r = res.getString("role");
-                return new User(uid, un, password, r);
+
+            try (ResultSet res = pst.executeQuery()) {
+                if (res.next()) {
+                    String uid = res.getString("user_id");
+                    String un = res.getString("username");
+                    String r = res.getString("role");
+                    System.out.println("[AuthService] Login successful for: " + username + " (Role: " + r + ")");
+                    return new User(uid, un, password, r);
+                }
             }
-            res.close();
-            pst.close();
+            System.out.println("[AuthService] Login failed for: " + username + " (Invalid credentials)");
         } catch (SQLException e) {
+            System.err.println("[AuthService] Database error during login: " + e.getMessage());
             e.printStackTrace();
         }
         return null;

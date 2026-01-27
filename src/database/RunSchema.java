@@ -33,10 +33,18 @@ public class RunSchema {
             }
 
             String sql = sqlBuilder.toString();
+            String[] statements = sql.split(";");
 
-            System.out.println("Executing SQL...");
-            stmt.execute(sql);
-            System.out.println("Schema executed successfully!");
+            System.out.println("Executing SQL statements...");
+            int count = 0;
+            for (String s : statements) {
+                String trimmed = s.trim();
+                if (!trimmed.isEmpty()) {
+                    stmt.execute(trimmed);
+                    count++;
+                }
+            }
+            System.out.println("Executed " + count + " SQL statements successfully!");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -43,7 +43,7 @@ public class MockDataGenerator {
             createProfile(conn, stud3Id, "Student Three", "stud3@example.com", "Physics");
 
             // 5. Create Seminar
-            String semId = "SEM-2026-A";
+            String semId = UUID.randomUUID().toString();
             createSeminar(conn, semId, "Grand Hall", Timestamp.valueOf("2026-06-01 09:00:00"));
 
             // 6. Create Sessions
@@ -127,25 +127,10 @@ public class MockDataGenerator {
     private static void createSeminar(Connection conn, String id, String loc, Timestamp t) throws SQLException {
         String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date) VALUES (?::uuid, ?, ?) ON CONFLICT DO NOTHING";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            // Need a valid UUID or use gen_random_uuid in SQL
-            // For seminar_id VARCHAR(50) in schema.sql but it is used as UUID PK?
-            // Actually schema.sql says: seminar_id UUID PRIMARY KEY DEFAULT
-            // gen_random_uuid()
-            // Wait, line 23 says VARCHAR(50) in submissions but line 37 says UUID in
-            // Seminars.
-            // Let's use a UUID for safety.
-            stmt.setString(1, UUID.randomUUID().toString());
+            stmt.setString(1, id);
             stmt.setString(2, loc);
             stmt.setTimestamp(3, t);
             stmt.executeUpdate();
-        } catch (Exception e) {
-            // Fallback if seminar_id is NOT a UUID in some contexts
-            String sql2 = "INSERT INTO Seminars (location, seminar_date) VALUES (?, ?) ON CONFLICT DO NOTHING";
-            try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
-                stmt2.setString(1, loc);
-                stmt2.setTimestamp(2, t);
-                stmt2.executeUpdate();
-            }
         }
     }
 
@@ -163,7 +148,7 @@ public class MockDataGenerator {
 
     private static void createSubmission(Connection conn, String subId, String semId, String studId, String title,
             String abstractText, String supervisor, String type, String status) throws SQLException {
-        String sql = "INSERT INTO submissions (submission_id, seminar_id, student_id, title, abstract_text, supervisor, presentation_type, status) VALUES (?::uuid, ?, ?::uuid, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING";
+        String sql = "INSERT INTO submissions (submission_id, seminar_id, student_id, title, abstract_text, supervisor, presentation_type, status) VALUES (?::uuid, ?::uuid, ?::uuid, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, subId);
             stmt.setString(2, semId);
