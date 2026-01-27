@@ -77,8 +77,8 @@ public class LoginPanel extends JPanel {
         card.add(registerButton, gbc);
 
         loginButton.addActionListener(e -> {
-            String username = userField.getText();
-            String password = new String(passField.getPassword());
+            String username = userField.getText().trim();
+            String password = new String(passField.getPassword()).trim();
 
             User user = authService.login(username, password);
 

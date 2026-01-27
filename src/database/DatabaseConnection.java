@@ -62,7 +62,9 @@ public class DatabaseConnection {
     public static boolean testConnection() {
         try {
             Connection conn = getConnection();
-            return conn != null && !conn.isClosed();
+            boolean isValid = conn != null && !conn.isClosed();
+            conn.close();
+            return isValid;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

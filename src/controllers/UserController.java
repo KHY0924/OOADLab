@@ -2,6 +2,7 @@ package controllers;
 
 import database.UserDAO;
 import database.StudentProfileDAO;
+import services.AuthService;
 import java.sql.SQLException;
 
 public class UserController {
@@ -9,8 +10,13 @@ public class UserController {
     private StudentProfileDAO profileDAO = new StudentProfileDAO();
 
     public void login(String username, String password) {
-
-        System.out.println("Login check for: " + username);
+        AuthService authService = new AuthService();
+        models.User user = authService.login(username, password);
+        if (user != null) {
+            System.out.println("Login success in Controller for: " + username);
+        } else {
+            System.out.println("Login failure in Controller for: " + username);
+        }
     }
 
     public void registerUser(String username, String password, String fullName, String email, String major) {
@@ -33,4 +39,3 @@ public class UserController {
 
     }
 }
-

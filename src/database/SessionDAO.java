@@ -22,7 +22,7 @@ public class SessionDAO {
                 String id = rs.getString("session_id");
                 String loc = rs.getString("location");
                 Timestamp date = rs.getTimestamp("session_date");
-                String type = rs.getString("type");
+                String type = rs.getString("session_type");
                 sessions.add(new Session(id, loc, new models.DateAndTime(date.toLocalDateTime().toLocalDate(),
                         date.toLocalDateTime().toLocalTime()), type));
             }
@@ -33,7 +33,7 @@ public class SessionDAO {
     }
 
     public void createSession(String sessionId, String location, Timestamp date, String type) throws SQLException {
-        String sql = "INSERT INTO sessions (session_id, location, session_date, type) VALUES (?::uuid, ?, ?)";
+        String sql = "INSERT INTO sessions (session_id, location, session_date, session_type) VALUES (?::uuid, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, sessionId);
@@ -91,12 +91,13 @@ public class SessionDAO {
     }
 
     public void updateSession(String sessionID, String location, Timestamp date, String type) throws SQLException {
-        String sql = "UPDATE sessions SET location = ?, session_date = ?, type = ? WHERE session_id = ?::uuid";
+        String sql = "UPDATE sessions SET location = ?, session_date = ?, session_type = ? WHERE session_id = ?::uuid";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, location);
             stmt.setTimestamp(2, date);
             stmt.setString(3, type);
+            stmt.setString(4, sessionID);
             stmt.executeUpdate();
         }
     }
@@ -143,13 +144,13 @@ public class SessionDAO {
     public List<ScheduleItem> getSessionSchedule() {
         List<ScheduleItem> schedule = new ArrayList<>();
         String sql = "SELECT s.session_id, s.session_date, s.location, ss.student_id, ea.evaluator_id " +
-                     "FROM sessions s " +
-                     "JOIN session_students ss ON s.session_id = ss.session_id " +
-                     "JOIN submissions sub ON ss.student_id = sub.student_id " +
-                     "JOIN evaluator_assignments ea ON sub.submission_id = ea.submission_id";
+                "FROM sessions s " +
+                "JOIN session_students ss ON s.session_id = ss.session_id " +
+                "JOIN submissions sub ON ss.student_id = sub.student_id " +
+                "JOIN evaluator_assignments ea ON sub.submission_id = ea.submission_id";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 String sessionID = rs.getString("session_id");

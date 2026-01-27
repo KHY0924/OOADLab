@@ -1,8 +1,6 @@
 package database;
 
 import models.Evaluation;
-
-import database.DatabaseConnection;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -10,27 +8,24 @@ import java.util.ArrayList;
 public class EvaluationDAO {
 
     public void saveEvaluation(Evaluation evaluation) {
+        String sql = "INSERT INTO evaluations (submission_id, evaluator_id, problem_clarity, methodology, results, presentation, overall_score, comments) "
+                +
+                "VALUES (?::uuid, ?::uuid, ?, ?, ?, ?, ?, ?)";
 
-        String sql = "INSERT INTO evaluations (submission_id, evaluator_id, score, comments, problem_clarity, methodology, results, presentation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        try {
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-
-            stmt.setObject(1, java.util.UUID.fromString(evaluation.getSubmissionId()));
-            stmt.setObject(2, java.util.UUID.fromString(evaluation.getEvaluatorId()));
-            stmt.setInt(3, evaluation.getTotalScore());
-            stmt.setString(4, evaluation.getComments());
-
-            stmt.setInt(5, evaluation.getProblemClarityScore());
-            stmt.setInt(6, evaluation.getMethodologyScore());
-            stmt.setInt(7, evaluation.getResultsScore());
-            stmt.setInt(8, evaluation.getPresentationScore());
+            stmt.setString(1, evaluation.getSubmissionId());
+            stmt.setString(2, evaluation.getEvaluatorId());
+            stmt.setInt(3, evaluation.getProblemClarity());
+            stmt.setInt(4, evaluation.getMethodology());
+            stmt.setInt(5, evaluation.getResults());
+            stmt.setInt(6, evaluation.getPresentation());
+            stmt.setInt(7, evaluation.getOverallScore());
+            stmt.setString(8, evaluation.getComments());
 
             stmt.executeUpdate();
             System.out.println("Success: Evaluation saved to Database!");
-
-            stmt.close();
 
         } catch (SQLException e) {
             e.printStackTrace();

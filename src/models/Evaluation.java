@@ -1,74 +1,48 @@
 package models;
 
+import java.util.UUID;
 import java.sql.Timestamp;
 
 public class Evaluation {
     private String evaluationId;
     private String submissionId;
     private String evaluatorId;
-
-    private int problemClarityScore;
-    private int methodologyScore;
-    private int resultsScore;
-    private int presentationScore;
-
-    private int totalScore;
+    private int problemClarity;
+    private int methodology;
+    private int results;
+    private int presentation;
+    private int overallScore;
     private String comments;
     private Timestamp createdAt;
 
-    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int totalScore, String comments,
-                      int problemClarity, int methodology, int results, int presentation, Timestamp createdAt) {
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int overallScore, String comments,
+            int problemClarity, int methodology, int results, int presentation, Timestamp createdAt) {
         this.evaluationId = evaluationId;
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
-        this.totalScore = totalScore;
+        this.problemClarity = problemClarity;
+        this.methodology = methodology;
+        this.results = results;
+        this.presentation = presentation;
+        this.overallScore = overallScore;
         this.comments = comments;
-        this.problemClarityScore = problemClarity;
-        this.methodologyScore = methodology;
-        this.resultsScore = results;
-        this.presentationScore = presentation;
         this.createdAt = createdAt;
     }
 
+    // Comprehensive constructor without Timestamp (for new evaluations)
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId,
+            int problemClarity, int methodology, int results, int presentation,
+            int overallScore, String comments) {
+        this(evaluationId, submissionId, evaluatorId, overallScore, comments,
+                problemClarity, methodology, results, presentation, new Timestamp(System.currentTimeMillis()));
+    }
+
     public Evaluation(String submissionId, String evaluatorId) {
-        this.submissionId = submissionId;
-        this.evaluatorId = evaluatorId;
+        this(UUID.randomUUID().toString(), submissionId, evaluatorId, 0, 0, 0, 0, 0, "");
     }
 
-    public void setRubricScores(int problem, int method, int results, int presentation) {
-        this.problemClarityScore = problem;
-        this.methodologyScore = method;
-        this.resultsScore = results;
-        this.presentationScore = presentation;
-        calculateTotal();
-    }
-
-    public void setProblemClarityScore(int score) {
-        this.problemClarityScore = score;
-        calculateTotal();
-    }
-
-    public void setMethodologyScore(int score) {
-        this.methodologyScore = score;
-        calculateTotal();
-    }
-
-    public void setResultsScore(int score) {
-        this.resultsScore = score;
-        calculateTotal();
-    }
-
-    public void setPresentationScore(int score) {
-        this.presentationScore = score;
-        calculateTotal();
-    }
-
-    private void calculateTotal() {
-        this.totalScore = problemClarityScore + methodologyScore + resultsScore + presentationScore;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
+    public String getEvaluationId() {
+        return evaluationId;
     }
 
     public String getSubmissionId() {
@@ -79,32 +53,86 @@ public class Evaluation {
         return evaluatorId;
     }
 
-    public int getTotalScore() {
-        return totalScore;
+    public int getProblemClarity() {
+        return problemClarity;
+    }
+
+    public int getMethodology() {
+        return methodology;
+    }
+
+    public int getResults() {
+        return results;
+    }
+
+    public int getPresentation() {
+        return presentation;
+    }
+
+    public int getOverallScore() {
+        return overallScore;
     }
 
     public String getComments() {
         return comments;
     }
 
+    public void setProblemClarity(int s) {
+        this.problemClarity = s;
+    }
+
+    public void setMethodology(int s) {
+        this.methodology = s;
+    }
+
+    public void setResults(int s) {
+        this.results = s;
+    }
+
+    public void setPresentation(int s) {
+        this.presentation = s;
+    }
+
+    public void setOverallScore(int s) {
+        this.overallScore = s;
+    }
+
+    public void setComments(String c) {
+        this.comments = c;
+    }
+
+    // Helper to set all at once from EvaluatorPanel
+    public void setRubricScores(int s1, int s2, int s3, int s4) {
+        this.problemClarity = s1;
+        this.methodology = s2;
+        this.results = s3;
+        this.presentation = s4;
+        this.overallScore = (s1 + s2 + s3 + s4) / 4; // Or keep separate overall if needed
+    }
+
+    // Legacy support for other components
+    public int getScore() {
+        return overallScore;
+    }
+
+    public int getTotalScore() {
+        return overallScore;
+    }
+
     public int getProblemClarityScore() {
-        return problemClarityScore;
+        return problemClarity;
     }
 
     public int getMethodologyScore() {
-        return methodologyScore;
+        return methodology;
     }
 
     public int getResultsScore() {
-        return resultsScore;
+        return results;
     }
 
     public int getPresentationScore() {
-        return presentationScore;
-    }
-
-    public String getEvaluationId() {
-        return evaluationId;
+        return presentation;
     }
 
     public Timestamp getCreatedAt() {

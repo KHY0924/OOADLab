@@ -1,0 +1,31 @@
+========================================
+OVERALL SEMINAR SUMMARY REPORT
+========================================
+
+Report ID: a836f88f-7320-45e1-96d6-d622df20715d
+Generated: 2026-01-27 22:49:47
+
+SEMINAR INFORMATION
+-------------------
+Seminar Title: Test Seminar
+Seminar ID: SEM-2024-REPORTS
+Total Students: 6
+Total Sessions: 2
+Overall Average Score: 88.00/100
+
+AWARD WINNERS
+-------------------
+Best Oral Presentation
+  Winner: Liam Anderson
+  Submission: Oral Presentation 2
+
+Best Poster Presentation
+  Winner: Noah Martinez
+  Submission: Poster Presentation 2
+
+People's Choice
+  Winner: Emma Wilson
+  Submission: Oral Presentation 1
+
+
+========================================

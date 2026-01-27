@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS student_profiles (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Submissions table
+-- Submissions table (FIXED: status column added here)
 CREATE TABLE IF NOT EXISTS submissions (
     submission_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     seminar_id UUID REFERENCES Seminars(seminar_id) ON DELETE CASCADE,
@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS submissions (
     supervisor VARCHAR(100),
     presentation_type VARCHAR(50),
     file_path VARCHAR(500),
+    status VARCHAR(50) DEFAULT 'SUBMITTED',
     deadline TIMESTAMP DEFAULT (NOW() + INTERVAL '2 days'),
     created_at TIMESTAMP DEFAULT NOW()
 );
@@ -55,7 +56,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location VARCHAR(100),
     session_date TIMESTAMP,
-    type VARCHAR(50),
+    session_type VARCHAR(50) DEFAULT 'Oral Presentation',
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -73,18 +74,55 @@ CREATE TABLE IF NOT EXISTS evaluator_assignments (
     submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE
 );
 
---  Table to store the Grades you submit
+-- Table to store the Grades you submit
 CREATE TABLE IF NOT EXISTS evaluations (
     evaluation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE,
     evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
-    score INT,
     comments TEXT,
     problem_clarity INT,
     methodology INT,
     results INT,
     presentation INT,
+    overall_score INT,
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Presentation Boards Table
+CREATE TABLE IF NOT EXISTS presentation_boards (
+    board_id SERIAL PRIMARY KEY,
+    board_name VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
+    max_presentations INT NOT NULL,
+    current_presentations INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Poster Presentations Table
+CREATE TABLE IF NOT EXISTS poster_presentations (
+    presentation_id SERIAL PRIMARY KEY,
+    board_id INT NOT NULL,
+    submission_id UUID NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    session_id UUID NOT NULL,
+    status VARCHAR(50) DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (board_id) REFERENCES presentation_boards(board_id),
+    FOREIGN KEY (submission_id) REFERENCES submissions(submission_id),
+    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+);
+
+-- Evaluation Criteria Table
+CREATE TABLE IF NOT EXISTS evaluation_criteria (
+    criteria_id SERIAL PRIMARY KEY,
+    presentation_id INT NOT NULL,
+    criteria_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    max_score INT NOT NULL,
+    weight INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (presentation_id) REFERENCES poster_presentations(presentation_id)
 );
 
 -- Schedule table to store session schedules
@@ -98,4 +136,3 @@ CREATE TABLE IF NOT EXISTS schedule (
     venue VARCHAR(100),
     created_at TIMESTAMP DEFAULT NOW()
 );
-
