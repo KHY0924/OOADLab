@@ -4,7 +4,7 @@ public class Evaluation {
     private String evaluationId;
     private String submissionId;
     private String evaluatorId;
-    private int score; // 1-10
+    private int score;
     private String presentationType; 
     private String comments;
 

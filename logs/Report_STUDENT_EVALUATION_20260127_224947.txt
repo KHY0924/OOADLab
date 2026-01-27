@@ -1,0 +1,25 @@
+========================================
+STUDENT EVALUATION REPORT
+========================================
+
+Report ID: 15e177e3-cc09-46e0-9fdb-f8d956b25606
+Generated: 2026-01-27 22:49:47
+
+STUDENT INFORMATION
+-------------------
+Name: Export Test Student
+Student ID: d790d89d-5aba-473d-a079-9b850d8ae3fd
+Session: Test Session (SESSION-001)
+
+EVALUATION SCORES
+-------------------
+Methodology              : 90/100
+Problem Clarity          : 85/100
+
+Final Average            : 87.50/100
+
+EVALUATOR COMMENTS
+-------------------
+Comment 1: Test comment for export.
+
+========================================
