@@ -17,6 +17,16 @@ CREATE TABLE IF NOT EXISTS student_profiles (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Seminars table (must be created before submissions which references it)
+CREATE TABLE IF NOT EXISTS Seminars (
+    seminar_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    location VARCHAR(100),
+    seminar_date TIMESTAMP,
+    semester INT DEFAULT 1,
+    year INT DEFAULT 2026,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Submissions table (FIXED: status column added here)
 CREATE TABLE IF NOT EXISTS submissions (
     submission_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -43,22 +53,14 @@ CREATE TABLE IF NOT EXISTS materials (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Seminars table
-CREATE TABLE IF NOT EXISTS Seminars (
-    seminar_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    location VARCHAR(100),
-    seminar_date TIMESTAMP,
-    semester INT DEFAULT 1,
-    year INT DEFAULT 2026,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
 -- Sessions table
 CREATE TABLE IF NOT EXISTS sessions (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seminar_id UUID REFERENCES Seminars(seminar_id) ON DELETE CASCADE,
     location VARCHAR(100),
     session_date TIMESTAMP,
     session_type VARCHAR(50) DEFAULT 'Oral Presentation',
+    evaluator_id UUID REFERENCES users(user_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 

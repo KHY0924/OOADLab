@@ -47,7 +47,8 @@ public class SessionController {
         }
     }
 
-    public void createSession(String sessionID, String location, int year, int month, int day, int hour, int minute,
+    public void createSession(String sessionID, String seminarId, String location, int year, int month, int day,
+            int hour, int minute,
             String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
@@ -56,7 +57,7 @@ public class SessionController {
         DateAndTime dateAndTime = new DateAndTime(date, time);
         Session session = new Session(sessionID, location, dateAndTime, type);
         try {
-            sessionDAO.createSession(sessionID, location, timestamp, type);
+            sessionDAO.createSession(sessionID, seminarId, location, timestamp, type);
             System.out.println("Session created in database: " + sessionID);
         } catch (SQLException e) {
             e.printStackTrace();

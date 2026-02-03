@@ -2,6 +2,7 @@ package views;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 import models.Session;
@@ -37,8 +38,10 @@ public class CoordinatorPanel extends JPanel {
 
     private JComboBox<String> studentCombo;
     private JComboBox<String> evaluatorCombo;
+    private JComboBox<String> seminarCombo;
     private List<String> studentIds;
     private List<String> evaluatorIds;
+    private List<String> seminarIds;
 
     public CoordinatorPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -51,6 +54,7 @@ public class CoordinatorPanel extends JPanel {
 
         this.studentIds = new ArrayList<>();
         this.evaluatorIds = new ArrayList<>();
+        this.seminarIds = new ArrayList<>();
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
@@ -59,7 +63,7 @@ public class CoordinatorPanel extends JPanel {
         headerPanel.setBackground(Theme.PRIMARY_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
-        JLabel title = new JLabel("Coordinator Dashboard");
+        JLabel title = new JLabel("Coordinator Dashboard v2");
         title.setFont(Theme.HEADER_FONT);
         title.setForeground(Color.WHITE);
 
@@ -94,19 +98,46 @@ public class CoordinatorPanel extends JPanel {
         card.setBackground(Theme.CARD_BG);
         card.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
-        String[] columns = { "ID", "Date", "Venue", "Type" };
+        // Seminar selector panel at the top
+        JPanel seminarSelectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        seminarSelectorPanel.setBackground(Theme.CARD_BG);
+        seminarSelectorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel seminarLabel = new JLabel("Select Seminar:");
+        seminarLabel.setFont(Theme.BOLD_FONT);
+        seminarCombo = new JComboBox<>();
+        seminarCombo.setFont(Theme.STANDARD_FONT);
+        seminarCombo.setPreferredSize(new Dimension(350, 30));
+        loadSeminars();
+
+        seminarCombo.addActionListener(e -> {
+            // When seminar is selected, reload sessions for that seminar
+            loadSessions();
+        });
+
+        seminarSelectorPanel.add(seminarLabel);
+        seminarSelectorPanel.add(seminarCombo);
+
+        String[] columns = { "ID", "Date", "Venue", "Type", "Evaluator", "Action" };
         sessionModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return column == 5;
             }
         };
         loadSessions();
         JTable table = new JTable(sessionModel);
-        table.setRowHeight(30);
+        table.setRowHeight(35); // Slightly taller for buttons
         table.setFont(Theme.STANDARD_FONT);
         table.getTableHeader().setFont(Theme.BOLD_FONT);
         table.getTableHeader().setBackground(Theme.UNVERIFIED_BG);
+
+        // Action Column Button
+        table.getColumnModel().getColumn(5).setCellRenderer(new ButtonRenderer());
+        table.getColumnModel().getColumn(5).setCellEditor(new ButtonEditor(new JCheckBox(), table));
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0); // Hide ID column but keep data
+        table.getColumnModel().getColumn(5).setPreferredWidth(100);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -125,16 +156,21 @@ public class CoordinatorPanel extends JPanel {
         Theme.styleButton(addSeminarButton);
         addSeminarButton.addActionListener(e -> {
             showAddSeminarDialog();
+            loadSeminars(); // Refresh seminar dropdown after adding
         });
 
         JButton refreshButton = new JButton("Refresh");
         Theme.styleSecondaryButton(refreshButton);
-        refreshButton.addActionListener(e -> loadSessions());
+        refreshButton.addActionListener(e -> {
+            loadSessions();
+            loadSeminars();
+        });
 
         controlPanel.add(addButton);
         controlPanel.add(addSeminarButton);
         controlPanel.add(refreshButton);
 
+        card.add(seminarSelectorPanel, BorderLayout.NORTH);
         card.add(scrollPane, BorderLayout.CENTER);
         card.add(controlPanel, BorderLayout.SOUTH);
 
@@ -144,18 +180,58 @@ public class CoordinatorPanel extends JPanel {
 
     private void loadSessions() {
         sessionModel.setRowCount(0);
-        List<Session> sessions = sessionDAO.getAllSessions();
+        int idx = seminarCombo != null ? seminarCombo.getSelectedIndex() : -1;
+        List<Session> sessions;
+        if (idx >= 0 && idx < seminarIds.size()) {
+            String selectedSeminarId = seminarIds.get(idx);
+            sessions = sessionDAO.getSessionsBySeminar(selectedSeminarId);
+        } else {
+            sessions = sessionDAO.getAllSessions();
+        }
         for (Session s : sessions) {
+            String evalDisplay = s.getEvaluatorName() != null ? s.getEvaluatorName() : "";
             sessionModel.addRow(new Object[] {
                     s.getSessionID(),
                     s.getSessionDate() + " " + s.getSessionTime(),
                     s.getLocation(),
-                    s.getSessionType()
+                    s.getSessionType(),
+                    evalDisplay,
+                    "Edit"
             });
         }
     }
 
+    private void loadSeminars() {
+        if (seminarCombo == null)
+            return;
+        seminarCombo.removeAllItems();
+        seminarIds.clear();
+        try {
+            ResultSet rs = sessionDAO.getAllSeminars();
+            while (rs.next()) {
+                String seminarId = rs.getString("seminar_id");
+                String location = rs.getString("location");
+                int semester = rs.getInt("semester");
+                int year = rs.getInt("year");
+                String displayText = "Semester " + semester + " " + year + " - " + location;
+                seminarCombo.addItem(displayText);
+                seminarIds.add(seminarId);
+            }
+            rs.getStatement().getConnection().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void showAddSessionDialog() {
+        // Check if a seminar is selected
+        int seminarIdx = seminarCombo != null ? seminarCombo.getSelectedIndex() : -1;
+        if (seminarIdx < 0 || seminarIdx >= seminarIds.size()) {
+            JOptionPane.showMessageDialog(this, "Please select a seminar first.");
+            return;
+        }
+        String selectedSeminarId = seminarIds.get(seminarIdx);
+
         JTextField locField = new JTextField();
         JTextField dateField = new JTextField("2026-02-10 09:00");
         String[] types = { "Oral", "Poster" };
@@ -172,7 +248,8 @@ public class CoordinatorPanel extends JPanel {
             try {
                 String id = java.util.UUID.randomUUID().toString();
                 Timestamp ts = Timestamp.valueOf(dateField.getText() + ":00");
-                sessionDAO.createSession(id, locField.getText(), ts, (String) typeBox.getSelectedItem());
+                sessionDAO.createSession(id, selectedSeminarId, locField.getText(), ts,
+                        (String) typeBox.getSelectedItem());
                 loadSessions();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error adding session: " + ex.getMessage());
@@ -297,7 +374,18 @@ public class CoordinatorPanel extends JPanel {
             showAssignStudentToSessionDialog();
         });
 
+        JButton assignSessionEvaluatorBtn = new JButton("Assign Evaluator to Session");
+        Theme.styleButton(assignSessionEvaluatorBtn);
+        assignSessionEvaluatorBtn.addActionListener(e -> {
+            showAssignEvaluatorToSessionDialog(null);
+        });
+
         card.add(assignStudentBtn, gbc);
+        gbc.gridx = 1;
+        card.add(assignSessionEvaluatorBtn, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
 
         gbc.gridx = 1;
         card.add(assignButton, gbc);
@@ -380,6 +468,64 @@ public class CoordinatorPanel extends JPanel {
                 if (sIdx >= 0 && sessIdx >= 0) {
                     sessionDAO.addStudentToSession(sessionIdsForSess.get(sessIdx), studentIdsForSess.get(sIdx));
                     JOptionPane.showMessageDialog(this, "Student assigned to session successfully!");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void showAssignEvaluatorToSessionDialog(String preSelectedSessionId) {
+        JComboBox<String> sessCombo = new JComboBox<>();
+        JComboBox<String> evalCombo = new JComboBox<>();
+        List<String> sessionIdsForSess = new ArrayList<>();
+        List<String> evaluatorIdsForSess = new ArrayList<>();
+
+        try {
+            List<Session> sessions = sessionDAO.getAllSessions();
+            int selectedIndex = -1;
+            for (int i = 0; i < sessions.size(); i++) {
+                Session s = sessions.get(i);
+                String status = s.getEvaluatorName() != null ? " [Assigned: " + s.getEvaluatorName() + "]"
+                        : " [UNASSIGNED]";
+                sessCombo.addItem(
+                        s.getSessionDate() + " - " + s.getLocation() + " (" + s.getSessionType() + ")" + status);
+                sessionIdsForSess.add(s.getSessionID());
+                if (preSelectedSessionId != null && preSelectedSessionId.equals(s.getSessionID())) {
+                    selectedIndex = i;
+                }
+            }
+            if (selectedIndex != -1) {
+                sessCombo.setSelectedIndex(selectedIndex);
+            }
+
+            ResultSet rsEval = userDAO.getUsersByRole("evaluator");
+            while (rsEval.next()) {
+                String name = rsEval.getString("username");
+                String eId = rsEval.getString("user_id");
+                evalCombo.addItem(name);
+                evaluatorIdsForSess.add(eId);
+            }
+            rsEval.getStatement().getConnection().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Object[] message = {
+                "Select Session:", sessCombo,
+                "Select Evaluator:", evalCombo
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Assign Evaluator to Session",
+                JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                int sessIdx = sessCombo.getSelectedIndex();
+                int evalIdx = evalCombo.getSelectedIndex();
+                if (sessIdx >= 0 && evalIdx >= 0) {
+                    sessionDAO.assignEvaluatorToSession(sessionIdsForSess.get(sessIdx),
+                            evaluatorIdsForSess.get(evalIdx));
+                    JOptionPane.showMessageDialog(this, "Evaluator assigned to all students in session successfully!");
                 }
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
@@ -628,5 +774,104 @@ public class CoordinatorPanel extends JPanel {
 
         panel.add(card, BorderLayout.CENTER);
         return panel;
+    }
+
+    private void showEditSessionDialog(String sessionId) {
+        try {
+            ResultSet rs = sessionDAO.findBySessionId(sessionId);
+            if (rs.next()) {
+                String currentLocation = rs.getString("location");
+                Timestamp currentTs = rs.getTimestamp("session_date");
+                String currentType = rs.getString("session_type");
+                rs.getStatement().getConnection().close();
+
+                JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
+                JTextField locField = new JTextField(currentLocation);
+                String formattedDate = currentTs.toString().substring(0, 16);
+                JTextField dateField = new JTextField(formattedDate);
+                String[] types = { "Oral Presentation", "Poster Presentation" };
+                JComboBox<String> typeBox = new JComboBox<>(types);
+                typeBox.setSelectedItem(currentType);
+
+                panel.add(new JLabel("Location:"));
+                panel.add(locField);
+                panel.add(new JLabel("Date (YYYY-MM-DD HH:MM):"));
+                panel.add(dateField);
+                panel.add(new JLabel("Type:"));
+                panel.add(typeBox);
+
+                int option = JOptionPane.showConfirmDialog(this, panel, "Edit Session", JOptionPane.OK_CANCEL_OPTION);
+                if (option == JOptionPane.OK_OPTION) {
+                    try {
+                        Timestamp ts = Timestamp.valueOf(dateField.getText() + ":00");
+                        sessionDAO.updateSession(sessionId, locField.getText(), ts, (String) typeBox.getSelectedItem());
+                        loadSessions();
+                        JOptionPane.showMessageDialog(this, "Session updated successfully!");
+                    } catch (IllegalArgumentException e) {
+                        JOptionPane.showMessageDialog(this, "Invalid date format. Use YYYY-MM-DD HH:MM");
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error editing session: " + ex.getMessage());
+        }
+    }
+
+    // --- Inner Classes for Table Button ---
+
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+            Theme.styleButton(this);
+            setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        }
+
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            setText((value == null) ? "Edit" : value.toString());
+            return this;
+        }
+    }
+
+    class ButtonEditor extends DefaultCellEditor {
+        protected JButton button;
+        private String label;
+        private boolean isPushed;
+        private JTable table;
+
+        public ButtonEditor(JCheckBox checkBox, JTable table) {
+            super(checkBox);
+            this.table = table;
+            button = new JButton();
+            button.setOpaque(true);
+            Theme.styleButton(button);
+            button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            button.addActionListener(e -> fireEditingStopped());
+        }
+
+        public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            label = (value == null) ? "Edit" : value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                int row = table.getSelectedRow();
+                if (row >= 0) {
+                    String sessionId = (String) table.getValueAt(row, 0);
+                    showEditSessionDialog(sessionId);
+                }
+            }
+            isPushed = false;
+            return label;
+        }
+
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
     }
 }

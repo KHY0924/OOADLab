@@ -11,6 +11,7 @@ public class Session {
     private String location;
     private DateAndTime sessionDT;
     private List<String> studentIDs;
+    private String evaluatorId;
 
     public Session(String sessionID, String location, DateAndTime sessionDT, String sessionType) {
         this.sessionID = sessionID;
@@ -52,10 +53,27 @@ public class Session {
         return studentIDs;
     }
 
+    private String evaluatorName;
+
+    public void setEvaluatorName(String evaluatorName) {
+        this.evaluatorName = evaluatorName;
+    }
+
+    public String getEvaluatorName() {
+        return evaluatorName;
+    }
+
+    public void setEvaluatorId(String evaluatorId) {
+        this.evaluatorId = evaluatorId;
+    }
+
+    public String getEvaluatorId() {
+        return evaluatorId;
+    }
+
     @Override
     public String toString() {
         return "Session " + sessionID + " at " + location;
     }
-    
-}
 
+}

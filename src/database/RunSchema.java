@@ -17,7 +17,7 @@ public class RunSchema {
                 BufferedReader br = new BufferedReader(new FileReader(schemaPath))) {
 
             System.out.println("Resetting Database...");
-            String dropSql = "DROP TABLE IF EXISTS evaluation_criteria, poster_presentations, presentation_boards, evaluations, evaluator_assignments, session_students, sessions, submissions, student_profiles, users CASCADE";
+            String dropSql = "DROP TABLE IF EXISTS evaluation_criteria, poster_presentations, presentation_boards, evaluations, evaluator_assignments, session_students, sessions, materials, submissions, student_profiles, Seminars, schedule, users CASCADE";
             stmt.execute(dropSql);
             System.out.println("Tables dropped.");
 
