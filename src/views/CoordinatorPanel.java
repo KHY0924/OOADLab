@@ -63,7 +63,7 @@ public class CoordinatorPanel extends JPanel {
         headerPanel.setBackground(Theme.PRIMARY_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
-        JLabel title = new JLabel("Coordinator Dashboard v2");
+        JLabel title = new JLabel("Coordinator Dashboard");
         title.setFont(Theme.HEADER_FONT);
         title.setForeground(Color.WHITE);
 
@@ -132,12 +132,12 @@ public class CoordinatorPanel extends JPanel {
         table.getTableHeader().setFont(Theme.BOLD_FONT);
         table.getTableHeader().setBackground(Theme.UNVERIFIED_BG);
 
-        // Action Column Button
-        table.getColumnModel().getColumn(5).setCellRenderer(new ButtonRenderer());
-        table.getColumnModel().getColumn(5).setCellEditor(new ButtonEditor(new JCheckBox(), table));
+        // Action Column Buttons
+        table.getColumnModel().getColumn(5).setCellRenderer(new ActionButtonsRenderer());
+        table.getColumnModel().getColumn(5).setCellEditor(new ActionButtonsEditor(new JCheckBox(), table));
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0); // Hide ID column but keep data
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);
+        table.getColumnModel().getColumn(5).setPreferredWidth(170); // Wider for two buttons
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -817,61 +817,112 @@ public class CoordinatorPanel extends JPanel {
         }
     }
 
-    // --- Inner Classes for Table Button ---
+    // --- Inner Classes for Table Buttons ---
 
-    class ButtonRenderer extends JButton implements TableCellRenderer {
-        public ButtonRenderer() {
+    class ActionButtonsRenderer extends JPanel implements TableCellRenderer {
+        private JButton editBtn;
+        private JButton deleteBtn;
+
+        public ActionButtonsRenderer() {
+            setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
             setOpaque(true);
-            Theme.styleButton(this);
-            setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            setBackground(Color.WHITE);
+
+            editBtn = new JButton("Edit");
+            deleteBtn = new JButton("Delete");
+
+            styleMiniButton(editBtn, Theme.PRIMARY_COLOR);
+            styleMiniButton(deleteBtn, new Color(220, 53, 69)); // Red for delete
+
+            add(editBtn);
+            add(deleteBtn);
         }
 
-        public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
+        private void styleMiniButton(JButton btn, Color bgColor) {
+            btn.setBackground(bgColor);
+            btn.setForeground(Color.WHITE);
+            btn.setFocusPainted(false);
+            btn.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
+            btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            setText((value == null) ? "Edit" : value.toString());
+            if (isSelected) {
+                setBackground(table.getSelectionBackground());
+            } else {
+                setBackground(table.getBackground());
+            }
             return this;
         }
     }
 
-    class ButtonEditor extends DefaultCellEditor {
-        protected JButton button;
-        private String label;
-        private boolean isPushed;
-        private JTable table;
+    class ActionButtonsEditor extends DefaultCellEditor {
+        private JPanel panel;
+        private JButton editBtn;
+        private JButton deleteBtn;
+        private String sessionId;
 
-        public ButtonEditor(JCheckBox checkBox, JTable table) {
+        public ActionButtonsEditor(JCheckBox checkBox, JTable table) {
             super(checkBox);
-            this.table = table;
-            button = new JButton();
-            button.setOpaque(true);
-            Theme.styleButton(button);
-            button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            button.addActionListener(e -> fireEditingStopped());
-        }
+            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
+            panel.setOpaque(true);
 
-        public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
-            label = (value == null) ? "Edit" : value.toString();
-            button.setText(label);
-            isPushed = true;
-            return button;
-        }
+            editBtn = new JButton("Edit");
+            deleteBtn = new JButton("Delete");
 
-        public Object getCellEditorValue() {
-            if (isPushed) {
-                int row = table.getSelectedRow();
-                if (row >= 0) {
-                    String sessionId = (String) table.getValueAt(row, 0);
-                    showEditSessionDialog(sessionId);
+            styleMiniButton(editBtn, Theme.PRIMARY_COLOR);
+            styleMiniButton(deleteBtn, new Color(220, 53, 69));
+
+            editBtn.addActionListener(e -> {
+                fireEditingStopped();
+                showEditSessionDialog(sessionId);
+            });
+
+            deleteBtn.addActionListener(e -> {
+                fireEditingStopped();
+                int confirm = JOptionPane.showConfirmDialog(panel,
+                        "Are you sure you want to delete this session?\nThis action cannot be undone.",
+                        "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
+                        sessionDAO.deleteSession(sessionId);
+                        loadSessions();
+                        JOptionPane.showMessageDialog(panel, "Session deleted successfully!");
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(panel, "Error deleting session: " + ex.getMessage());
+                    }
                 }
-            }
-            isPushed = false;
-            return label;
+            });
+
+            panel.add(editBtn);
+            panel.add(deleteBtn);
         }
 
-        public boolean stopCellEditing() {
-            isPushed = false;
-            return super.stopCellEditing();
+        private void styleMiniButton(JButton btn, Color bgColor) {
+            btn.setBackground(bgColor);
+            btn.setForeground(Color.WHITE);
+            btn.setFocusPainted(false);
+            btn.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
+            btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            this.sessionId = (String) table.getValueAt(row, 0);
+            if (isSelected) {
+                panel.setBackground(table.getSelectionBackground());
+            } else {
+                panel.setBackground(table.getBackground());
+            }
+            return panel;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return "Edit/Delete";
         }
     }
 }

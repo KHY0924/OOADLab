@@ -112,9 +112,9 @@ CREATE TABLE IF NOT EXISTS poster_presentations (
     session_id UUID NOT NULL,
     status VARCHAR(50) DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (board_id) REFERENCES presentation_boards(board_id),
-    FOREIGN KEY (submission_id) REFERENCES submissions(submission_id),
-    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+    FOREIGN KEY (board_id) REFERENCES presentation_boards(board_id) ON DELETE CASCADE,
+    FOREIGN KEY (submission_id) REFERENCES submissions(submission_id) ON DELETE CASCADE,
+    FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
 );
 
 -- Evaluation Criteria Table
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS evaluation_criteria (
     max_score INT NOT NULL,
     weight INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (presentation_id) REFERENCES poster_presentations(presentation_id)
+    FOREIGN KEY (presentation_id) REFERENCES poster_presentations(presentation_id) ON DELETE CASCADE
 );
 
 -- Schedule table to store session schedules
