@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS Seminars (
     seminar_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location VARCHAR(100),
     seminar_date TIMESTAMP,
+    semester INT DEFAULT 1,
+    year INT DEFAULT 2026,
     created_at TIMESTAMP DEFAULT NOW()
 );
 

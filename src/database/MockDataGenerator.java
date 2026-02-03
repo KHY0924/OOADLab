@@ -44,7 +44,7 @@ public class MockDataGenerator {
 
             // 5. Create Seminar
             String semId = UUID.randomUUID().toString();
-            createSeminar(conn, semId, "Grand Hall", Timestamp.valueOf("2026-06-01 09:00:00"));
+            createSeminar(conn, semId, "Grand Hall", Timestamp.valueOf("2026-06-01 09:00:00"), 1, 2026);
 
             // 6. Create Sessions
             String sess1Id = UUID.randomUUID().toString();
@@ -124,12 +124,15 @@ public class MockDataGenerator {
         }
     }
 
-    private static void createSeminar(Connection conn, String id, String loc, Timestamp t) throws SQLException {
-        String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date) VALUES (?::uuid, ?, ?) ON CONFLICT DO NOTHING";
+    private static void createSeminar(Connection conn, String id, String loc, Timestamp t, int semester, int year)
+            throws SQLException {
+        String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date, semester, year) VALUES (?::uuid, ?, ?, ?, ?) ON CONFLICT DO NOTHING";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
             stmt.setString(2, loc);
             stmt.setTimestamp(3, t);
+            stmt.setInt(4, semester);
+            stmt.setInt(5, year);
             stmt.executeUpdate();
         }
     }

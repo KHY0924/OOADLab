@@ -44,13 +44,16 @@ public class SessionDAO {
         }
     }
 
-    public void createSeminar(String seminarId, String location, Timestamp date) throws SQLException {
-        String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date) VALUES (?::uuid, ?, ?)";
+    public void createSeminar(String seminarId, String location, Timestamp date, int semester, int year)
+            throws SQLException {
+        String sql = "INSERT INTO Seminars (seminar_id, location, seminar_date, semester, year) VALUES (?::uuid, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, seminarId);
             stmt.setString(2, location);
             stmt.setTimestamp(3, date);
+            stmt.setInt(4, semester);
+            stmt.setInt(5, year);
             stmt.executeUpdate();
         }
     }

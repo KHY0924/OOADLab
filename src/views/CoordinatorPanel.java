@@ -121,11 +121,18 @@ public class CoordinatorPanel extends JPanel {
             showAddSessionDialog();
         });
 
+        JButton addSeminarButton = new JButton("Add Seminar");
+        Theme.styleButton(addSeminarButton);
+        addSeminarButton.addActionListener(e -> {
+            showAddSeminarDialog();
+        });
+
         JButton refreshButton = new JButton("Refresh");
         Theme.styleSecondaryButton(refreshButton);
         refreshButton.addActionListener(e -> loadSessions());
 
         controlPanel.add(addButton);
+        controlPanel.add(addSeminarButton);
         controlPanel.add(refreshButton);
 
         card.add(scrollPane, BorderLayout.CENTER);
@@ -169,6 +176,41 @@ public class CoordinatorPanel extends JPanel {
                 loadSessions();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error adding session: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void showAddSeminarDialog() {
+        JTextField locField = new JTextField();
+        JTextField dateField = new JTextField("2026-02-10 09:00");
+
+        // Semester dropdown (1 or 2)
+        String[] semesters = { "1", "2" };
+        JComboBox<String> semesterCombo = new JComboBox<>(semesters);
+
+        // Year dropdown
+        String[] years = { "2024", "2025", "2026", "2027", "2028" };
+        JComboBox<String> yearCombo = new JComboBox<>(years);
+        yearCombo.setSelectedItem("2026");
+
+        Object[] message = {
+                "Location:", locField,
+                "Date (YYYY-MM-DD HH:MM):", dateField,
+                "Semester:", semesterCombo,
+                "Year:", yearCombo
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Add New Seminar", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String id = java.util.UUID.randomUUID().toString();
+                Timestamp ts = Timestamp.valueOf(dateField.getText() + ":00");
+                int semester = Integer.parseInt((String) semesterCombo.getSelectedItem());
+                int year = Integer.parseInt((String) yearCombo.getSelectedItem());
+                sessionDAO.createSeminar(id, locField.getText(), ts, semester, year);
+                JOptionPane.showMessageDialog(this, "Seminar created successfully!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error adding seminar: " + ex.getMessage());
             }
         }
     }

@@ -31,7 +31,8 @@ public class SessionController {
         }
     }
 
-    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute) {
+    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute,
+            int semester) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -39,7 +40,7 @@ public class SessionController {
         DateAndTime dateAndTime = new DateAndTime(date, time);
         Seminar seminar = new Seminar(seminarID, location, dateAndTime);
         try {
-            sessionDAO.createSeminar(seminarID, location, timestamp);
+            sessionDAO.createSeminar(seminarID, location, timestamp, semester, year);
             System.out.println("Seminar created in database: " + seminarID);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,7 +72,8 @@ public class SessionController {
         }
     }
 
-    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type){
+    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute,
+            String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
