@@ -33,14 +33,22 @@ public class MockDataGenerator {
             createUser(conn, stud1Id, "stud1", "password", "student");
             createUser(conn, stud2Id, "stud2", "password", "student");
             createUser(conn, stud3Id, "stud3", "password", "student");
+            String stud4Id = UUID.randomUUID().toString();
+            String stud5Id = UUID.randomUUID().toString();
+            createUser(conn, stud4Id, "stud4", "password", "student");
+            createUser(conn, stud5Id, "stud5", "password", "student");
             stud1Id = getUserId(conn, "stud1");
             stud2Id = getUserId(conn, "stud2");
             stud3Id = getUserId(conn, "stud3");
+            stud4Id = getUserId(conn, "stud4");
+            stud5Id = getUserId(conn, "stud5");
 
             // 4. Create Student Profiles
             createProfile(conn, stud1Id, "Student One", "stud1@example.com", "Computer Science");
             createProfile(conn, stud2Id, "Student Two", "stud2@example.com", "Mathematics");
             createProfile(conn, stud3Id, "Student Three", "stud3@example.com", "Physics");
+            createProfile(conn, stud4Id, "Student Four", "stud4@example.com", "Biology");
+            createProfile(conn, stud5Id, "Student Five", "stud5@example.com", "Chemistry");
 
             // 5. Create Seminar
             String semId = UUID.randomUUID().toString();
@@ -62,6 +70,12 @@ public class MockDataGenerator {
                     "Oral", "EVALUATED");
             createSubmission(conn, sub3Id, semId, stud3Id, "Solar Panels Efficiency", "Abstract for Solar", "Prof. Z",
                     "Poster", "ASSIGNED");
+            String sub4Id = UUID.randomUUID().toString();
+            String sub5Id = UUID.randomUUID().toString();
+            createSubmission(conn, sub4Id, semId, stud4Id, "Bio-waste Power", "Abstract for Bio", "Prof. B",
+                    "Poster", "SUBMITTED");
+            createSubmission(conn, sub5Id, semId, stud5Id, "Chemical Catalysis", "Abstract for Chem", "Prof. C",
+                    "Poster", "SUBMITTED");
 
             // 8. Assignments
             assignEvaluator(conn, eval1Id, sub1Id);
@@ -72,7 +86,9 @@ public class MockDataGenerator {
             createEvaluation(conn, sub2Id, eval2Id, 85, "Great work", 18, 17, 19, 31);
 
             // 10. Presentation Boards
-            int boardId = createBoard(conn, "Board 001", "North Wing", 5, 1);
+            int boardId = createBoard(conn, "Board 001", "North Wing", 1, 1);
+            createBoard(conn, "Board 002", "South Wing", 1, 0);
+            createBoard(conn, "Board 003", "East Wing", 1, 0);
 
             // 11. Poster Presentation for student 3
             int presId = createPosterPresentation(conn, boardId, sub3Id, "Solar Panels Efficiency", "Poster details",

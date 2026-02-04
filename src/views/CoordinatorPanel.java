@@ -7,6 +7,7 @@ import java.awt.*;
 
 import models.Session;
 import models.PresentationBoard;
+import models.PosterPresentation;
 import database.SessionDAO;
 import database.UserDAO;
 import database.SubmissionDAO;
@@ -30,7 +31,8 @@ public class CoordinatorPanel extends JPanel {
     private SubmissionDAO submissionDAO;
     private ReportDAO reportDAO;
     private PosterPresentationService posterService;
-    private PresentationBoardDAO boardDAO;
+    private DefaultTableModel boardModel;
+    private JButton posterRefreshBtn;
 
     private JComboBox<String> seminarCombo;
     private List<String> seminarIds;
@@ -42,7 +44,6 @@ public class CoordinatorPanel extends JPanel {
         this.submissionDAO = new SubmissionDAO();
         this.reportDAO = new ReportDAO();
         this.posterService = new PosterPresentationService();
-        this.boardDAO = new PresentationBoardDAO();
 
         this.seminarIds = new ArrayList<>();
 
@@ -424,37 +425,50 @@ public class CoordinatorPanel extends JPanel {
         card.setBackground(Theme.CARD_BG);
         card.setBorder(Theme.createCardBorder());
 
-        String[] columns = { "Board ID", "Name", "Location", "Capacity", "Current" };
-        DefaultTableModel boardModel = new DefaultTableModel(columns, 0);
+        String[] columns = { "Board ID", "Location", "Assigned Student" };
+        boardModel = new DefaultTableModel(columns, 0);
         JTable boardTable = new JTable(boardModel);
+        boardTable.setRowHeight(30);
+        boardTable.setFont(Theme.STANDARD_FONT);
+        boardTable.getTableHeader().setFont(Theme.BOLD_FONT);
 
-        JButton refreshBtn = new JButton("Refresh Boards");
-        Theme.styleSecondaryButton(refreshBtn);
-        refreshBtn.addActionListener(e -> {
+        posterRefreshBtn = new JButton("Refresh Boards");
+        Theme.styleSecondaryButton(posterRefreshBtn);
+        posterRefreshBtn.addActionListener(e -> {
             boardModel.setRowCount(0);
             List<PresentationBoard> boards = posterService.getAllBoards();
             for (PresentationBoard b : boards) {
-                boardModel.addRow(new Object[] { b.getBoardId(), b.getBoardName(), b.getLocation(),
-                        b.getMaxPresentations(), b.getCurrentPresentations() });
+                String studentName = posterService.getStudentNameForBoard(b.getBoardId());
+                boardModel.addRow(new Object[] {
+                        b.getBoardName(),
+                        b.getLocation(),
+                        studentName
+                });
             }
         });
 
-        JButton addBoardBtn = new JButton("Add Board");
+        JButton addBoardBtn = new JButton("Add New Board");
         Theme.styleButton(addBoardBtn);
         addBoardBtn.addActionListener(e -> {
-            JTextField nameF = new JTextField();
+            JTextField idF = new JTextField();
             JTextField locF = new JTextField();
-            JTextField capF = new JTextField("10");
-            Object[] msg = { "Name:", nameF, "Location:", locF, "Capacity:", capF };
-            if (JOptionPane.showConfirmDialog(this, msg, "New Board",
+            Object[] msg = {
+                    "Board ID (e.g., P1, P2):", idF,
+                    "Location / Area:", locF
+            };
+            if (JOptionPane.showConfirmDialog(this, msg, "Add New Board",
                     JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                if (idF.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Board ID is required.");
+                    return;
+                }
                 try {
-                    PresentationBoard board = new PresentationBoard(0, nameF.getText(), locF.getText(),
-                            Integer.parseInt(capF.getText()), 0);
+                    // Default capacity to 1 as per requirements (one student per board)
+                    PresentationBoard board = new PresentationBoard(0, idF.getText(), locF.getText(), 1, 0);
                     posterService.createBoard(board);
-                    refreshBtn.doClick();
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Invalid capacity format.");
+                    posterRefreshBtn.doClick();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
                 }
             }
         });
@@ -477,13 +491,13 @@ public class CoordinatorPanel extends JPanel {
         btns.add(addBoardBtn);
         btns.add(assignPosterBtn);
         btns.add(defineCriteriaBtn);
-        btns.add(refreshBtn);
+        btns.add(posterRefreshBtn);
 
         card.add(new JScrollPane(boardTable), BorderLayout.CENTER);
         card.add(btns, BorderLayout.SOUTH);
         panel.add(card, BorderLayout.CENTER);
 
-        refreshBtn.doClick();
+        posterRefreshBtn.doClick();
         return panel;
     }
 
@@ -491,21 +505,25 @@ public class CoordinatorPanel extends JPanel {
         JComboBox<String> subCombo = new JComboBox<>();
         JComboBox<String> boardCombo = new JComboBox<>();
         List<String> subIds = new ArrayList<>();
+        List<String> subTitles = new ArrayList<>();
         List<Integer> boardIds = new ArrayList<>();
 
         try {
             ResultSet rs = submissionDAO.getAllSubmissions();
             while (rs.next()) {
-                if ("Poster Presentation".equals(rs.getString("presentation_type"))) {
+                String type = rs.getString("presentation_type");
+                if ("Poster Presentation".equals(type) || "Poster".equals(type)) {
                     subCombo.addItem(rs.getString("student_name") + ": " + rs.getString("title"));
                     subIds.add(rs.getString("submission_id"));
+                    subTitles.add(rs.getString("title"));
                 }
             }
             rs.getStatement().getConnection().close();
 
             List<PresentationBoard> boards = posterService.getAllBoards();
             for (PresentationBoard b : boards) {
-                boardCombo.addItem(b.getBoardName() + " (" + b.getLocation() + ")");
+                String assigned = posterService.isBoardAssigned(b.getBoardId()) ? " [ASSIGNED]" : "";
+                boardCombo.addItem(b.getBoardName() + " (" + b.getLocation() + ")" + assigned);
                 boardIds.add(b.getBoardId());
             }
         } catch (SQLException e) {
@@ -513,23 +531,53 @@ public class CoordinatorPanel extends JPanel {
         }
 
         Object[] message = {
-                "Select Poster Submission:", subCombo,
-                "Select Board:", boardCombo
+                "Select Student / Poster Submission:", subCombo,
+                "Select Board ID:", boardCombo
         };
 
-        if (JOptionPane.showConfirmDialog(this, message, "Assign Poster",
+        if (JOptionPane.showConfirmDialog(this, message, "Assign Student to Board",
                 JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             int sIdx = subCombo.getSelectedIndex();
             int bIdx = boardCombo.getSelectedIndex();
             if (sIdx >= 0 && bIdx >= 0) {
-                // Here we usually create a PosterPresentation record or link board_id to
-                // submission
-                // Using existing services or direct DAO
+                int selectedBoardId = boardIds.get(bIdx);
+                String selectedSubId = subIds.get(sIdx);
+                String selectedTitle = subTitles.get(sIdx);
+
+                if (posterService.isBoardAssigned(selectedBoardId)) {
+                    JOptionPane.showMessageDialog(this, "Error: This board is already assigned to a student.");
+                    return;
+                }
+
                 try {
-                    // Assuming a logical link: submissions table has board_id or similar
-                    // For now, let's use a dummy success message or update a table if service
-                    // exists
-                    JOptionPane.showMessageDialog(this, "Poster assigned successfully (Logical link established)");
+                    // We need a session_id as per schema. Find the first Poster session.
+                    List<Session> sessions = sessionDAO.getAllSessions();
+                    String sessionId = null;
+                    for (Session s : sessions) {
+                        if ("Poster Presentation".equalsIgnoreCase(s.getSessionType())
+                                || "Poster".equalsIgnoreCase(s.getSessionType())) {
+                            sessionId = s.getSessionID();
+                            break;
+                        }
+                    }
+
+                    if (sessionId == null) {
+                        JOptionPane.showMessageDialog(this,
+                                "Error: No Poster Session found. Please create a Poster session first.");
+                        return;
+                    }
+
+                    PosterPresentation pp = new PosterPresentation(0, selectedBoardId, selectedSubId,
+                            selectedTitle, "", sessionId, "ASSIGNED");
+
+                    if (posterService.addPresentation(pp)) {
+                        JOptionPane.showMessageDialog(this, "Student assigned to board successfully!");
+                        if (posterRefreshBtn != null) {
+                            posterRefreshBtn.doClick();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Failed to assign student to board.");
+                    }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
                 }
