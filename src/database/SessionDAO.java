@@ -40,6 +40,31 @@ public class SessionDAO {
         return sessions;
     }
 
+    public List<Session> getUnassignedSessions() {
+        List<Session> sessions = new ArrayList<>();
+        // Query to fetch only sessions where evaluator_id is NULL
+        String sql = "SELECT s.* FROM sessions s WHERE s.evaluator_id IS NULL";
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String id = rs.getString("session_id");
+                String loc = rs.getString("location");
+                Timestamp date = rs.getTimestamp("session_date");
+                String type = rs.getString("session_type");
+
+                Session session = new Session(id, loc, new models.DateAndTime(date.toLocalDateTime().toLocalDate(),
+                        date.toLocalDateTime().toLocalTime()), type);
+                // evaluatorName and evaluatorId are null by definition of the query
+                sessions.add(session);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sessions;
+    }
+
     public List<Session> getSessionsBySeminar(String seminarId) {
         List<Session> sessions = new ArrayList<>();
         // Modified query to fetch evaluator name
