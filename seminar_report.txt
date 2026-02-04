@@ -26,14 +26,14 @@
 [Poster] 2026-06-01 13:00:00.0
    Location:  Poster Area A
    Evaluator: Not Assigned
-   Student:   stud5
-   Project:   Chemical Catalysis
+   Student:   stud4
+   Project:   Bio-waste Power
 ------------------------------------------
 [Poster] 2026-06-01 13:00:00.0
    Location:  Poster Area A
    Evaluator: Not Assigned
-   Student:   stud4
-   Project:   Bio-waste Power
+   Student:   stud5
+   Project:   Chemical Catalysis
 ------------------------------------------
 
 
@@ -117,4 +117,4 @@ Average Score:  82.00
 
 
 ==========================================
-Report Generated on: Thu Feb 05 06:27:38 GMT+08:00 2026
+Report Generated on: Thu Feb 05 06:37:13 GMT+08:00 2026

@@ -595,6 +595,7 @@ public class CoordinatorPanel extends JPanel {
         }
     }
 
+    private int currentEditPart = 0; // 1: Schedule, 2: Summary, 3: Awards
     private String lastSchedule = "";
     private String lastSummary = "";
     private String lastAwards = "";
@@ -643,15 +644,20 @@ public class CoordinatorPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         buttonPanel.setBackground(Theme.CARD_BG);
 
-        JButton exportButton = new JButton("5. Export to File");
+        JButton exportButton = new JButton("5. Export Report");
         Theme.styleSecondaryButton(exportButton);
         exportButton.setEnabled(false);
 
-        JButton compileButton = new JButton("4. Save & Compile");
+        JButton contextualEditBtn = new JButton("Edit Content");
+        Theme.styleSecondaryButton(contextualEditBtn);
+        contextualEditBtn.setEnabled(false);
+        contextualEditBtn.setPreferredSize(new Dimension(150, 30));
+
+        JButton compileButton = new JButton("4. Save & Compile Report");
         Theme.styleButton(compileButton);
         compileButton.setEnabled(false);
 
-        JButton reportButton = new JButton("1. Schedule");
+        JButton reportButton = new JButton("1. Seminar Schedule");
         Theme.styleSecondaryButton(reportButton);
         reportButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
@@ -677,7 +683,12 @@ public class CoordinatorPanel extends JPanel {
                 }
                 lastSchedule = sb.toString();
                 reportArea.setText(lastSchedule);
+                reportArea.setEditable(false);
                 scheduleDone = true;
+                currentEditPart = 1;
+                contextualEditBtn.setText("Edit Schedule");
+                contextualEditBtn.setEnabled(true);
+                contextualEditBtn.setBackground(Color.WHITE);
                 rs.getStatement().getConnection().close();
                 if (scheduleDone && summaryDone && awardsDone)
                     compileButton.setEnabled(true);
@@ -686,7 +697,7 @@ public class CoordinatorPanel extends JPanel {
             }
         });
 
-        JButton summaryButton = new JButton("2. Summary");
+        JButton summaryButton = new JButton("2. Evaluation Summary");
         Theme.styleSecondaryButton(summaryButton);
         summaryButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
@@ -741,7 +752,12 @@ public class CoordinatorPanel extends JPanel {
                 }
                 lastSummary = sb.toString();
                 reportArea.setText(lastSummary);
+                reportArea.setEditable(false);
                 summaryDone = true;
+                currentEditPart = 2;
+                contextualEditBtn.setText("Edit Summary");
+                contextualEditBtn.setEnabled(true);
+                contextualEditBtn.setBackground(Color.WHITE);
                 rs.getStatement().getConnection().close();
                 if (scheduleDone && summaryDone && awardsDone)
                     compileButton.setEnabled(true);
@@ -750,8 +766,35 @@ public class CoordinatorPanel extends JPanel {
             }
         });
 
-        JButton awardButton = new JButton("3. Awards");
+        JButton awardButton = new JButton("3. Calculate Awards");
         Theme.styleButton(awardButton);
+
+        // Contextual Edit logic
+        contextualEditBtn.addActionListener(e -> {
+            boolean editing = reportArea.isEditable();
+            if (editing) {
+                // Save
+                String text = reportArea.getText();
+                if (currentEditPart == 1)
+                    lastSchedule = text;
+                else if (currentEditPart == 2)
+                    lastSummary = text;
+                else if (currentEditPart == 3)
+                    lastAwards = text;
+
+                reportArea.setEditable(false);
+                String label = (currentEditPart == 1) ? "Edit Schedule"
+                        : (currentEditPart == 2) ? "Edit Summary" : "Edit Awards";
+                contextualEditBtn.setText(label);
+                contextualEditBtn.setBackground(Color.WHITE);
+            } else {
+                // Start Edit
+                reportArea.setEditable(true);
+                reportArea.requestFocus();
+                contextualEditBtn.setText("Save Changes");
+                contextualEditBtn.setBackground(new Color(255, 235, 235));
+            }
+        });
         awardButton.setBackground(new Color(255, 193, 7));
         awardButton.setForeground(Color.BLACK);
         awardButton.addActionListener(e -> {
@@ -776,7 +819,12 @@ public class CoordinatorPanel extends JPanel {
                 sb.append("5. Closing Ceremony and Refreshments\n");
                 lastAwards = sb.toString();
                 reportArea.setText(lastAwards);
+                reportArea.setEditable(false);
                 awardsDone = true;
+                currentEditPart = 3;
+                contextualEditBtn.setText("Edit Awards");
+                contextualEditBtn.setEnabled(true);
+                contextualEditBtn.setBackground(Color.WHITE);
                 rs.getStatement().getConnection().close();
                 if (scheduleDone && summaryDone && awardsDone)
                     compileButton.setEnabled(true);
@@ -802,7 +850,7 @@ public class CoordinatorPanel extends JPanel {
             exportButton.setEnabled(true);
             Theme.styleButton(exportButton);
             JOptionPane.showMessageDialog(this,
-                    "Report Compiled Successfully!\nYou can now click '5. Export to File' to save the report.");
+                    "Report Compiled Successfully!\nYou can now click '5. Export Report' to save the report.");
         });
 
         exportButton.addActionListener(e -> {
@@ -815,15 +863,35 @@ public class CoordinatorPanel extends JPanel {
             }
         });
 
-        buttonPanel.add(reportButton);
-        buttonPanel.add(summaryButton);
-        buttonPanel.add(awardButton);
-        buttonPanel.add(compileButton);
-        buttonPanel.add(exportButton);
+        JPanel footerPanel = new JPanel(new BorderLayout());
+        footerPanel.setBackground(Theme.CARD_BG);
+
+        JPanel stepRow1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        stepRow1.setBackground(Theme.CARD_BG);
+        stepRow1.add(reportButton);
+        stepRow1.add(summaryButton);
+        stepRow1.add(awardButton);
+        stepRow1.add(compileButton);
+
+        JPanel stepRow2 = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        stepRow2.setBackground(Theme.CARD_BG);
+        stepRow2.add(exportButton);
+
+        footerPanel.add(stepRow1, BorderLayout.NORTH);
+        footerPanel.add(stepRow2, BorderLayout.SOUTH);
+
+        // Edit button overlay/sub-panel
+        JPanel editOverlayPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        editOverlayPanel.setBackground(Theme.CARD_BG);
+        editOverlayPanel.add(contextualEditBtn);
 
         card.add(seminarSelectorPanel, BorderLayout.NORTH);
-        card.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-        card.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel centerContainer = new JPanel(new BorderLayout());
+        centerContainer.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+        centerContainer.add(editOverlayPanel, BorderLayout.SOUTH);
+
+        card.add(centerContainer, BorderLayout.CENTER);
+        card.add(footerPanel, BorderLayout.SOUTH);
 
         panel.add(card, BorderLayout.CENTER);
         return panel;
