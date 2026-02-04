@@ -451,10 +451,17 @@ public class CoordinatorPanel extends JPanel {
         Theme.styleButton(addBoardBtn);
         addBoardBtn.addActionListener(e -> {
             JTextField idF = new JTextField();
-            JTextField locF = new JTextField();
+            String[] locations = {
+                    "North Wing", "South Wing", "East Wing", "West Wing",
+                    "Main Lobby", "Exhibition Hall A", "Exhibition Hall B",
+                    "Level 1 Corridor", "Level 2 Corridor", "Outdoor Plaza",
+                    "Library Atrium", "Science Block Foyer"
+            };
+            JComboBox<String> locCombo = new JComboBox<>(locations);
+
             Object[] msg = {
                     "Board ID (e.g., P1, P2):", idF,
-                    "Location / Area:", locF
+                    "Select Location:", locCombo
             };
             if (JOptionPane.showConfirmDialog(this, msg, "Add New Board",
                     JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -463,8 +470,9 @@ public class CoordinatorPanel extends JPanel {
                     return;
                 }
                 try {
+                    String selectedLoc = (String) locCombo.getSelectedItem();
                     // Default capacity to 1 as per requirements (one student per board)
-                    PresentationBoard board = new PresentationBoard(0, idF.getText(), locF.getText(), 1, 0);
+                    PresentationBoard board = new PresentationBoard(0, idF.getText(), selectedLoc, 1, 0);
                     posterService.createBoard(board);
                     posterRefreshBtn.doClick();
                 } catch (Exception ex) {

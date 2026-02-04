@@ -87,8 +87,8 @@ public class MockDataGenerator {
 
             // 10. Presentation Boards
             int boardId = createBoard(conn, "Board 001", "North Wing", 1, 1);
-            createBoard(conn, "Board 002", "South Wing", 1, 0);
-            createBoard(conn, "Board 003", "East Wing", 1, 0);
+            createBoard(conn, "Board 002", "Exhibition Hall A", 1, 0);
+            createBoard(conn, "Board 003", "Main Lobby", 1, 0);
 
             // 11. Poster Presentation for student 3
             int presId = createPosterPresentation(conn, boardId, sub3Id, "Solar Panels Efficiency", "Poster details",
