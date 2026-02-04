@@ -640,17 +640,18 @@ public class CoordinatorPanel extends JPanel {
         seminarSelectorPanel.add(reportSeminarCombo);
         seminarSelectorPanel.add(statusLabel);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         buttonPanel.setBackground(Theme.CARD_BG);
 
-        JButton exportButton = new JButton("Export Report");
+        JButton exportButton = new JButton("5. Export to File");
+        Theme.styleSecondaryButton(exportButton);
         exportButton.setEnabled(false);
 
-        JButton compileButton = new JButton("Save & Compile Report");
+        JButton compileButton = new JButton("4. Save & Compile");
         Theme.styleButton(compileButton);
         compileButton.setEnabled(false);
 
-        JButton reportButton = new JButton("1. Seminar Schedule");
+        JButton reportButton = new JButton("1. Schedule");
         Theme.styleSecondaryButton(reportButton);
         reportButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
@@ -685,7 +686,7 @@ public class CoordinatorPanel extends JPanel {
             }
         });
 
-        JButton summaryButton = new JButton("2. Evaluation Summary");
+        JButton summaryButton = new JButton("2. Summary");
         Theme.styleSecondaryButton(summaryButton);
         summaryButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
@@ -749,7 +750,7 @@ public class CoordinatorPanel extends JPanel {
             }
         });
 
-        JButton awardButton = new JButton("3. Calculate Awards");
+        JButton awardButton = new JButton("3. Awards");
         Theme.styleButton(awardButton);
         awardButton.setBackground(new Color(255, 193, 7));
         awardButton.setForeground(Color.BLACK);
@@ -800,9 +801,10 @@ public class CoordinatorPanel extends JPanel {
             statusLabel.setForeground(new Color(0, 150, 0));
             exportButton.setEnabled(true);
             Theme.styleButton(exportButton);
+            JOptionPane.showMessageDialog(this,
+                    "Report Compiled Successfully!\nYou can now click '5. Export to File' to save the report.");
         });
 
-        Theme.styleSecondaryButton(exportButton);
         exportButton.addActionListener(e -> {
             String content = reportArea.getText();
             try (FileWriter writer = new FileWriter("seminar_report.txt")) {

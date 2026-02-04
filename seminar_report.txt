@@ -1,2 +1,120 @@
+==========================================
+   OFFICIAL SEMINAR COMPREHENSIVE REPORT  
+==========================================
+
 --- SEMINAR SCHEDULE ---
 
+[Oral] 2026-06-01 10:00:00.0
+   Location:  Room 101
+   Evaluator: Not Assigned
+   Student:   stud1
+   Project:   AI in Healthcare
+------------------------------------------
+[Oral] 2026-06-01 10:00:00.0
+   Location:  Room 101
+   Evaluator: Not Assigned
+   Student:   stud2
+   Project:   Quantum Algorithms
+------------------------------------------
+[Poster] 2026-06-01 13:00:00.0
+   Location:  Poster Area A
+   Poster:    Board 001
+   Evaluator: Not Assigned
+   Student:   stud3
+   Project:   Solar Panels Efficiency
+------------------------------------------
+[Poster] 2026-06-01 13:00:00.0
+   Location:  Poster Area A
+   Evaluator: Not Assigned
+   Student:   stud5
+   Project:   Chemical Catalysis
+------------------------------------------
+[Poster] 2026-06-01 13:00:00.0
+   Location:  Poster Area A
+   Evaluator: Not Assigned
+   Student:   stud4
+   Project:   Bio-waste Power
+------------------------------------------
+
+
+--- EVALUATION SUMMARY & ANALYTICS ---
+
+Student:   stud1 (Oral)
+Evaluator: eval1
+Title:     AI in Healthcare
+Detailed Scores:
+   - Problem Clarity: 22/25
+   - Methodology:     21/25
+   - Results:         22/25
+   - Presentation:    23/25
+OVERALL SCORE: 88/100
+Comments: Solid presentation and good Q&A.
+------------------------------------------
+Student:   stud2 (Oral)
+Evaluator: eval2
+Title:     Quantum Algorithms
+Detailed Scores:
+   - Problem Clarity: 18/25
+   - Methodology:     17/25
+   - Results:         19/25
+   - Presentation:    21/25
+OVERALL SCORE: 75/100
+Comments: Great work on quantum theory.
+------------------------------------------
+Student:   stud3 (Poster)
+Evaluator: eval1
+Poster:    Board 001
+Title:     Solar Panels Efficiency
+Detailed Scores:
+   - Problem Clarity: 23/25
+   - Methodology:     23/25
+   - Results:         23/25
+   - Presentation:    23/25
+OVERALL SCORE: 92/100
+Comments: Excellent poster design and results.
+------------------------------------------
+Student:   stud4 (Poster)
+Evaluator: eval2
+Title:     Bio-waste Power
+Detailed Scores:
+   - Problem Clarity: 15/25
+   - Methodology:     20/25
+   - Results:         20/25
+   - Presentation:    20/25
+OVERALL SCORE: 75/100
+Comments: Interesting topic, needs more data.
+------------------------------------------
+Student:   stud5 (Poster)
+Evaluator: eval1
+Title:     Chemical Catalysis
+Detailed Scores:
+   - Problem Clarity: 20/25
+   - Methodology:     20/25
+   - Results:         20/25
+   - Presentation:    20/25
+OVERALL SCORE: 80/100
+Comments: Good chemical analysis.
+------------------------------------------
+
+DATA ANALYTICS:
+Total Students: 5
+Evaluated:      5
+Average Score:  82.00
+
+
+--- AWARD WINNERS & CEREMONY AGENDA ---
+
+1. Introduction and Welcome
+2. Opening Remarks by Faculty Dean
+3. Presentation of Awards:
+
+- Best Oral: stud1 - AI in Healthcare (Score: 88)
+- Best Poster: stud3 - Solar Panels Efficiency (Score: 92)
+- People's Choice: stud5 - Chemical Catalysis (Score: 80)
+
+4. Keynote Presentation by Winners
+5. Closing Ceremony and Refreshments
+
+
+==========================================
+Report Generated on: Thu Feb 05 06:27:38 GMT+08:00 2026
