@@ -57,8 +57,8 @@ public class MockDataGenerator {
             // 6. Create Sessions
             String sess1Id = UUID.randomUUID().toString();
             String sess2Id = UUID.randomUUID().toString();
-            createSession(conn, sess1Id, "Room 101", Timestamp.valueOf("2026-06-01 10:00:00"), "Oral");
-            createSession(conn, sess2Id, "Poster Area A", Timestamp.valueOf("2026-06-01 13:00:00"), "Poster");
+            createSession(conn, sess1Id, semId, "Room 101", Timestamp.valueOf("2026-06-01 10:00:00"), "Oral");
+            createSession(conn, sess2Id, semId, "Poster Area A", Timestamp.valueOf("2026-06-01 13:00:00"), "Poster");
 
             // 7. Submissions
             String sub1Id = UUID.randomUUID().toString();
@@ -81,6 +81,13 @@ public class MockDataGenerator {
             assignEvaluator(conn, eval1Id, sub1Id);
             assignEvaluator(conn, eval2Id, sub2Id);
             assignEvaluator(conn, eval1Id, sub3Id);
+
+            // 8.5 Assign students to sessions for schedule
+            addStudentToSession(conn, sess1Id, stud1Id);
+            addStudentToSession(conn, sess1Id, stud2Id);
+            addStudentToSession(conn, sess2Id, stud3Id);
+            addStudentToSession(conn, sess2Id, stud4Id);
+            addStudentToSession(conn, sess2Id, stud5Id);
 
             // 9. Evaluations for student 2 (EVALUATED)
             createEvaluation(conn, sub2Id, eval2Id, 85, "Great work", 18, 17, 19, 31);
@@ -153,14 +160,24 @@ public class MockDataGenerator {
         }
     }
 
-    private static void createSession(Connection conn, String id, String loc, Timestamp t, String type)
+    private static void createSession(Connection conn, String id, String semId, String loc, Timestamp t, String type)
             throws SQLException {
-        String sql = "INSERT INTO sessions (session_id, location, session_date, session_type) VALUES (?::uuid, ?, ?, ?) ON CONFLICT DO NOTHING";
+        String sql = "INSERT INTO sessions (session_id, seminar_id, location, session_date, session_type) VALUES (?::uuid, ?::uuid, ?, ?, ?) ON CONFLICT DO NOTHING";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
-            stmt.setString(2, loc);
-            stmt.setTimestamp(3, t);
-            stmt.setString(4, type);
+            stmt.setString(2, semId);
+            stmt.setString(3, loc);
+            stmt.setTimestamp(4, t);
+            stmt.setString(5, type);
+            stmt.executeUpdate();
+        }
+    }
+
+    private static void addStudentToSession(Connection conn, String sessionId, String studentId) throws SQLException {
+        String sql = "INSERT INTO session_students (session_id, student_id) VALUES (?::uuid, ?::uuid) ON CONFLICT DO NOTHING";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, sessionId);
+            stmt.setString(2, studentId);
             stmt.executeUpdate();
         }
     }

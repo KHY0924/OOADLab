@@ -146,12 +146,15 @@ public class SessionDAO {
     }
 
     public void addStudentToSession(String sessionId, String studentId) throws SQLException {
-        String sql = "INSERT INTO session_students (session_id, student_id) VALUES (?::uuid, ?::uuid)";
+        String sql = "INSERT INTO session_students (session_id, student_id) VALUES (?::uuid, ?::uuid) ON CONFLICT (session_id, student_id) DO NOTHING";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, sessionId);
             stmt.setString(2, studentId);
-            stmt.executeUpdate();
+            int affected = stmt.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("Student is already assigned to this session.");
+            }
         }
     }
 

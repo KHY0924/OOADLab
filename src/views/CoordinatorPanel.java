@@ -34,7 +34,8 @@ public class CoordinatorPanel extends JPanel {
     private DefaultTableModel boardModel;
     private JButton posterRefreshBtn;
 
-    private JComboBox<String> seminarCombo;
+    private JComboBox<String> sessionSeminarCombo;
+    private JComboBox<String> reportSeminarCombo;
     private List<String> seminarIds;
 
     public CoordinatorPanel(MainFrame mainFrame) {
@@ -96,18 +97,18 @@ public class CoordinatorPanel extends JPanel {
 
         JLabel seminarLabel = new JLabel("Select Seminar:");
         seminarLabel.setFont(Theme.BOLD_FONT);
-        seminarCombo = new JComboBox<>();
-        seminarCombo.setFont(Theme.STANDARD_FONT);
-        seminarCombo.setPreferredSize(new Dimension(350, 30));
+        sessionSeminarCombo = new JComboBox<>();
+        sessionSeminarCombo.setFont(Theme.STANDARD_FONT);
+        sessionSeminarCombo.setPreferredSize(new Dimension(350, 30));
         loadSeminars();
 
-        seminarCombo.addActionListener(e -> {
+        sessionSeminarCombo.addActionListener(e -> {
             // When seminar is selected, reload sessions for that seminar
             loadSessions();
         });
 
         seminarSelectorPanel.add(seminarLabel);
-        seminarSelectorPanel.add(seminarCombo);
+        seminarSelectorPanel.add(sessionSeminarCombo);
 
         String[] columns = { "ID", "Date", "Venue", "Type", "Evaluator", "Action" };
         sessionModel = new DefaultTableModel(columns, 0) {
@@ -171,7 +172,7 @@ public class CoordinatorPanel extends JPanel {
 
     private void loadSessions() {
         sessionModel.setRowCount(0);
-        int idx = seminarCombo != null ? seminarCombo.getSelectedIndex() : -1;
+        int idx = sessionSeminarCombo != null ? sessionSeminarCombo.getSelectedIndex() : -1;
         List<Session> sessions;
         if (idx >= 0 && idx < seminarIds.size()) {
             String selectedSeminarId = seminarIds.get(idx);
@@ -193,9 +194,10 @@ public class CoordinatorPanel extends JPanel {
     }
 
     private void loadSeminars() {
-        if (seminarCombo == null)
-            return;
-        seminarCombo.removeAllItems();
+        if (sessionSeminarCombo != null)
+            sessionSeminarCombo.removeAllItems();
+        if (reportSeminarCombo != null)
+            reportSeminarCombo.removeAllItems();
         seminarIds.clear();
         try {
             ResultSet rs = sessionDAO.getAllSeminars();
@@ -205,7 +207,10 @@ public class CoordinatorPanel extends JPanel {
                 int semester = rs.getInt("semester");
                 int year = rs.getInt("year");
                 String displayText = "Semester " + semester + " " + year + " - " + location;
-                seminarCombo.addItem(displayText);
+                if (sessionSeminarCombo != null)
+                    sessionSeminarCombo.addItem(displayText);
+                if (reportSeminarCombo != null)
+                    reportSeminarCombo.addItem(displayText);
                 seminarIds.add(seminarId);
             }
             rs.getStatement().getConnection().close();
@@ -216,7 +221,7 @@ public class CoordinatorPanel extends JPanel {
 
     private void showAddSessionDialog() {
         // Check if a seminar is selected
-        int seminarIdx = seminarCombo != null ? seminarCombo.getSelectedIndex() : -1;
+        int seminarIdx = sessionSeminarCombo != null ? sessionSeminarCombo.getSelectedIndex() : -1;
         if (seminarIdx < 0 || seminarIdx >= seminarIds.size()) {
             JOptionPane.showMessageDialog(this, "Please select a seminar first.");
             return;
@@ -593,6 +598,13 @@ public class CoordinatorPanel extends JPanel {
         }
     }
 
+    private String lastSchedule = "";
+    private String lastSummary = "";
+    private String lastAwards = "";
+    private boolean scheduleDone = false;
+    private boolean summaryDone = false;
+    private boolean awardsDone = false;
+
     private JPanel createReportPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Theme.BG_COLOR);
@@ -605,46 +617,96 @@ public class CoordinatorPanel extends JPanel {
         JTextArea reportArea = new JTextArea();
         reportArea.setEditable(false);
         reportArea.setFont(new Font("Consolas", Font.PLAIN, 14));
-        reportArea.setText("Click buttons below to view reports...");
+        reportArea.setText("--- REPORT GENERATION STEPS ---\n" +
+                "1. Click 'Seminar Schedule' to prepare part 1.\n" +
+                "2. Click 'Evaluation Summary' to prepare part 2.\n" +
+                "3. Click 'Calculate Awards' to prepare part 3.\n" +
+                "4. After all 3 steps, click 'Save & Compile' to finalize.\n" +
+                "5. Finally, click 'Export Report' to save to file.");
         reportArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel seminarSelectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        seminarSelectorPanel.setBackground(Theme.CARD_BG);
+        seminarSelectorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel seminarLabel = new JLabel("Select Seminar for Report:");
+        seminarLabel.setFont(Theme.BOLD_FONT);
+        reportSeminarCombo = new JComboBox<>();
+        reportSeminarCombo.setFont(Theme.STANDARD_FONT);
+        reportSeminarCombo.setPreferredSize(new Dimension(350, 30));
+        loadSeminars();
+
+        JLabel statusLabel = new JLabel("Status: Steps Pending");
+        statusLabel.setForeground(Color.RED);
+
+        seminarSelectorPanel.add(seminarLabel);
+        seminarSelectorPanel.add(reportSeminarCombo);
+        seminarSelectorPanel.add(statusLabel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(Theme.CARD_BG);
 
-        JButton reportButton = new JButton("Seminar Schedule");
+        JButton exportButton = new JButton("Export Report");
+        exportButton.setEnabled(false);
+
+        JButton compileButton = new JButton("Save & Compile Report");
+        Theme.styleButton(compileButton);
+        compileButton.setEnabled(false);
+
+        JButton reportButton = new JButton("1. Seminar Schedule");
         Theme.styleSecondaryButton(reportButton);
         reportButton.addActionListener(e -> {
+            int idx = reportSeminarCombo.getSelectedIndex();
+            if (idx < 0)
+                return;
+            String semId = seminarIds.get(idx);
             try {
                 StringBuilder sb = new StringBuilder("--- SEMINAR SCHEDULE ---\n\n");
-                ResultSet rs = reportDAO.getSeminarSchedule();
+                ResultSet rs = reportDAO.getSeminarSchedule(semId);
                 while (rs.next()) {
-                    sb.append(rs.getTimestamp("session_date")).append(" - ")
-                            .append(rs.getString("student_name")).append(" (")
-                            .append(rs.getString("location")).append("): ")
-                            .append(rs.getString("title")).append("\n");
+                    sb.append("[").append(rs.getString("presentation_type")).append("] ")
+                            .append(rs.getTimestamp("session_date")).append("\n")
+                            .append("   Location: ").append(rs.getString("location")).append("\n")
+                            .append("   Student:  ").append(rs.getString("student_name")).append("\n")
+                            .append("   Project:  ").append(rs.getString("title")).append("\n")
+                            .append("------------------------------------------\n");
                 }
-                reportArea.setText(sb.toString());
+                lastSchedule = sb.toString();
+                reportArea.setText(lastSchedule);
+                scheduleDone = true;
                 rs.getStatement().getConnection().close();
+                if (scheduleDone && summaryDone && awardsDone)
+                    compileButton.setEnabled(true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
         });
 
-        JButton summaryButton = new JButton("Evaluation Summary & Analytics");
+        JButton summaryButton = new JButton("2. Evaluation Summary");
         Theme.styleSecondaryButton(summaryButton);
         summaryButton.addActionListener(e -> {
+            int idx = reportSeminarCombo.getSelectedIndex();
+            if (idx < 0)
+                return;
+            String semId = seminarIds.get(idx);
             try {
                 StringBuilder sb = new StringBuilder("--- EVALUATION SUMMARY & ANALYTICS ---\n\n");
-                ResultSet rs = reportDAO.getEvaluationSummary();
+                ResultSet rs = reportDAO.getEvaluationSummary(semId);
                 int count = 0;
                 double total = 0;
                 while (rs.next()) {
                     int score = rs.getInt("overall_score");
                     sb.append("Student: ").append(rs.getString("student_name"))
-                            .append("\nTitle: ").append(rs.getString("title"))
-                            .append("\nScore: ").append(score)
-                            .append("\nComments: ").append(rs.getString("comments"))
-                            .append("\n--------------------------\n");
+                            .append(" (").append(rs.getString("presentation_type")).append(")\n")
+                            .append("Title:   ").append(rs.getString("title")).append("\n")
+                            .append("Detailed Scores:\n")
+                            .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/25\n")
+                            .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/25\n")
+                            .append("   - Results:         ").append(rs.getInt("results")).append("/25\n")
+                            .append("   - Presentation:    ").append(rs.getInt("presentation")).append("/25\n")
+                            .append("OVERALL SCORE: ").append(score).append("/100\n")
+                            .append("Comments: ").append(rs.getString("comments")).append("\n")
+                            .append("------------------------------------------\n");
                     total += score;
                     count++;
                 }
@@ -653,50 +715,76 @@ public class CoordinatorPanel extends JPanel {
                     sb.append("Total Evaluations: ").append(count).append("\n");
                     sb.append("Average Overall Score: ").append(String.format("%.2f", total / count)).append("\n");
                 }
-                reportArea.setText(sb.toString());
+                lastSummary = sb.toString();
+                reportArea.setText(lastSummary);
+                summaryDone = true;
                 rs.getStatement().getConnection().close();
+                if (scheduleDone && summaryDone && awardsDone)
+                    compileButton.setEnabled(true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
         });
 
-        JButton awardButton = new JButton("Calculate Awards & Agenda");
+        JButton awardButton = new JButton("3. Calculate Awards");
         Theme.styleButton(awardButton);
         awardButton.setBackground(new Color(255, 193, 7));
         awardButton.setForeground(Color.BLACK);
         awardButton.addActionListener(e -> {
+            int idx = reportSeminarCombo.getSelectedIndex();
+            if (idx < 0)
+                return;
+            String semId = seminarIds.get(idx);
             try {
                 StringBuilder sb = new StringBuilder("--- AWARD WINNERS & CEREMONY AGENDA ---\n\n");
                 sb.append("1. Introduction and Welcome\n");
                 sb.append("2. Opening Remarks by Faculty Dean\n");
                 sb.append("3. Presentation of Awards:\n\n");
 
-                ResultSet rs = reportDAO.getAwardWinners();
+                ResultSet rs = reportDAO.getAwardWinners(semId);
                 while (rs.next()) {
-                    sb.append("   - ").append(rs.getString("presentation_type")).append(" Winner: ")
-                            .append(rs.getString("student_name")).append("\n")
-                            .append("     Project: ").append(rs.getString("title")).append("\n")
-                            .append("     Final Score: ").append(rs.getInt("overall_score")).append("\n\n");
+                    sb.append("- ").append(rs.getString("presentation_type")).append(": ")
+                            .append(rs.getString("student_name")).append(" - ")
+                            .append(rs.getString("title")).append(" (Score: ")
+                            .append(rs.getInt("overall_score")).append(")\n");
                 }
-                sb.append("4. Closing Remarks and Photo Session\n");
-                reportArea.setText(sb.toString());
+                sb.append("\n4. Keynote Presentation by Winners\n");
+                sb.append("5. Closing Ceremony and Refreshments\n");
+                lastAwards = sb.toString();
+                reportArea.setText(lastAwards);
+                awardsDone = true;
                 rs.getStatement().getConnection().close();
+                if (scheduleDone && summaryDone && awardsDone)
+                    compileButton.setEnabled(true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
         });
 
-        JButton exportButton = new JButton("Export Report");
+        compileButton.addActionListener(e -> {
+            StringBuilder finalReport = new StringBuilder();
+            finalReport.append("==========================================\n");
+            finalReport.append("   OFFICIAL SEMINAR COMPREHENSIVE REPORT  \n");
+            finalReport.append("==========================================\n\n");
+            finalReport.append(lastSchedule).append("\n\n");
+            finalReport.append(lastSummary).append("\n\n");
+            finalReport.append(lastAwards).append("\n\n");
+            finalReport.append("==========================================\n");
+            finalReport.append("Report Generated on: ").append(new java.util.Date()).append("\n");
+
+            reportArea.setText(finalReport.toString());
+            statusLabel.setText("Status: Report Compiled!");
+            statusLabel.setForeground(new Color(0, 150, 0));
+            exportButton.setEnabled(true);
+            Theme.styleButton(exportButton);
+        });
+
         Theme.styleSecondaryButton(exportButton);
         exportButton.addActionListener(e -> {
             String content = reportArea.getText();
-            if (content.isEmpty() || content.startsWith("Click")) {
-                JOptionPane.showMessageDialog(this, "Please generate a report first.");
-                return;
-            }
             try (FileWriter writer = new FileWriter("seminar_report.txt")) {
                 writer.write(content);
-                JOptionPane.showMessageDialog(this, "Report exported to 'seminar_report.txt'");
+                JOptionPane.showMessageDialog(this, "Complete Report exported to 'seminar_report.txt'");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Error exporting: " + ex.getMessage());
             }
@@ -705,8 +793,10 @@ public class CoordinatorPanel extends JPanel {
         buttonPanel.add(reportButton);
         buttonPanel.add(summaryButton);
         buttonPanel.add(awardButton);
+        buttonPanel.add(compileButton);
         buttonPanel.add(exportButton);
 
+        card.add(seminarSelectorPanel, BorderLayout.NORTH);
         card.add(new JScrollPane(reportArea), BorderLayout.CENTER);
         card.add(buttonPanel, BorderLayout.SOUTH);
 
