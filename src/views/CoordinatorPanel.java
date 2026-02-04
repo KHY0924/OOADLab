@@ -12,7 +12,6 @@ import database.SessionDAO;
 import database.UserDAO;
 import database.SubmissionDAO;
 import database.ReportDAO;
-import database.PresentationBoardDAO;
 import services.PosterPresentationService;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -664,11 +663,17 @@ public class CoordinatorPanel extends JPanel {
                 StringBuilder sb = new StringBuilder("--- SEMINAR SCHEDULE ---\n\n");
                 ResultSet rs = reportDAO.getSeminarSchedule(semId);
                 while (rs.next()) {
+                    String evalName = rs.getString("evaluator_name");
+                    String boardName = rs.getString("board_name");
                     sb.append("[").append(rs.getString("presentation_type")).append("] ")
                             .append(rs.getTimestamp("session_date")).append("\n")
-                            .append("   Location: ").append(rs.getString("location")).append("\n")
-                            .append("   Student:  ").append(rs.getString("student_name")).append("\n")
-                            .append("   Project:  ").append(rs.getString("title")).append("\n")
+                            .append("   Location:  ").append(rs.getString("location")).append("\n");
+                    if (boardName != null) {
+                        sb.append("   Poster:    ").append(boardName).append("\n");
+                    }
+                    sb.append("   Evaluator: ").append(evalName != null ? evalName : "Not Assigned").append("\n")
+                            .append("   Student:   ").append(rs.getString("student_name")).append("\n")
+                            .append("   Project:   ").append(rs.getString("title")).append("\n")
                             .append("------------------------------------------\n");
                 }
                 lastSchedule = sb.toString();
@@ -696,9 +701,15 @@ public class CoordinatorPanel extends JPanel {
                 double total = 0;
                 while (rs.next()) {
                     int score = rs.getInt("overall_score");
-                    sb.append("Student: ").append(rs.getString("student_name"))
+                    String evalName = rs.getString("evaluator_name");
+                    String boardName = rs.getString("board_name");
+                    sb.append("Student:   ").append(rs.getString("student_name"))
                             .append(" (").append(rs.getString("presentation_type")).append(")\n")
-                            .append("Title:   ").append(rs.getString("title")).append("\n")
+                            .append("Evaluator: ").append(evalName != null ? evalName : "Unknown").append("\n");
+                    if (boardName != null) {
+                        sb.append("Poster:    ").append(boardName).append("\n");
+                    }
+                    sb.append("Title:     ").append(rs.getString("title")).append("\n")
                             .append("Detailed Scores:\n")
                             .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/25\n")
                             .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/25\n")

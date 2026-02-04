@@ -5,12 +5,16 @@ import java.sql.*;
 public class ReportDAO {
 
     public ResultSet getSeminarSchedule(String seminarId) throws SQLException {
-        String sql = "SELECT s.session_date, s.location, sub.title, u.username as student_name, sub.presentation_type "
+        String sql = "SELECT s.session_date, s.location, sub.title, u.username as student_name, sub.presentation_type, "
                 +
+                "eval.username as evaluator_name, pb.board_name " +
                 "FROM sessions s " +
                 "JOIN session_students ss ON s.session_id = ss.session_id " +
                 "JOIN submissions sub ON ss.student_id = sub.student_id " +
                 "JOIN users u ON sub.student_id = u.user_id " +
+                "LEFT JOIN users eval ON s.evaluator_id = eval.user_id " +
+                "LEFT JOIN poster_presentations pp ON sub.submission_id = pp.submission_id " +
+                "LEFT JOIN presentation_boards pb ON pp.board_id = pb.board_id " +
                 "WHERE s.seminar_id = ?::uuid " +
                 "ORDER BY s.session_date ASC";
         Connection conn = DatabaseConnection.getConnection();
@@ -22,10 +26,14 @@ public class ReportDAO {
     public ResultSet getEvaluationSummary(String seminarId) throws SQLException {
         // Fetching individual scores and presentation type for more detail
         String sql = "SELECT sub.title, u.username as student_name, sub.presentation_type, " +
-                "e.overall_score, e.comments, e.problem_clarity, e.methodology, e.results, e.presentation " +
+                "e.overall_score, e.comments, e.problem_clarity, e.methodology, e.results, e.presentation, " +
+                "eval.username as evaluator_name, pb.board_name " +
                 "FROM evaluations e " +
                 "JOIN submissions sub ON e.submission_id = sub.submission_id " +
                 "JOIN users u ON sub.student_id = u.user_id " +
+                "LEFT JOIN users eval ON e.evaluator_id = eval.user_id " +
+                "LEFT JOIN poster_presentations pp ON sub.submission_id = pp.submission_id " +
+                "LEFT JOIN presentation_boards pb ON pp.board_id = pb.board_id " +
                 "WHERE sub.seminar_id = ?::uuid";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);
