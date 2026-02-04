@@ -22,7 +22,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class CoordinatorPanel extends JPanel {
-    private MainFrame mainFrame;
     private DefaultTableModel sessionModel;
     private DefaultTableModel assignmentModel;
     private SessionDAO sessionDAO;
@@ -38,7 +37,6 @@ public class CoordinatorPanel extends JPanel {
     private List<String> seminarIds;
 
     public CoordinatorPanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
         this.sessionDAO = new SessionDAO();
         this.userDAO = new UserDAO();
         this.submissionDAO = new SubmissionDAO();
@@ -698,33 +696,47 @@ public class CoordinatorPanel extends JPanel {
                 StringBuilder sb = new StringBuilder("--- EVALUATION SUMMARY & ANALYTICS ---\n\n");
                 ResultSet rs = reportDAO.getEvaluationSummary(semId);
                 int count = 0;
+                int evaluatedCount = 0;
                 double total = 0;
                 while (rs.next()) {
                     int score = rs.getInt("overall_score");
+                    boolean isEvaluated = !rs.wasNull();
                     String evalName = rs.getString("evaluator_name");
                     String boardName = rs.getString("board_name");
+
                     sb.append("Student:   ").append(rs.getString("student_name"))
-                            .append(" (").append(rs.getString("presentation_type")).append(")\n")
-                            .append("Evaluator: ").append(evalName != null ? evalName : "Unknown").append("\n");
-                    if (boardName != null) {
-                        sb.append("Poster:    ").append(boardName).append("\n");
+                            .append(" (").append(rs.getString("presentation_type")).append(")\n");
+
+                    if (!isEvaluated) {
+                        sb.append("STATUS:    [PENDING EVALUATION]\n");
+                        sb.append("Evaluator: ").append(evalName != null ? evalName : "Not Assigned").append("\n");
+                    } else {
+                        sb.append("Evaluator: ").append(evalName != null ? evalName : "Unknown").append("\n");
+                        if (boardName != null) {
+                            sb.append("Poster:    ").append(boardName).append("\n");
+                        }
+                        sb.append("Title:     ").append(rs.getString("title")).append("\n")
+                                .append("Detailed Scores:\n")
+                                .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/25\n")
+                                .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/25\n")
+                                .append("   - Results:         ").append(rs.getInt("results")).append("/25\n")
+                                .append("   - Presentation:    ").append(rs.getInt("presentation")).append("/25\n")
+                                .append("OVERALL SCORE: ").append(score).append("/100\n")
+                                .append("Comments: ").append(rs.getString("comments")).append("\n");
+                        total += score;
+                        evaluatedCount++;
                     }
-                    sb.append("Title:     ").append(rs.getString("title")).append("\n")
-                            .append("Detailed Scores:\n")
-                            .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/25\n")
-                            .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/25\n")
-                            .append("   - Results:         ").append(rs.getInt("results")).append("/25\n")
-                            .append("   - Presentation:    ").append(rs.getInt("presentation")).append("/25\n")
-                            .append("OVERALL SCORE: ").append(score).append("/100\n")
-                            .append("Comments: ").append(rs.getString("comments")).append("\n")
-                            .append("------------------------------------------\n");
-                    total += score;
+                    sb.append("------------------------------------------\n");
                     count++;
                 }
                 if (count > 0) {
                     sb.append("\nDATA ANALYTICS:\n");
-                    sb.append("Total Evaluations: ").append(count).append("\n");
-                    sb.append("Average Overall Score: ").append(String.format("%.2f", total / count)).append("\n");
+                    sb.append("Total Students: ").append(count).append("\n");
+                    sb.append("Evaluated:      ").append(evaluatedCount).append("\n");
+                    if (evaluatedCount > 0) {
+                        sb.append("Average Score:  ").append(String.format("%.2f", total / evaluatedCount))
+                                .append("\n");
+                    }
                 }
                 lastSummary = sb.toString();
                 reportArea.setText(lastSummary);
@@ -754,7 +766,7 @@ public class CoordinatorPanel extends JPanel {
 
                 ResultSet rs = reportDAO.getAwardWinners(semId);
                 while (rs.next()) {
-                    sb.append("- ").append(rs.getString("presentation_type")).append(": ")
+                    sb.append("- ").append(rs.getString("award_category")).append(": ")
                             .append(rs.getString("student_name")).append(" - ")
                             .append(rs.getString("title")).append(" (Score: ")
                             .append(rs.getInt("overall_score")).append(")\n");

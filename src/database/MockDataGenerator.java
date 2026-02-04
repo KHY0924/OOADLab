@@ -89,8 +89,12 @@ public class MockDataGenerator {
             addStudentToSession(conn, sess2Id, stud4Id);
             addStudentToSession(conn, sess2Id, stud5Id);
 
-            // 9. Evaluations for student 2 (EVALUATED)
-            createEvaluation(conn, sub2Id, eval2Id, 85, "Great work", 18, 17, 19, 31);
+            // 9. Evaluations for all students
+            createEvaluation(conn, sub1Id, eval1Id, 88, "Solid presentation and good Q&A.", 22, 21, 22, 23);
+            createEvaluation(conn, sub2Id, eval2Id, 75, "Great work on quantum theory.", 18, 17, 19, 21);
+            createEvaluation(conn, sub3Id, eval1Id, 92, "Excellent poster design and results.", 23, 23, 23, 23);
+            createEvaluation(conn, sub4Id, eval2Id, 75, "Interesting topic, needs more data.", 15, 20, 20, 20);
+            createEvaluation(conn, sub5Id, eval1Id, 80, "Good chemical analysis.", 20, 20, 20, 20);
 
             // 10. Presentation Boards
             int boardId = createBoard(conn, "Board 001", "North Wing", 1, 1);
