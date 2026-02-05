@@ -11,12 +11,12 @@ Location: Main Hall A
   [Oral] stud1
      Title:     AI in Healthcare
      Evaluator: eval1
-     Poster:    P1
+     Poster:    P2
   ------------------------------------------
   [Oral] stud1
      Title:     AI in Healthcare
      Evaluator: eval1
-     Poster:    P2
+     Poster:    P1
   ------------------------------------------
   [Oral Presentation] stud1
      Title:     Sample Project 1
@@ -30,6 +30,11 @@ Location: Main Hall A
      Title:     Solar Panels Efficiency
      Evaluator: eval1
      Poster:    Board 001
+  ------------------------------------------
+  [Poster] stud3
+     Title:     Solar Panels Efficiency
+     Evaluator: eval1
+     Poster:    P3
   ------------------------------------------
 
 ==========================================
@@ -48,22 +53,44 @@ Location: Poster Area B
 
 --- EVALUATION SUMMARY & ANALYTICS ---
 
+Student:   stud1 (Oral Presentation)
+Evaluator: eval1
+Title:     Sample Project 1
+Detailed Scores:
+   - Problem Clarity: 22/25
+   - Methodology:     19/25
+   - Results:         21/25
+   - Presentation:    18/25
+OVERALL SCORE: 80/100
+Comments: Good work on Sample Project 1. Keep improving methodology.
+------------------------------------------
 Student:   stud2 (Poster Presentation)
-STATUS:    [PENDING EVALUATION]
-Evaluator: Not Assigned
+Evaluator: eval1
+Title:     Sample Project 2
+Detailed Scores:
+   - Problem Clarity: 17/25
+   - Methodology:     18/25
+   - Results:         17/25
+   - Presentation:    25/25
+OVERALL SCORE: 77/100
+Comments: Good work on Sample Project 2. Keep improving methodology.
 ------------------------------------------
 Student:   stud3 (Oral Presentation)
-STATUS:    [PENDING EVALUATION]
-Evaluator: Not Assigned
-------------------------------------------
-Student:   stud1 (Oral Presentation)
-STATUS:    [PENDING EVALUATION]
-Evaluator: Not Assigned
+Evaluator: eval1
+Title:     Sample Project 3
+Detailed Scores:
+   - Problem Clarity: 20/25
+   - Methodology:     17/25
+   - Results:         24/25
+   - Presentation:    18/25
+OVERALL SCORE: 79/100
+Comments: Good work on Sample Project 3. Keep improving methodology.
 ------------------------------------------
 
 DATA ANALYTICS:
 Total Students: 3
-Evaluated:      0
+Evaluated:      3
+Average Score:  78.67
 
 
 --- AWARD WINNERS & CEREMONY AGENDA ---
@@ -72,10 +99,13 @@ Evaluated:      0
 2. Opening Remarks by Faculty Dean
 3. Presentation of Awards:
 
+- Best Oral: stud1 - Sample Project 1 (Score: 80)
+- Best Poster: stud2 - Sample Project 2 (Score: 77)
+- People's Choice: stud2 - Sample Project 2 (Score: 77)
 
 4. Keynote Presentation by Winners
 5. Closing Ceremony and Refreshments
 
 
 ==========================================
-Report Generated on: Fri Feb 06 01:25:40 GMT+08:00 2026
+Report Generated on: Fri Feb 06 01:33:59 GMT+08:00 2026
