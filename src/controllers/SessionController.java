@@ -38,7 +38,7 @@ public class SessionController {
         LocalDateTime dateTime = LocalDateTime.of(date, time);
         Timestamp timestamp = Timestamp.valueOf(dateTime);
         DateAndTime dateAndTime = new DateAndTime(date, time);
-        Seminar seminar = new Seminar(seminarID, location, dateAndTime);
+        Seminar seminar = new Seminar(seminarID, location, dateAndTime, semester, year);
         try {
             sessionDAO.createSeminar(seminarID, location, timestamp, semester, year);
             System.out.println("Seminar created in database: " + seminarID);

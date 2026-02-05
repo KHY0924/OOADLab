@@ -5,6 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
+import models.Submission;
 import models.Session;
 import models.PresentationBoard;
 import models.PosterPresentation;
@@ -190,7 +191,7 @@ public class CoordinatorPanel extends JPanel {
         }
     }
 
-    private void loadSeminars() {
+    public void loadSeminars() {
         if (sessionSeminarCombo != null)
             sessionSeminarCombo.removeAllItems();
         if (reportSeminarCombo != null)
@@ -227,7 +228,7 @@ public class CoordinatorPanel extends JPanel {
 
         JTextField locField = new JTextField();
         JTextField dateField = new JTextField("2026-02-10 09:00");
-        String[] types = { "Oral", "Poster" };
+        String[] types = { "Oral Presentation", "Poster Presentation" };
         JComboBox<String> typeBox = new JComboBox<>(types);
 
         Object[] message = {
@@ -518,25 +519,26 @@ public class CoordinatorPanel extends JPanel {
         List<String> subTitles = new ArrayList<>();
         List<Integer> boardIds = new ArrayList<>();
 
-        try {
-            ResultSet rs = submissionDAO.getAllSubmissions();
-            while (rs.next()) {
-                String type = rs.getString("presentation_type");
-                if ("Poster Presentation".equals(type) || "Poster".equals(type)) {
-                    subCombo.addItem(rs.getString("student_name") + ": " + rs.getString("title"));
-                    subIds.add(rs.getString("submission_id"));
-                    subTitles.add(rs.getString("title"));
-                }
-            }
-            rs.getStatement().getConnection().close();
+        List<Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
+        for (Submission s : allSubmissions) {
+            String studentName = s.getStudentName();
+            String title = s.getTitle();
+            String type = s.getPresentationType();
 
+            // Show all submitted students, but keep type clear
+            subCombo.addItem("[" + type + "] " + studentName + ": " + title);
+            subIds.add(s.getId());
+            subTitles.add(title);
+        }
+
+        try {
             List<PresentationBoard> boards = posterService.getAllBoards();
             for (PresentationBoard b : boards) {
                 String assigned = posterService.isBoardAssigned(b.getBoardId()) ? " [ASSIGNED]" : "";
                 boardCombo.addItem(b.getBoardName() + " (" + b.getLocation() + ")" + assigned);
                 boardIds.add(b.getBoardId());
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -560,20 +562,26 @@ public class CoordinatorPanel extends JPanel {
                 }
 
                 try {
-                    // We need a session_id as per schema. Find the first Poster session.
+                    // We need a session_id as per schema. Find a Poster session if possible.
                     List<Session> sessions = sessionDAO.getAllSessions();
                     String sessionId = null;
+
+                    // 1. Try to find an explicit poster session
                     for (Session s : sessions) {
-                        if ("Poster Presentation".equalsIgnoreCase(s.getSessionType())
-                                || "Poster".equalsIgnoreCase(s.getSessionType())) {
+                        if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
                             sessionId = s.getSessionID();
                             break;
                         }
                     }
 
+                    // 2. Fallback to any session if none marked as poster
+                    if (sessionId == null && !sessions.isEmpty()) {
+                        sessionId = sessions.get(0).getSessionID();
+                    }
+
                     if (sessionId == null) {
                         JOptionPane.showMessageDialog(this,
-                                "Error: No Poster Session found. Please create a Poster session first.");
+                                "Error: No session found in database. Please create a session in 'Manage Sessions' first.");
                         return;
                     }
 

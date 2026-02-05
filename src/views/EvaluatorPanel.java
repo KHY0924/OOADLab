@@ -76,6 +76,11 @@ public class EvaluatorPanel extends JPanel {
         cardLayout.show(listPanel, "DASHBOARD");
     }
 
+    public void refreshData() {
+        loadAssignments();
+        cardLayout.show(listPanel, "DASHBOARD");
+    }
+
     private JPanel createDashboardPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Theme.BG_COLOR);

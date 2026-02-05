@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import models.Session;
 import models.Seminar;
 import models.ScheduleItem;
@@ -127,6 +128,33 @@ public class SessionDAO {
         Connection conn = DatabaseConnection.getConnection();
         Statement stmt = conn.createStatement();
         return stmt.executeQuery(sql);
+    }
+
+    public List<Seminar> getSeminarsList() {
+        List<Seminar> seminars = new ArrayList<>();
+        try (ResultSet rs = getAllSeminars()) {
+            while (rs.next()) {
+                String id = rs.getString("seminar_id");
+                String loc = rs.getString("location");
+                Timestamp ts = rs.getTimestamp("seminar_date");
+                int semester = rs.getInt("semester");
+                int year = rs.getInt("year");
+
+                models.DateAndTime dt = null;
+                if (ts != null) {
+                    LocalDateTime ldt = ts.toLocalDateTime();
+                    dt = new models.DateAndTime(ldt.toLocalDate(), ldt.toLocalTime());
+                }
+
+                seminars.add(new Seminar(id, loc, dt, semester, year));
+            }
+            if (!rs.isClosed()) {
+                rs.getStatement().getConnection().close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return seminars;
     }
 
     public ResultSet findBySessionId(String sessionId) throws SQLException {

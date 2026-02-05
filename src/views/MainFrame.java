@@ -61,6 +61,12 @@ public class MainFrame extends JFrame {
     public void showPanel(String panelName) {
         if (PROFILE_PANEL.equals(panelName)) {
             profilePanel.loadProfile();
+        } else if (STUDENT_PANEL.equals(panelName)) {
+            studentPanel.refreshData();
+        } else if (COORDINATOR_PANEL.equals(panelName)) {
+            coordinatorPanel.loadSeminars();
+        } else if (EVALUATOR_PANEL.equals(panelName)) {
+            evaluatorPanel.refreshData();
         }
         cardLayout.show(mainPanel, panelName);
     }

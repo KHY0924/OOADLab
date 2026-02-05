@@ -9,7 +9,7 @@ public class SubmissionDAO {
 
     public void createSubmission(String seminarId, String studentId, String title,
             String abstractText, String supervisor, String presentationType) throws SQLException {
-        String sql = "INSERT INTO submissions (seminar_id, student_id, title, abstract_text, supervisor, presentation_type) VALUES (?, ?::uuid, ?, ?, ?, ?)";
+        String sql = "INSERT INTO submissions (seminar_id, student_id, title, abstract_text, supervisor, presentation_type) VALUES (?::uuid, ?::uuid, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, seminarId);
@@ -69,7 +69,7 @@ public class SubmissionDAO {
 
     public List<Submission> getAllSubmissionsList() {
         List<Submission> submissions = new ArrayList<>();
-        String sql = "SELECT * FROM submissions";
+        String sql = "SELECT s.*, u.username as student_name FROM submissions s JOIN users u ON s.student_id = u.user_id";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
@@ -81,8 +81,12 @@ public class SubmissionDAO {
                 String abstractText = rs.getString("abstract_text");
                 String supervisor = rs.getString("supervisor");
                 String presentationType = rs.getString("presentation_type");
-                submissions.add(new Submission(submissionId, seminarId, studentId, title, abstractText, supervisor,
-                        presentationType));
+                String studentName = rs.getString("student_name");
+
+                Submission sub = new Submission(submissionId, seminarId, studentId, title, abstractText, supervisor,
+                        presentationType);
+                sub.setStudentName(studentName);
+                submissions.add(sub);
             }
         } catch (SQLException e) {
             e.printStackTrace();

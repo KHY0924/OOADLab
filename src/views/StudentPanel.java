@@ -41,7 +41,7 @@ public class StudentPanel extends JPanel {
     private JTextArea abstractArea;
     private JComboBox<String> supervisorField;
     private JComboBox<String> typeCombo;
-    private JComboBox<String> sessionCombo;
+    private JComboBox<models.Seminar> sessionCombo;
 
     private JTable statusTable;
     private DefaultTableModel statusModel;
@@ -131,8 +131,8 @@ public class StudentPanel extends JPanel {
 
         JLabel sessionLabel = new JLabel("Select Semester");
         Theme.styleLabel(sessionLabel, false);
-        String[] semesters = { "Semester 1", "Semester 2", "Semester 3" };
-        sessionCombo = new JComboBox<>(semesters);
+        sessionCombo = new JComboBox<>();
+        loadAvailableSeminars();
         sessionCombo.setFont(Theme.STANDARD_FONT);
         sessionCombo.setBackground(Color.WHITE);
 
@@ -181,15 +181,15 @@ public class StudentPanel extends JPanel {
                 return;
             }
 
-            String selectedSemester = (String) sessionCombo.getSelectedItem();
-            if (selectedSemester == null || selectedSemester.isEmpty()) {
+            models.Seminar selectedSeminar = (models.Seminar) sessionCombo.getSelectedItem();
+            if (selectedSeminar == null) {
                 JOptionPane.showMessageDialog(this, "Please select a valid semester.");
                 return;
             }
 
             try {
                 submissionDAO.createSubmission(
-                        selectedSemester,
+                        selectedSeminar.getSeminarId(),
                         user.getUserId(),
                         titleField.getText(),
                         abstractArea.getText(),
@@ -239,7 +239,21 @@ public class StudentPanel extends JPanel {
         return wrapper;
     }
 
-    // Semester options are now hardcoded in createRegistrationPanel()
+    public void refreshData() {
+        loadAvailableSeminars();
+        refreshMaterials();
+        refreshStatus();
+    }
+
+    private void loadAvailableSeminars() {
+        sessionCombo.removeAllItems();
+        List<models.Seminar> seminars = sessionDAO.getSeminarsList();
+        for (models.Seminar s : seminars) {
+            sessionCombo.addItem(s);
+        }
+    }
+
+    // Semester options are now dynamic
 
     private JPanel createUploadPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());
