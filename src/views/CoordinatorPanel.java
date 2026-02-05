@@ -800,19 +800,50 @@ public class CoordinatorPanel extends JPanel {
             try {
                 StringBuilder sb = new StringBuilder("--- SEMINAR SCHEDULE ---\n\n");
                 ResultSet rs = reportDAO.getSeminarSchedule(semId);
+                String currentSessionId = null;
                 while (rs.next()) {
+                    String sessionId = rs.getString("session_id");
+                    java.sql.Timestamp sessionDate = rs.getTimestamp("session_date");
+                    String location = rs.getString("location");
+
+                    String studentName = rs.getString("student_name");
+                    String pType = rs.getString("presentation_type");
                     String evalName = rs.getString("evaluator_name");
                     String boardName = rs.getString("board_name");
-                    sb.append("[").append(rs.getString("presentation_type")).append("] ")
-                            .append(rs.getTimestamp("session_date")).append("\n")
-                            .append("   Location:  ").append(rs.getString("location")).append("\n");
-                    if (boardName != null) {
-                        sb.append("   Poster:    ").append(boardName).append("\n");
+                    String title = rs.getString("title");
+
+                    // New session header
+                    if (!sessionId.equals(currentSessionId)) {
+                        if (currentSessionId != null) {
+                            sb.append("\n"); // Add spacing between sessions
+                        }
+                        currentSessionId = sessionId;
+                        sb.append("==========================================\n");
+                        sb.append("SESSION: ").append(sessionDate).append("\n");
+                        sb.append("Location: ").append(location).append("\n");
+                        sb.append("==========================================\n");
                     }
-                    sb.append("   Evaluator: ").append(evalName != null ? evalName : "Not Assigned").append("\n")
-                            .append("   Student:   ").append(rs.getString("student_name")).append("\n")
-                            .append("   Project:   ").append(rs.getString("title")).append("\n")
-                            .append("------------------------------------------\n");
+
+                    // Student details under session
+                    if (studentName != null) {
+                        sb.append("  [").append(pType != null ? pType : "N/A").append("] ").append(studentName)
+                                .append("\n")
+                                .append("     Title:     ").append(title).append("\n")
+                                .append("     Evaluator: ").append(evalName != null ? evalName : "Not Assigned")
+                                .append("\n");
+                        if (boardName != null) {
+                            sb.append("     Poster:    ").append(boardName).append("\n");
+                        }
+                        sb.append("  ------------------------------------------\n");
+                    } else {
+                        sb.append("  [No students assigned to this session]\n");
+                    }
+                }
+                if (currentSessionId == null) {
+                    sb.append("No sessions found for this seminar.\n\n");
+                    sb.append("DEBUG INFO:\n");
+                    sb.append("Seminar ID: ").append(semId).append("\n");
+                    sb.append("\nPlease ensure sessions are created in 'Manage Sessions' tab.\n");
                 }
                 lastSchedule = sb.toString();
                 reportArea.setText(lastSchedule);
