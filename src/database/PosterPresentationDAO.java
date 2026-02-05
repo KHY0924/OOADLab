@@ -133,6 +133,19 @@ public class PosterPresentationDAO {
         return "Unassigned";
     }
 
+    public boolean isSubmissionAssigned(String submissionId) {
+        String sql = "SELECT 1 FROM poster_presentations WHERE submission_id = ?::uuid LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, submissionId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean deletePresentation(int presentationId) {
         String sql = "DELETE FROM poster_presentations WHERE presentation_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();

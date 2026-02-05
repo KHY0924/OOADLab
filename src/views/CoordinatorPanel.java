@@ -3,24 +3,26 @@ package views;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.event.TableModelListener;
+// import javax.swing.event.TableModelEvent; // Removed unused import
 import java.awt.*;
 
 import models.Submission;
 import models.Session;
 import models.PresentationBoard;
 import models.PosterPresentation;
+import database.DatabaseConnection;
 import database.SessionDAO;
 import database.UserDAO;
 import database.SubmissionDAO;
 import database.ReportDAO;
 import services.PosterPresentationService;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.UUID; // Added missing import
 
 public class CoordinatorPanel extends JPanel {
     private DefaultTableModel sessionModel;
@@ -108,11 +110,11 @@ public class CoordinatorPanel extends JPanel {
         seminarSelectorPanel.add(seminarLabel);
         seminarSelectorPanel.add(sessionSeminarCombo);
 
-        String[] columns = { "ID", "Date", "Venue", "Type", "Evaluator", "Action" };
+        String[] columns = { "ID", "Date", "Venue", "Type", "Action" };
         sessionModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 5;
+                return column == 4;
             }
         };
         loadSessions();
@@ -123,11 +125,11 @@ public class CoordinatorPanel extends JPanel {
         table.getTableHeader().setBackground(Theme.UNVERIFIED_BG);
 
         // Action Column Buttons
-        table.getColumnModel().getColumn(5).setCellRenderer(new ActionButtonsRenderer());
-        table.getColumnModel().getColumn(5).setCellEditor(new ActionButtonsEditor(new JCheckBox(), table));
+        table.getColumnModel().getColumn(4).setCellRenderer(new ActionButtonsRenderer());
+        table.getColumnModel().getColumn(4).setCellEditor(new ActionButtonsEditor(new JCheckBox(), table));
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0); // Hide ID column but keep data
-        table.getColumnModel().getColumn(5).setPreferredWidth(170); // Wider for two buttons
+        table.getColumnModel().getColumn(4).setPreferredWidth(170); // Wider for two buttons
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -179,13 +181,11 @@ public class CoordinatorPanel extends JPanel {
             sessions = sessionDAO.getAllSessions();
         }
         for (Session s : sessions) {
-            String evalDisplay = s.getEvaluatorName() != null ? s.getEvaluatorName() : "";
             sessionModel.addRow(new Object[] {
                     s.getSessionID(),
                     s.getSessionDate() + " " + s.getSessionTime(),
                     s.getLocation(),
                     s.getSessionType(),
-                    evalDisplay,
                     "Edit"
             });
         }
@@ -240,7 +240,7 @@ public class CoordinatorPanel extends JPanel {
         int option = JOptionPane.showConfirmDialog(this, message, "Add New Session", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-                String id = java.util.UUID.randomUUID().toString();
+                String id = UUID.randomUUID().toString();
                 Timestamp ts = Timestamp.valueOf(dateField.getText() + ":00");
                 sessionDAO.createSession(id, selectedSeminarId, locField.getText(), ts,
                         (String) typeBox.getSelectedItem());
@@ -274,7 +274,7 @@ public class CoordinatorPanel extends JPanel {
         int option = JOptionPane.showConfirmDialog(this, message, "Add New Seminar", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-                String id = java.util.UUID.randomUUID().toString();
+                String id = UUID.randomUUID().toString();
                 Timestamp ts = Timestamp.valueOf(dateField.getText() + ":00");
                 int semester = Integer.parseInt((String) semesterCombo.getSelectedItem());
                 int year = Integer.parseInt((String) yearCombo.getSelectedItem());
@@ -295,12 +295,12 @@ public class CoordinatorPanel extends JPanel {
         card.setBackground(Theme.CARD_BG);
         card.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
-        JLabel header = new JLabel("Assign Students and Evaluators to Sessions");
+        JLabel header = new JLabel("Manage Students and Evaluators for All Sessions");
         header.setFont(Theme.SUBHEADER_FONT);
         header.setForeground(Theme.PRIMARY_COLOR);
         header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        String[] columns = { "ID", "Date", "Venue", "Type", "Action" };
+        String[] columns = { "ID", "Date", "Venue", "Type", "Management" };
         assignmentModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -347,74 +347,166 @@ public class CoordinatorPanel extends JPanel {
         if (assignmentModel == null)
             return;
         assignmentModel.setRowCount(0);
-        List<Session> sessions = sessionDAO.getUnassignedSessions();
+        List<Session> sessions = sessionDAO.getAllSessions();
         for (Session s : sessions) {
+            // We could add student counts here if needed, but for now just show basic info
             assignmentModel.addRow(new Object[] {
                     s.getSessionID(),
                     s.getSessionDate() + " " + s.getSessionTime(),
                     s.getLocation(),
                     s.getSessionType(),
-                    "Assign"
+                    "Manage"
             });
         }
     }
 
-    private void showAssignEvaluatorToSessionDialog(String preSelectedSessionId) {
-        JComboBox<String> sessCombo = new JComboBox<>();
-        JComboBox<String> evalCombo = new JComboBox<>();
-        List<String> sessionIdsForSess = new ArrayList<>();
-        List<String> evaluatorIdsForSess = new ArrayList<>();
+    private void showManageAssignmentsDialog(String sessionId) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Manage Session Assignments",
+                true);
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(900, 600); // Made it slightly wider for the split pane
+        dialog.setLocationRelativeTo(this);
 
+        // Directly show the Assignments Overview (Assignment Form + Table)
+        JPanel contentPanel = createAssignmentsOverviewPanel(sessionId);
+        dialog.add(contentPanel, BorderLayout.CENTER);
+
+        JButton closeBtn = new JButton("Close & Refresh");
+        Theme.styleButton(closeBtn);
+        closeBtn.addActionListener(e -> {
+            dialog.dispose();
+            loadUnassignedSessions();
+            loadSessions();
+        });
+
+        JPanel south = new JPanel();
+        south.add(closeBtn);
+        dialog.add(south, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
+    // Removed unused createManageStudentsPanel and createManageEvaluatorsPanel
+    // methods
+    // ... (Use multi_replace to remove them if I want to be clean, but for now
+    // focus on the requested changes.
+    // Actually, I should probably leave them or remove them? The prompt asks to
+    // remove the *tabs*, not necessarily delete the code, but cleaning is good.
+    // I will just replace the dialog method and the helper function here.
+
+    // Helper to extract ID from display string (e.g., "username (ID: uuid)")
+    private String extractIdFromDisplayString(String displayString) {
+        int startIndex = displayString.lastIndexOf("(ID: ");
+        if (startIndex != -1) {
+            int endIndex = displayString.lastIndexOf(")");
+            // "(ID: " is 5 chars long.
+            if (endIndex != -1 && endIndex > startIndex + 5) {
+                return displayString.substring(startIndex + 5, endIndex).trim();
+            }
+        }
+        return null;
+    }
+
+    private void refreshStudentList(String sessionId, DefaultListModel<String> model) {
+        model.clear();
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT u.username, u.user_id FROM session_students ss JOIN users u ON ss.student_id = u.user_id WHERE ss.session_id = ?::uuid")) {
+            stmt.setString(1, sessionId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                model.addElement(rs.getString("username") + " (ID: " + rs.getString("user_id") + ")");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshEvaluatorList(String sessionId, DefaultListModel<String> model) {
+        model.clear();
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT u.username, u.user_id FROM session_evaluators se JOIN users u ON se.evaluator_id = u.user_id WHERE se.session_id = ?::uuid")) {
+            stmt.setString(1, sessionId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                model.addElement(rs.getString("username") + " (ID: " + rs.getString("user_id") + ")");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showAddStudentToSessionDialog(String sessionId, DefaultListModel<String> listModel) {
+        JComboBox<String> studentCombo = new JComboBox<>();
+        List<String> studentIds = new ArrayList<>();
         try {
-            List<Session> sessions = sessionDAO.getAllSessions();
-            int selectedIndex = -1;
-            for (int i = 0; i < sessions.size(); i++) {
-                Session s = sessions.get(i);
-                String status = s.getEvaluatorName() != null ? " [Assigned: " + s.getEvaluatorName() + "]"
-                        : " [UNASSIGNED]";
-                sessCombo.addItem(
-                        s.getSessionDate() + " - " + s.getLocation() + " (" + s.getSessionType() + ")" + status);
-                sessionIdsForSess.add(s.getSessionID());
-                if (preSelectedSessionId != null && preSelectedSessionId.equals(s.getSessionID())) {
-                    selectedIndex = i;
+            // Get all students who have submitted, and are not already in this session
+            List<models.Submission> submissions = submissionDAO.getAllSubmissionsList();
+            List<String> currentStudentIdsInSession = sessionDAO.getStudentIdsInSession(sessionId);
+
+            for (models.Submission s : submissions) {
+                if (!currentStudentIdsInSession.contains(s.getStudentId())) {
+                    studentCombo
+                            .addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle());
+                    studentIds.add(s.getStudentId());
                 }
             }
-            if (selectedIndex != -1) {
-                sessCombo.setSelectedIndex(selectedIndex);
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            ResultSet rsEval = userDAO.getUsersByRole("evaluator");
-            while (rsEval.next()) {
-                String name = rsEval.getString("username");
-                String eId = rsEval.getString("user_id");
-                evalCombo.addItem(name);
-                evaluatorIdsForSess.add(eId);
+        if (studentIds.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No available students to add to this session.");
+            return;
+        }
+
+        int option = JOptionPane.showConfirmDialog(this, studentCombo, "Add Student to Session",
+                JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION && studentCombo.getSelectedIndex() >= 0) {
+            try {
+                sessionDAO.addStudentToSession(sessionId, studentIds.get(studentCombo.getSelectedIndex()));
+                refreshStudentList(sessionId, listModel);
+                JOptionPane.showMessageDialog(this, "Student added successfully!");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
             }
-            rsEval.getStatement().getConnection().close();
+        }
+    }
+
+    private void showAddEvaluatorToSessionDialog(String sessionId, DefaultListModel<String> listModel) {
+        JComboBox<String> evalCombo = new JComboBox<>();
+        List<String> evalIds = new ArrayList<>();
+        try {
+            // Get all evaluators not already assigned to this session
+            List<String> currentEvaluatorIdsInSession = sessionDAO.getEvaluatorIdsInSession(sessionId);
+            ResultSet rs = userDAO.getUsersByRole("evaluator");
+            while (rs.next()) {
+                String evaluatorId = rs.getString("user_id");
+                if (!currentEvaluatorIdsInSession.contains(evaluatorId)) {
+                    evalCombo.addItem(rs.getString("username"));
+                    evalIds.add(evaluatorId);
+                }
+            }
+            rs.getStatement().getConnection().close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        Object[] message = {
-                "Select Session:", sessCombo,
-                "Select Evaluator:", evalCombo
-        };
+        if (evalIds.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No available evaluators to add to this session.");
+            return;
+        }
 
-        int option = JOptionPane.showConfirmDialog(this, message, "Assign Evaluator to Session",
+        int option = JOptionPane.showConfirmDialog(this, evalCombo, "Add Evaluator to Session",
                 JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
+        if (option == JOptionPane.OK_OPTION && evalCombo.getSelectedIndex() >= 0) {
             try {
-                int sessIdx = sessCombo.getSelectedIndex();
-                int evalIdx = evalCombo.getSelectedIndex();
-                if (sessIdx >= 0 && evalIdx >= 0) {
-                    sessionDAO.assignEvaluatorToSession(sessionIdsForSess.get(sessIdx),
-                            evaluatorIdsForSess.get(evalIdx));
-                    JOptionPane.showMessageDialog(this, "Evaluator assigned to all students in session successfully!");
-                    loadUnassignedSessions();
-                    loadSessions();
-                }
+                sessionDAO.addEvaluatorToSession(sessionId, evalIds.get(evalCombo.getSelectedIndex()));
+                refreshEvaluatorList(sessionId, listModel);
+                JOptionPane.showMessageDialog(this, "Evaluator added successfully!");
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, ex.getMessage());
             }
         }
     }
@@ -515,9 +607,11 @@ public class CoordinatorPanel extends JPanel {
     private void showAssignPosterDialog() {
         JComboBox<String> subCombo = new JComboBox<>();
         JComboBox<String> boardCombo = new JComboBox<>();
+        JComboBox<String> sessionCombo = new JComboBox<>();
         List<String> subIds = new ArrayList<>();
         List<String> subTitles = new ArrayList<>();
         List<Integer> boardIds = new ArrayList<>();
+        List<String> posterSessionIds = new ArrayList<>();
 
         List<Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
         for (Submission s : allSubmissions) {
@@ -538,13 +632,22 @@ public class CoordinatorPanel extends JPanel {
                 boardCombo.addItem(b.getBoardName() + " (" + b.getLocation() + ")" + assigned);
                 boardIds.add(b.getBoardId());
             }
+
+            List<Session> allSessions = sessionDAO.getAllSessions();
+            for (Session s : allSessions) {
+                if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
+                    sessionCombo.addItem(s.getSessionType() + " at " + s.getLocation());
+                    posterSessionIds.add(s.getSessionID());
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Object[] message = {
                 "Select Student / Poster Submission:", subCombo,
-                "Select Board ID:", boardCombo
+                "Select Board ID:", boardCombo,
+                "Select Poster Session:", sessionCombo
         };
 
         if (JOptionPane.showConfirmDialog(this, message, "Assign Student to Board",
@@ -562,26 +665,15 @@ public class CoordinatorPanel extends JPanel {
                 }
 
                 try {
-                    // We need a session_id as per schema. Find a Poster session if possible.
-                    List<Session> sessions = sessionDAO.getAllSessions();
+                    int sessIdx = sessionCombo.getSelectedIndex();
                     String sessionId = null;
-
-                    // 1. Try to find an explicit poster session
-                    for (Session s : sessions) {
-                        if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
-                            sessionId = s.getSessionID();
-                            break;
-                        }
-                    }
-
-                    // 2. Fallback to any session if none marked as poster
-                    if (sessionId == null && !sessions.isEmpty()) {
-                        sessionId = sessions.get(0).getSessionID();
+                    if (sessIdx >= 0) {
+                        sessionId = posterSessionIds.get(sessIdx);
                     }
 
                     if (sessionId == null) {
                         JOptionPane.showMessageDialog(this,
-                                "Error: No session found in database. Please create a session in 'Manage Sessions' first.");
+                                "Error: No Poster Session selected. Please select a valid Poster session.");
                         return;
                     }
 
@@ -1056,22 +1148,18 @@ public class CoordinatorPanel extends JPanel {
     }
 
     class AssignmentActionRenderer extends JPanel implements TableCellRenderer {
-        private JButton assignStudentBtn;
-        private JButton assignEvaluatorBtn;
+        private JButton manageBtn;
 
         public AssignmentActionRenderer() {
             setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
             setOpaque(true);
             setBackground(Color.WHITE);
 
-            assignStudentBtn = new JButton("Assign Student");
-            assignEvaluatorBtn = new JButton("Assign Evaluator");
+            manageBtn = new JButton("Assign Student & Evaluator");
 
-            styleMiniButton(assignStudentBtn, Theme.PRIMARY_COLOR);
-            styleMiniButton(assignEvaluatorBtn, Theme.PRIMARY_COLOR);
+            styleMiniButton(manageBtn, Theme.PRIMARY_COLOR);
 
-            add(assignStudentBtn);
-            add(assignEvaluatorBtn);
+            add(manageBtn);
         }
 
         private void styleMiniButton(JButton btn, Color bgColor) {
@@ -1096,8 +1184,7 @@ public class CoordinatorPanel extends JPanel {
 
     class AssignmentActionEditor extends DefaultCellEditor {
         private JPanel panel;
-        private JButton assignStudentBtn;
-        private JButton assignEvaluatorBtn;
+        private JButton manageBtn;
         private String sessionId;
 
         public AssignmentActionEditor(JCheckBox checkBox, JTable table) {
@@ -1105,24 +1192,15 @@ public class CoordinatorPanel extends JPanel {
             panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
             panel.setOpaque(true);
 
-            assignStudentBtn = new JButton("Assign Student");
-            assignEvaluatorBtn = new JButton("Assign Evaluator");
+            manageBtn = new JButton("Assign Student & Evaluator");
+            styleMiniButton(manageBtn, Theme.PRIMARY_COLOR);
 
-            styleMiniButton(assignStudentBtn, Theme.PRIMARY_COLOR);
-            styleMiniButton(assignEvaluatorBtn, Theme.PRIMARY_COLOR);
-
-            assignStudentBtn.addActionListener(e -> {
+            manageBtn.addActionListener(e -> {
                 fireEditingStopped();
-                showAssignSpecificStudentDialog(sessionId);
+                showManageAssignmentsDialog(sessionId);
             });
 
-            assignEvaluatorBtn.addActionListener(e -> {
-                fireEditingStopped();
-                showAssignEvaluatorToSessionDialog(sessionId);
-            });
-
-            panel.add(assignStudentBtn);
-            panel.add(assignEvaluatorBtn);
+            panel.add(manageBtn);
         }
 
         private void styleMiniButton(JButton btn, Color bgColor) {
@@ -1147,42 +1225,151 @@ public class CoordinatorPanel extends JPanel {
 
         @Override
         public Object getCellEditorValue() {
-            return "Assign";
+            return "Assign Student & Evaluator";
         }
     }
 
-    private void showAssignSpecificStudentDialog(String sessionId) {
-        JComboBox<String> subCombo = new JComboBox<>();
-        List<String> studentIdsForSess = new ArrayList<>();
+    private JPanel createAssignmentsOverviewPanel(String sessionId) {
+        JPanel panel = new JPanel(new BorderLayout());
 
-        try {
-            ResultSet rsSub = submissionDAO.getAllSubmissions();
-            while (rsSub.next()) {
-                subCombo.addItem(rsSub.getString("student_name") + ": " + rsSub.getString("title"));
-                studentIdsForSess.add(rsSub.getString("student_id"));
+        // --- LEFT SIDE: Assignment Form ---
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Theme.CARD_BG);
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel studentLabel = new JLabel("Select Student:");
+        studentLabel.setFont(Theme.BOLD_FONT);
+        JComboBox<String> studentCombo = new JComboBox<>();
+        studentCombo.setPreferredSize(new Dimension(250, 30));
+
+        JLabel evaluatorLabel = new JLabel("Select Evaluator:");
+        evaluatorLabel.setFont(Theme.BOLD_FONT);
+        JComboBox<String> evaluatorCombo = new JComboBox<>();
+        evaluatorCombo.setPreferredSize(new Dimension(250, 30));
+
+        JButton saveBtn = new JButton("Save Assignment");
+        Theme.styleButton(saveBtn);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(studentLabel, gbc);
+        gbc.gridy = 1;
+        formPanel.add(studentCombo, gbc);
+        gbc.gridy = 2;
+        formPanel.add(evaluatorLabel, gbc);
+        gbc.gridy = 3;
+        formPanel.add(evaluatorCombo, gbc);
+        gbc.gridy = 4;
+        gbc.ipady = 10;
+        formPanel.add(saveBtn, gbc);
+
+        // Spacer to push components up
+        gbc.gridy = 5;
+        gbc.weighty = 1.0;
+        formPanel.add(new JPanel() {
+            {
+                setOpaque(false);
             }
-            rsSub.getStatement().getConnection().close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        }, gbc);
 
-        Object[] message = {
-                "Select Student to add to this session:", subCombo
+        // --- RIGHT SIDE: Table ---
+        String[] columns = { "Student", "Submission Title", "Assigned Evaluator", "StudentId" };
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make read-only as we have the form now
+            }
         };
 
-        int option = JOptionPane.showConfirmDialog(this, message, "Assign Student to Session",
-                JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
+        JTable table = new JTable(model);
+        table.setRowHeight(35);
+        table.getTableHeader().setFont(Theme.BOLD_FONT);
+        table.getColumnModel().getColumn(3).setMinWidth(0);
+        table.getColumnModel().getColumn(3).setMaxWidth(0);
+
+        JScrollPane tableScroll = new JScrollPane(table);
+
+        // --- DATA LOADING & ACTIONS ---
+        Runnable refreshData = () -> {
+            model.setRowCount(0);
+            studentCombo.removeAllItems();
+            evaluatorCombo.removeAllItems();
+
             try {
-                int sIdx = subCombo.getSelectedIndex();
-                if (sIdx >= 0) {
-                    sessionDAO.addStudentToSession(sessionId, studentIdsForSess.get(sIdx));
-                    JOptionPane.showMessageDialog(this, "Student assigned to session successfully!");
-                    loadUnassignedSessions();
+                // 1. Load Table Data (Current Assignments)
+                List<String[]> overview = sessionDAO.getAssignmentsOverview(sessionId);
+                for (String[] row : overview) {
+                    model.addRow(new Object[] { row[0], row[1], row[2], row[4] });
                 }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+
+                // 2. Load Combobox Data (ALL Students & Evaluators)
+
+                // Load ALL Submissions (Students)
+                List<models.Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
+                for (models.Submission s : allSubmissions) {
+                    // Format: [Type] Name: Title (ID: uuid)
+                    studentCombo.addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle()
+                            + " (ID: " + s.getStudentId() + ")");
+                }
+
+                // Load ALL Evaluators
+                ResultSet rs = userDAO.getUsersByRole("evaluator");
+                while (rs.next()) {
+                    evaluatorCombo.addItem(rs.getString("username") + " (ID: " + rs.getString("user_id") + ")");
+                }
+                rs.getStatement().getConnection().close();
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(panel, "Error loading data: " + e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
+        };
+
+        // Initial Load
+        refreshData.run();
+
+        // Save Action
+        saveBtn.addActionListener(e -> {
+            String selectedStudentRaw = (String) studentCombo.getSelectedItem();
+            String selectedEvaluatorRaw = (String) evaluatorCombo.getSelectedItem();
+
+            if (selectedStudentRaw == null || selectedEvaluatorRaw == null) {
+                JOptionPane.showMessageDialog(panel, "Please select both a student and an evaluator.");
+                return;
+            }
+
+            String studentId = extractIdFromDisplayString(selectedStudentRaw);
+            String evaluatorId = extractIdFromDisplayString(selectedEvaluatorRaw);
+
+            if (studentId != null && evaluatorId != null) {
+                try {
+                    // Auto-Add Logic: Ensure they are in the session first
+                    sessionDAO.addStudentToSession(sessionId, studentId);
+                    sessionDAO.addEvaluatorToSession(sessionId, evaluatorId);
+
+                    // Now Assign
+                    sessionDAO.updateStudentEvaluator(sessionId, studentId, evaluatorId);
+                    JOptionPane.showMessageDialog(panel, "Assignment Saved Successfully!");
+                    refreshData.run(); // Refresh UI
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Error saving assignment: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Error parsing IDs. Please try again.");
+            }
+        });
+
+        // --- SPLIT PANE ---
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tableScroll);
+        splitPane.setDividerLocation(300); // Give form some space
+        splitPane.setResizeWeight(0.0); // Form stays fixed ish
+        splitPane.setOneTouchExpandable(true);
+
+        panel.add(splitPane, BorderLayout.CENTER);
+        return panel;
     }
 }

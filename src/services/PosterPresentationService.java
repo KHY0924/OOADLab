@@ -39,6 +39,10 @@ public class PosterPresentationService {
         return presentationDAO.getPresentationsByBoardId(boardId);
     }
 
+    public boolean isSubmissionAssigned(String submissionId) {
+        return presentationDAO.isSubmissionAssigned(submissionId);
+    }
+
     public boolean updatePresentation(PosterPresentation presentation) {
         return presentationDAO.updatePresentation(presentation);
     }

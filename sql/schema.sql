@@ -71,6 +71,13 @@ CREATE TABLE IF NOT EXISTS session_students (
     PRIMARY KEY (session_id, student_id)
 );
 
+-- Session-Evaluators junction table (many-to-many)
+CREATE TABLE IF NOT EXISTS session_evaluators (
+    session_id UUID REFERENCES sessions(session_id) ON DELETE CASCADE,
+    evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    PRIMARY KEY (session_id, evaluator_id)
+);
+
 -- Table to link an Evaluator to a Submission 
 CREATE TABLE IF NOT EXISTS evaluator_assignments (
     assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
