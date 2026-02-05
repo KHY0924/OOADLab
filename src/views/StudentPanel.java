@@ -34,6 +34,7 @@ import database.SubmissionDAO;
 import models.Material;
 import models.Session;
 import models.User;
+import services.PosterPresentationService;
 
 public class StudentPanel extends JPanel {
     private MainFrame mainFrame;
@@ -53,6 +54,7 @@ public class StudentPanel extends JPanel {
     private SessionDAO sessionDAO;
     private EvaluationDAO evaluationDAO;
     private MaterialDAO materialDAO;
+    private PosterPresentationService posterService;
     private List<Session> availableSessions;
 
     public StudentPanel(MainFrame mainFrame) {
@@ -61,6 +63,7 @@ public class StudentPanel extends JPanel {
         this.sessionDAO = new SessionDAO();
         this.evaluationDAO = new EvaluationDAO();
         this.materialDAO = new MaterialDAO();
+        this.posterService = new PosterPresentationService();
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
@@ -188,6 +191,20 @@ public class StudentPanel extends JPanel {
             }
 
             try {
+                // Constraint: Check for pending submissions
+                ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
+                while (rs.next()) {
+                    String subId = rs.getString("submission_id");
+                    if (!evaluationDAO.isEvaluated(subId)) {
+                        JOptionPane.showMessageDialog(this,
+                                "You cannot submit a new application while you have a pending registration.\nPlease wait until your previous submission is graded.",
+                                "Submission Blocked", JOptionPane.WARNING_MESSAGE);
+                        rs.close(); // Close result set before returning
+                        return;
+                    }
+                }
+                rs.close(); // Close result set if loop completes
+
                 submissionDAO.createSubmission(
                         selectedSeminar.getSeminarId(),
                         user.getUserId(),
@@ -411,11 +428,14 @@ public class StudentPanel extends JPanel {
                     }
                 }
 
-                // Get Board ID (dummy logic or from DB if column added)
-                String board = type.contains("Poster") ? "TBD" : "-";
+                // Get Board ID
+                String board = "-";
+                if (type.contains("Poster")) {
+                    board = posterService.getBoardNameForSubmission(subId);
+                }
 
                 boolean isEvaluated = evaluationDAO.isEvaluated(subId);
-                String status = isEvaluated ? "Graded \u2705" : "Pending \u23F3";
+                String status = isEvaluated ? "Graded" : "Pending";
 
                 statusModel.addRow(new Object[] { subId, title, supervisor, type, venue, time, board, status });
             }

@@ -157,4 +157,21 @@ public class PosterPresentationDAO {
             return false;
         }
     }
+
+    public String getBoardNameForSubmission(String submissionId) {
+        String sql = "SELECT pb.board_name FROM presentation_boards pb " +
+                "JOIN poster_presentations pp ON pb.board_id = pp.board_id " +
+                "WHERE pp.submission_id = ?::uuid";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, submissionId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("board_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Not Assigned";
+    }
 }

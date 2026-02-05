@@ -110,4 +110,8 @@ public class PosterPresentationService {
         }
         return false;
     }
+
+    public String getBoardNameForSubmission(String submissionId) {
+        return presentationDAO.getBoardNameForSubmission(submissionId);
+    }
 }
