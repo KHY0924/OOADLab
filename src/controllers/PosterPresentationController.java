@@ -33,7 +33,7 @@ public class PosterPresentationController {
     }
 
     public boolean createBoard(String boardName, String location, int maxPresentations) {
-        PresentationBoard board = new PresentationBoard(0, boardName, location, maxPresentations, 0);
+        PresentationBoard board = new PresentationBoard(0, boardName, location, maxPresentations, 0, null, null);
         return service.createBoard(board);
     }
 

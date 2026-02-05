@@ -11,15 +11,17 @@ public class PresentationBoardDAO {
     }
 
     public boolean createBoard(PresentationBoard board) {
-        String sql = "INSERT INTO presentation_boards (board_name, location, max_presentations, current_presentations) "
+        String sql = "INSERT INTO presentation_boards (board_name, location, max_presentations, current_presentations, session_id, presentation_type) "
                 +
-                "VALUES (?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?::uuid, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, board.getBoardName());
             stmt.setString(2, board.getLocation());
             stmt.setInt(3, board.getMaxPresentations());
             stmt.setInt(4, board.getCurrentPresentations());
+            stmt.setString(5, board.getSessionId());
+            stmt.setString(6, board.getPresentationType());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -39,7 +41,9 @@ public class PresentationBoardDAO {
                         rs.getString("board_name"),
                         rs.getString("location"),
                         rs.getInt("max_presentations"),
-                        rs.getInt("current_presentations"));
+                        rs.getInt("current_presentations"),
+                        rs.getString("session_id"),
+                        rs.getString("presentation_type"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -59,7 +63,9 @@ public class PresentationBoardDAO {
                         rs.getString("board_name"),
                         rs.getString("location"),
                         rs.getInt("max_presentations"),
-                        rs.getInt("current_presentations")));
+                        rs.getInt("current_presentations"),
+                        rs.getString("session_id"),
+                        rs.getString("presentation_type")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -69,14 +75,16 @@ public class PresentationBoardDAO {
 
     public boolean updateBoard(PresentationBoard board) {
         String sql = "UPDATE presentation_boards SET board_name = ?, location = ?, " +
-                "max_presentations = ?, current_presentations = ? WHERE board_id = ?";
+                "max_presentations = ?, current_presentations = ?, session_id = ?::uuid, presentation_type = ? WHERE board_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, board.getBoardName());
             stmt.setString(2, board.getLocation());
             stmt.setInt(3, board.getMaxPresentations());
             stmt.setInt(4, board.getCurrentPresentations());
-            stmt.setInt(5, board.getBoardId());
+            stmt.setString(5, board.getSessionId());
+            stmt.setString(6, board.getPresentationType());
+            stmt.setInt(7, board.getBoardId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

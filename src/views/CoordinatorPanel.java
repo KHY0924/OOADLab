@@ -55,7 +55,7 @@ public class CoordinatorPanel extends JPanel {
         headerPanel.setBackground(Theme.PRIMARY_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
-        JLabel title = new JLabel("Coordinator Dashboard");
+        JLabel title = new JLabel("Coordinator Dashboard (Updated)");
         title.setFont(Theme.HEADER_FONT);
         title.setForeground(Color.WHITE);
 
@@ -520,7 +520,7 @@ public class CoordinatorPanel extends JPanel {
         card.setBackground(Theme.CARD_BG);
         card.setBorder(Theme.createCardBorder());
 
-        String[] columns = { "Board ID", "Location", "Assigned Student" };
+        String[] columns = { "Board ID", "Location", "Assigned Student", "Session", "Type" };
         boardModel = new DefaultTableModel(columns, 0);
         JTable boardTable = new JTable(boardModel);
         boardTable.setRowHeight(30);
@@ -537,7 +537,9 @@ public class CoordinatorPanel extends JPanel {
                 boardModel.addRow(new Object[] {
                         b.getBoardName(),
                         b.getLocation(),
-                        studentName
+                        studentName,
+                        b.getSessionId(),
+                        b.getPresentationType()
                 });
             }
         });
@@ -554,9 +556,34 @@ public class CoordinatorPanel extends JPanel {
             };
             JComboBox<String> locCombo = new JComboBox<>(locations);
 
+            // Session Dropdown
+            JComboBox<String> sessionBox = new JComboBox<>();
+            List<String> sessionIds = new ArrayList<>();
+            List<models.Session> sessions = sessionDAO.getAllSessions();
+            for (models.Session s : sessions) {
+                // Filter for poster sessions if possible, or show all
+                if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
+                    sessionBox.addItem(s.getSessionType() + " (" + s.getLocation() + ")");
+                    sessionIds.add(s.getSessionID());
+                }
+            }
+            if (sessionIds.isEmpty()) {
+                // Fallback if no poster sessions found for testing
+                for (models.Session s : sessions) {
+                    sessionBox.addItem(s.getSessionType() + " (" + s.getLocation() + ")");
+                    sessionIds.add(s.getSessionID());
+                }
+            }
+
+            // Type Dropdown
+            String[] types = { "A1 Portrait", "A1 Landscape", "A0 Portrait", "Digital Screen" };
+            JComboBox<String> typeBox = new JComboBox<>(types);
+
             Object[] msg = {
                     "Board ID (e.g., P1, P2):", idF,
-                    "Select Location:", locCombo
+                    "Select Location:", locCombo,
+                    "Select Session:", sessionBox,
+                    "Board Type:", typeBox
             };
             if (JOptionPane.showConfirmDialog(this, msg, "Add New Board",
                     JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -566,8 +593,14 @@ public class CoordinatorPanel extends JPanel {
                 }
                 try {
                     String selectedLoc = (String) locCombo.getSelectedItem();
+                    int sessIdx = sessionBox.getSelectedIndex();
+                    String selectedSessionId = (sessIdx >= 0 && sessIdx < sessionIds.size()) ? sessionIds.get(sessIdx)
+                            : null;
+                    String selectedType = (String) typeBox.getSelectedItem();
+
                     // Default capacity to 1 as per requirements (one student per board)
-                    PresentationBoard board = new PresentationBoard(0, idF.getText(), selectedLoc, 1, 0);
+                    PresentationBoard board = new PresentationBoard(0, idF.getText(), selectedLoc, 1, 0,
+                            selectedSessionId, selectedType);
                     posterService.createBoard(board);
                     posterRefreshBtn.doClick();
                 } catch (Exception ex) {
