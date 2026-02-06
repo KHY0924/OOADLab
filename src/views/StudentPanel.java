@@ -34,6 +34,7 @@ import database.SubmissionDAO;
 import models.Material;
 import models.Session;
 import models.User;
+import services.PosterPresentationService;
 
 public class StudentPanel extends JPanel {
     private MainFrame mainFrame;
@@ -41,7 +42,7 @@ public class StudentPanel extends JPanel {
     private JTextArea abstractArea;
     private JComboBox<String> supervisorField;
     private JComboBox<String> typeCombo;
-    private JComboBox<String> sessionCombo;
+    private JComboBox<models.Seminar> sessionCombo;
 
     private JTable statusTable;
     private DefaultTableModel statusModel;
@@ -53,6 +54,7 @@ public class StudentPanel extends JPanel {
     private SessionDAO sessionDAO;
     private EvaluationDAO evaluationDAO;
     private MaterialDAO materialDAO;
+    private PosterPresentationService posterService;
     private List<Session> availableSessions;
 
     public StudentPanel(MainFrame mainFrame) {
@@ -61,6 +63,7 @@ public class StudentPanel extends JPanel {
         this.sessionDAO = new SessionDAO();
         this.evaluationDAO = new EvaluationDAO();
         this.materialDAO = new MaterialDAO();
+        this.posterService = new PosterPresentationService();
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
@@ -131,8 +134,8 @@ public class StudentPanel extends JPanel {
 
         JLabel sessionLabel = new JLabel("Select Semester");
         Theme.styleLabel(sessionLabel, false);
-        String[] semesters = { "Semester 1", "Semester 2", "Semester 3" };
-        sessionCombo = new JComboBox<>(semesters);
+        sessionCombo = new JComboBox<>();
+        loadAvailableSeminars();
         sessionCombo.setFont(Theme.STANDARD_FONT);
         sessionCombo.setBackground(Color.WHITE);
 
@@ -181,15 +184,29 @@ public class StudentPanel extends JPanel {
                 return;
             }
 
-            String selectedSemester = (String) sessionCombo.getSelectedItem();
-            if (selectedSemester == null || selectedSemester.isEmpty()) {
+            models.Seminar selectedSeminar = (models.Seminar) sessionCombo.getSelectedItem();
+            if (selectedSeminar == null) {
                 JOptionPane.showMessageDialog(this, "Please select a valid semester.");
                 return;
             }
 
             try {
+                // Constraint: Check for pending submissions
+                ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
+                while (rs.next()) {
+                    String subId = rs.getString("submission_id");
+                    if (!evaluationDAO.isEvaluated(subId)) {
+                        JOptionPane.showMessageDialog(this,
+                                "You cannot submit a new application while you have a pending registration.\nPlease wait until your previous submission is graded.",
+                                "Submission Blocked", JOptionPane.WARNING_MESSAGE);
+                        rs.close(); // Close result set before returning
+                        return;
+                    }
+                }
+                rs.close(); // Close result set if loop completes
+
                 submissionDAO.createSubmission(
-                        selectedSemester,
+                        selectedSeminar.getSeminarId(),
                         user.getUserId(),
                         titleField.getText(),
                         abstractArea.getText(),
@@ -239,7 +256,21 @@ public class StudentPanel extends JPanel {
         return wrapper;
     }
 
-    // Semester options are now hardcoded in createRegistrationPanel()
+    public void refreshData() {
+        loadAvailableSeminars();
+        refreshMaterials();
+        refreshStatus();
+    }
+
+    private void loadAvailableSeminars() {
+        sessionCombo.removeAllItems();
+        List<models.Seminar> seminars = sessionDAO.getSeminarsList();
+        for (models.Seminar s : seminars) {
+            sessionCombo.addItem(s);
+        }
+    }
+
+    // Semester options are now dynamic
 
     private JPanel createUploadPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -397,11 +428,14 @@ public class StudentPanel extends JPanel {
                     }
                 }
 
-                // Get Board ID (dummy logic or from DB if column added)
-                String board = type.contains("Poster") ? "TBD" : "-";
+                // Get Board ID
+                String board = "-";
+                if (type.contains("Poster")) {
+                    board = posterService.getBoardNameForSubmission(subId);
+                }
 
                 boolean isEvaluated = evaluationDAO.isEvaluated(subId);
-                String status = isEvaluated ? "Graded \u2705" : "Pending \u23F3";
+                String status = isEvaluated ? "Graded" : "Pending";
 
                 statusModel.addRow(new Object[] { subId, title, supervisor, type, venue, time, board, status });
             }

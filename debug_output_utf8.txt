@@ -1,8 +1,0 @@
-﻿--- USERS TABLE ---
-ID: 1c126575-685f-46db-9b05-9c144b1188c1, User: [admin], Pass: [password], Role: coordinator
-ID: 97961aca-d6ea-4163-b776-6cb2a99ecb75, User: [eval1], Pass: [password], Role: evaluator
-ID: 6510cddf-26f4-40f1-b495-fb304a0d348c, User: [eval2], Pass: [password], Role: evaluator
-ID: 4e010eec-0e0c-4216-941a-8583c6d6091c, User: [stud1], Pass: [password], Role: student
-ID: 5f1e227a-e382-4c05-abc6-c77b92048628, User: [stud2], Pass: [password], Role: student
-ID: a03a9d82-1123-446e-8644-a5f8db1837ec, User: [stud3], Pass: [password], Role: student
--------------------

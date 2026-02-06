@@ -32,8 +32,10 @@ public class AssignmentDAO {
                 String subId = rs.getString("submission_id");
                 String title = rs.getString("title");
                 String studentName = rs.getString("student_name");
+                String type = rs.getString("presentation_type");
+                String supervisor = rs.getString("supervisor");
 
-                Submission sub = new Submission(subId, title);
+                Submission sub = new Submission(subId, null, null, title, null, supervisor, type);
                 sub.setStudentName(studentName);
                 list.add(sub);
             }

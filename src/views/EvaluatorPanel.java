@@ -9,6 +9,7 @@ import models.Submission;
 import models.Evaluation;
 import database.AssignmentDAO;
 import database.EvaluationDAO;
+import services.PosterPresentationService;
 
 public class EvaluatorPanel extends JPanel {
     private MainFrame mainFrame;
@@ -31,12 +32,14 @@ public class EvaluatorPanel extends JPanel {
     private String currentSubmissionId;
     private AssignmentDAO assignmentDAO;
     private EvaluationDAO evaluationDAO;
+    private PosterPresentationService posterService;
     private List<Submission> currentAssignments;
 
     public EvaluatorPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.assignmentDAO = new AssignmentDAO();
         this.evaluationDAO = new EvaluationDAO();
+        this.posterService = new PosterPresentationService();
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
@@ -73,6 +76,11 @@ public class EvaluatorPanel extends JPanel {
         add(listPanel, BorderLayout.CENTER);
 
         // Show Dashboard initially
+        cardLayout.show(listPanel, "DASHBOARD");
+    }
+
+    public void refreshData() {
+        loadAssignments();
         cardLayout.show(listPanel, "DASHBOARD");
     }
 
@@ -253,17 +261,32 @@ public class EvaluatorPanel extends JPanel {
     }
 
     private void openEvaluationForm(String subId, String title) {
-        String studentName = "Unknown";
+        Submission selectedSub = null;
         // Find student name from loaded assignments
         for (Submission s : currentAssignments) {
             if (s.getId().equals(subId)) {
-                studentName = s.getStudentName();
+                selectedSub = s;
                 break;
             }
         }
 
+        if (selectedSub == null)
+            return;
+
+        // Validation: If it's a poster, it must be assigned to a board
+        String type = selectedSub.getPresentationType();
+        if (type != null && type.toLowerCase().contains("poster")) {
+            if (!posterService.isSubmissionAssigned(subId)) {
+                JOptionPane.showMessageDialog(this,
+                        "Evaluation Blocked: This poster has not been assigned a Board ID by the Coordinator yet.",
+                        "Assignment Required",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
         currentSubmissionId = subId;
-        selectedStudentLabel.setText("Evaluating: " + studentName + " - " + title);
+        selectedStudentLabel.setText("Evaluating: " + selectedSub.getStudentName() + " - " + title);
 
         // Clear sliders and text
         problemSlider.setValue(5);

@@ -19,9 +19,16 @@ public class PosterPresentationService {
         this.criteriaDAO = new EvaluationCriteriaDAO();
     }
 
-
     public boolean addPresentation(PosterPresentation presentation) {
-        return presentationDAO.createPresentation(presentation);
+        if (presentationDAO.createPresentation(presentation)) {
+            PresentationBoard board = boardDAO.getBoardById(presentation.getBoardId());
+            if (board != null) {
+                board.setCurrentPresentations(board.getCurrentPresentations() + 1);
+                boardDAO.updateBoard(board);
+            }
+            return true;
+        }
+        return false;
     }
 
     public PosterPresentation getPresentationById(int presentationId) {
@@ -32,6 +39,10 @@ public class PosterPresentationService {
         return presentationDAO.getPresentationsByBoardId(boardId);
     }
 
+    public boolean isSubmissionAssigned(String submissionId) {
+        return presentationDAO.isSubmissionAssigned(submissionId);
+    }
+
     public boolean updatePresentation(PosterPresentation presentation) {
         return presentationDAO.updatePresentation(presentation);
     }
@@ -39,7 +50,6 @@ public class PosterPresentationService {
     public boolean deletePresentation(int presentationId) {
         return presentationDAO.deletePresentation(presentationId);
     }
-
 
     public boolean createBoard(PresentationBoard board) {
         return boardDAO.createBoard(board);
@@ -61,6 +71,13 @@ public class PosterPresentationService {
         return boardDAO.deleteBoard(boardId);
     }
 
+    public boolean isBoardAssigned(int boardId) {
+        return presentationDAO.getPresentationByBoardId(boardId) != null;
+    }
+
+    public String getStudentNameForBoard(int boardId) {
+        return presentationDAO.getStudentNameForBoard(boardId);
+    }
 
     public boolean addCriteria(EvaluationCriteria criteria) {
         return criteriaDAO.createCriteria(criteria);
@@ -82,16 +99,19 @@ public class PosterPresentationService {
         return criteriaDAO.deleteCriteria(criteriaId);
     }
 
-
     public boolean assignPresentationToBoard(int presentationId, int boardId) {
         PosterPresentation presentation = presentationDAO.getPresentationById(presentationId);
         PresentationBoard board = boardDAO.getBoardById(boardId);
-        
+
         if (presentation != null && board != null && !board.isFull()) {
             presentation.setBoardId(boardId);
             board.setCurrentPresentations(board.getCurrentPresentations() + 1);
             return presentationDAO.updatePresentation(presentation) && boardDAO.updateBoard(board);
         }
         return false;
+    }
+
+    public String getBoardNameForSubmission(String submissionId) {
+        return presentationDAO.getBoardNameForSubmission(submissionId);
     }
 }
