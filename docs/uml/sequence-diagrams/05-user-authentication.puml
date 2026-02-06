@@ -1,0 +1,84 @@
+@startuml user-authentication
+!theme plain
+
+title User Authentication & Role-Based Access
+
+actor User
+participant "LoginWindow" as LW
+participant "AuthService" as AS
+participant "UserDAO" as DAO
+database "PostgreSQL" as DB
+participant "MainApplication" as MA
+participant "StudentPanel" as SP
+participant "EvaluatorPanel" as EP
+participant "CoordinatorPanel" as CoP
+
+== Login Process ==
+User -> LW : Enter username & password
+User -> LW : Click "Login"
+
+LW -> AS : login(username, password)
+AS -> DAO : findByUsername(username)
+DAO -> DB : SELECT * FROM users \n WHERE username = ?
+DB --> DAO : User record
+
+alt User not found
+    DAO --> AS : null
+    AS --> LW : "Invalid credentials"
+    LW --> User : Show error message
+else User found
+    DAO --> AS : User object
+    AS -> AS : validateCredentials(password)
+    
+    alt Password incorrect
+        AS --> LW : "Invalid credentials"
+        LW --> User : Show error message
+    else Password correct
+        AS --> LW : User authenticated
+        AS -> AS : Log successful login
+        note right of AS
+            [AuthService] Login successful
+            for: username (Role: role)
+        end note
+        
+        LW -> MA : showMainWindow(user)
+        MA -> MA : Determine user role
+        
+        alt role == "student"
+            MA -> SP : new StudentPanel(userId)
+            SP --> User : Show Student Dashboard
+            note right of SP
+                - View Sessions
+                - View/Edit Submissions
+                - Upload Presentations
+            end note
+        else role == "evaluator"
+            MA -> EP : new EvaluatorPanel(userId)
+            EP --> User : Show Evaluator Dashboard
+            note right of EP
+                - View Assigned Submissions
+                - Submit Evaluations
+                - View Past Evaluations
+            end note
+        else role == "coordinator"
+            MA -> CoP : new CoordinatorPanel(userId)
+            CoP --> User : Show Coordinator Dashboard
+            note right of CoP
+                - Manage Seminars
+                - Manage Sessions
+                - Assign Students/Evaluators
+                - Generate Reports
+                - Manage Poster Boards
+            end note
+        end
+    end
+end
+
+== Logout ==
+User -> MA : Click "Logout"
+MA -> AS : logout()
+AS -> AS : Clear session
+MA -> LW : Show login window
+LW --> User : Ready for new login
+
+@enduml

@@ -107,7 +107,8 @@ public class Evaluation {
         this.methodology = s2;
         this.results = s3;
         this.presentation = s4;
-        this.overallScore = (s1 + s2 + s3 + s4) / 4; // Or keep separate overall if needed
+        // Each score is 0-10, total 40 max. Multiply by 2.5 to get 100 scale.
+        this.overallScore = (int) ((s1 + s2 + s3 + s4) * 2.5);
     }
 
     // Legacy support for other components

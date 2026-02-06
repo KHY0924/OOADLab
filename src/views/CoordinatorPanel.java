@@ -640,10 +640,11 @@ public class CoordinatorPanel extends JPanel {
     private void showAssignPosterDialog() {
         JComboBox<String> subCombo = new JComboBox<>();
         JComboBox<String> boardCombo = new JComboBox<>();
+        JComboBox<String> sessionCombo = new JComboBox<>();
         List<String> subIds = new ArrayList<>();
         List<String> subTitles = new ArrayList<>();
         List<Integer> boardIds = new ArrayList<>();
-        List<String> boardSessionIds = new ArrayList<>();
+        List<String> posterSessionIds = new ArrayList<>();
 
         List<Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
         for (Submission s : allSubmissions) {
@@ -663,7 +664,14 @@ public class CoordinatorPanel extends JPanel {
                 String assigned = posterService.isBoardAssigned(b.getBoardId()) ? " [ASSIGNED]" : "";
                 boardCombo.addItem(b.getBoardName() + " (" + b.getLocation() + ")" + assigned);
                 boardIds.add(b.getBoardId());
-                boardSessionIds.add(b.getSessionId()); // Store the board's session ID
+            }
+
+            List<Session> allSessions = sessionDAO.getAllSessions();
+            for (Session s : allSessions) {
+                if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
+                    sessionCombo.addItem(s.getSessionType() + " at " + s.getLocation());
+                    posterSessionIds.add(s.getSessionID());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -671,7 +679,8 @@ public class CoordinatorPanel extends JPanel {
 
         Object[] message = {
                 "Select Student / Poster Submission:", subCombo,
-                "Select Board ID:", boardCombo
+                "Select Board ID:", boardCombo,
+                "Select Poster Session:", sessionCombo
         };
 
         if (JOptionPane.showConfirmDialog(this, message, "Assign Student to Board",
@@ -689,12 +698,15 @@ public class CoordinatorPanel extends JPanel {
                 }
 
                 try {
-                    // Use the board's associated session ID
-                    String sessionId = boardSessionIds.get(bIdx);
+                    int sessIdx = sessionCombo.getSelectedIndex();
+                    String sessionId = null;
+                    if (sessIdx >= 0) {
+                        sessionId = posterSessionIds.get(sessIdx);
+                    }
 
                     if (sessionId == null) {
                         JOptionPane.showMessageDialog(this,
-                                "Error: This board has no associated session. Please edit the board to assign a session first.");
+                                "Error: No Poster Session selected. Please select a valid Poster session.");
                         return;
                     }
 
@@ -881,10 +893,10 @@ public class CoordinatorPanel extends JPanel {
                         }
                         sb.append("Title:     ").append(rs.getString("title")).append("\n")
                                 .append("Detailed Scores:\n")
-                                .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/25\n")
-                                .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/25\n")
-                                .append("   - Results:         ").append(rs.getInt("results")).append("/25\n")
-                                .append("   - Presentation:    ").append(rs.getInt("presentation")).append("/25\n")
+                                .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/10\n")
+                                .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/10\n")
+                                .append("   - Results:         ").append(rs.getInt("results")).append("/10\n")
+                                .append("   - Presentation:    ").append(rs.getInt("presentation")).append("/10\n")
                                 .append("OVERALL SCORE: ").append(score).append("/100\n")
                                 .append("Comments: ").append(rs.getString("comments")).append("\n");
                         total += score;

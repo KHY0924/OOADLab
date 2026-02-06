@@ -5,19 +5,21 @@ import java.sql.*;
 public class ReportDAO {
 
     public ResultSet getSeminarSchedule(String seminarId) throws SQLException {
-        // Session-centric view: Show sessions with their assigned students
-        String sql = "SELECT s.session_id, s.session_date, s.location, " +
+        // Show ALL students with submissions for this seminar, plus their
+        // session/evaluator assignments if any
+        String sql = "SELECT COALESCE(s.session_id::text, 'UNASSIGNED') as session_id, " +
+                "s.session_date, COALESCE(s.location, 'Not Scheduled') as location, " +
                 "sub.title, u.username as student_name, sub.presentation_type, " +
                 "eval.username as evaluator_name, pb.board_name " +
-                "FROM sessions s " +
-                "LEFT JOIN session_students ss ON s.session_id = ss.session_id " +
-                "LEFT JOIN submissions sub ON ss.student_id = sub.student_id " +
-                "LEFT JOIN users u ON sub.student_id = u.user_id " +
+                "FROM submissions sub " +
+                "JOIN users u ON sub.student_id = u.user_id " +
+                "LEFT JOIN session_students ss ON sub.student_id = ss.student_id " +
+                "LEFT JOIN sessions s ON ss.session_id = s.session_id AND s.seminar_id = sub.seminar_id " +
                 "LEFT JOIN users eval ON ss.evaluator_id = eval.user_id " +
                 "LEFT JOIN poster_presentations pp ON sub.submission_id = pp.submission_id " +
                 "LEFT JOIN presentation_boards pb ON pp.board_id = pb.board_id " +
-                "WHERE s.seminar_id = ?::uuid " +
-                "ORDER BY s.session_date ASC, sub.title ASC";
+                "WHERE sub.seminar_id = ?::uuid " +
+                "ORDER BY s.session_date ASC NULLS LAST, sub.title ASC";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, seminarId);

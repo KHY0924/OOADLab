@@ -1,0 +1,79 @@
+@startuml award-ceremony
+!theme plain
+
+title Award Ceremony & Winner Calculation
+
+actor Coordinator
+participant "CoordinatorPanel" as CP
+participant "ReportDAO" as RDAO
+participant "Award" as Award
+participant "Ceremony" as Ceremony
+database "PostgreSQL" as DB
+
+== Calculate Award Winners ==
+Coordinator -> CP : Click "Calculate Awards"
+CP -> RDAO : getAwardWinners(seminarId)
+
+group Best Oral Award
+    RDAO -> DB : SELECT student_name, title, score \n FROM evaluations e \n JOIN submissions s \n WHERE presentation_type LIKE '%Oral%' \n ORDER BY overall_score DESC \n LIMIT 1
+    DB --> RDAO : Best Oral winner
+end
+
+group Best Poster Award
+    RDAO -> DB : SELECT student_name, title, score \n FROM evaluations e \n JOIN submissions s \n WHERE presentation_type LIKE '%Poster%' \n ORDER BY overall_score DESC \n LIMIT 1
+    DB --> RDAO : Best Poster winner
+end
+
+group People's Choice Award
+    RDAO -> DB : SELECT student_name, title, score \n FROM evaluations e \n JOIN submissions s \n ORDER BY overall_score DESC \n OFFSET 2 LIMIT 1
+    DB --> RDAO : People's Choice winner
+end
+
+RDAO --> CP : List of Award winners
+
+loop For each winner
+    CP -> Award : new Award(type, studentId, \n studentName, submissionTitle)
+    Award --> CP : Award object
+end
+
+CP -> CP : Format ceremony agenda
+note right of CP
+    Ceremony Agenda:
+    1. Introduction & Welcome
+    2. Opening Remarks by Dean
+    3. Present Awards:
+       - Best Oral
+       - Best Poster
+       - People's Choice
+    4. Keynote by Winners
+    5. Closing & Refreshments
+end note
+
+CP --> Coordinator : Display awards & agenda
+
+== Generate Ceremony Report ==
+Coordinator -> CP : Click "Compile Report"
+
+CP -> Ceremony : createCeremony(seminarId, awards)
+Ceremony -> Ceremony : generateAgenda()
+Ceremony -> Ceremony : assignPresentationOrder()
+
+CP -> CP : Include in final report:
+note right of CP
+    --- AWARD WINNERS & CEREMONY ---
+    
+    1. Introduction and Welcome
+    2. Opening Remarks by Faculty Dean
+    3. Presentation of Awards:
+    
+    - Best Oral: [Winner Name] - [Title]
+    - Best Poster: [Winner Name] - [Title]
+    - People's Choice: [Winner Name] - [Title]
+    
+    4. Keynote Presentation by Winners
+    5. Closing Ceremony and Refreshments
+end note
+
+CP --> Coordinator : Complete ceremony section
+
+@enduml

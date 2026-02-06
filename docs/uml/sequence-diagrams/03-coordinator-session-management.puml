@@ -1,0 +1,79 @@
+@startuml coordinator-session-management
+!theme plain
+
+title Coordinator Session & Assignment Management
+
+actor Coordinator
+participant "CoordinatorPanel" as CP
+participant "SessionDAO" as SDAO
+participant "UserDAO" as UDAO
+database "PostgreSQL" as DB
+
+== Create New Session ==
+Coordinator -> CP : Click "Add Session"
+CP -> CP : Show session creation dialog
+Coordinator -> CP : Enter details (date, location, type)
+Coordinator -> CP : Select seminar from dropdown
+Coordinator -> CP : Click "OK"
+
+CP -> SDAO : createSession(session)
+SDAO -> DB : INSERT INTO sessions \n (seminar_id, session_date, \n location, session_type)
+DB --> SDAO : session_id
+SDAO --> CP : Session created
+CP --> Coordinator : "Session created successfully"
+CP -> CP : Refresh sessions table
+
+== Assign Student to Session ==
+Coordinator -> CP : Click "Manage" on session
+CP -> CP : Show management dialog
+Coordinator -> CP : Click "Add Student"
+
+CP -> UDAO : getAvailableStudents()
+UDAO -> DB : SELECT * FROM users \n WHERE role = 'student'
+DB --> UDAO : List<User>
+CP -> SDAO : getStudentIdsInSession(sessionId)
+SDAO -> DB : SELECT student_id FROM session_students
+DB --> SDAO : List<String>
+CP -> CP : Filter out already assigned students
+CP --> Coordinator : Show student dropdown
+
+Coordinator -> CP : Select student
+Coordinator -> CP : Click "OK"
+
+CP -> SDAO : addStudentToSession(sessionId, studentId)
+SDAO -> DB : INSERT INTO session_students \n (session_id, student_id)
+DB --> SDAO : Success
+SDAO --> CP : true
+CP --> Coordinator : "Student added"
+CP -> CP : Refresh student list
+
+== Assign Evaluator to Session ==
+Coordinator -> CP : Click "Add Evaluator"
+
+CP -> UDAO : getUsersByRole("evaluator")
+UDAO -> DB : SELECT * FROM users WHERE role = 'evaluator'
+DB --> UDAO : List<Evaluator>
+CP -> SDAO : getEvaluatorIdsInSession(sessionId)
+SDAO -> DB : SELECT evaluator_id FROM session_evaluators
+DB --> SDAO : List<String>
+CP -> CP : Filter out already assigned evaluators
+CP --> Coordinator : Show evaluator dropdown
+
+Coordinator -> CP : Select evaluator
+Coordinator -> CP : Click "OK"
+
+CP -> SDAO : addEvaluatorToSession(sessionId, evaluatorId)
+SDAO -> DB : INSERT INTO session_evaluators \n (session_id, evaluator_id)
+DB --> SDAO : Success
+
+note right of SDAO
+    Auto-assign evaluator to 
+    student submissions in session
+end note
+
+SDAO -> DB : INSERT INTO evaluator_assignments \n (evaluator_id, submission_id)
+DB --> SDAO : Success
+SDAO --> CP : true
+CP --> Coordinator : "Evaluator assigned"
+
+@enduml
