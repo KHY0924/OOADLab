@@ -13,12 +13,7 @@ Location: Hall
      Evaluator: eval1
      Poster:    p1
   ------------------------------------------
-
-==========================================
-SESSION: 2026-02-10 09:00:00.0
-Location: Dewan
-==========================================
-  [Poster Presentation] stud2
+  [Oral Presentation] stud2
      Title:     Learning
      Evaluator: eval2
      Poster:    p2
@@ -26,9 +21,9 @@ Location: Dewan
 
 ==========================================
 SESSION: 2026-02-10 09:00:00.0
-Location: Hall
+Location: Dewan
 ==========================================
-  [Oral Presentation] stud3
+  [Poster Presentation] stud3
      Title:     Reading
      Evaluator: eval3
      Poster:    p3
@@ -49,22 +44,10 @@ Detailed Scores:
 OVERALL SCORE: 10/100
 Comments: good
 ------------------------------------------
-Student:   stud2 (Poster Presentation)
+Student:   stud2 (Oral Presentation)
 Evaluator: eval2
 Poster:    p2
 Title:     Learning
-Detailed Scores:
-   - Problem Clarity: 10/10
-   - Methodology:     10/10
-   - Results:         10/10
-   - Presentation:    10/10
-OVERALL SCORE: 10/100
-Comments: good
-------------------------------------------
-Student:   stud3 (Oral Presentation)
-Evaluator: eval3
-Poster:    p3
-Title:     Reading
 Detailed Scores:
    - Problem Clarity: 5/10
    - Methodology:     5/10
@@ -72,6 +55,18 @@ Detailed Scores:
    - Presentation:    5/10
 OVERALL SCORE: 5/100
 Comments: no bad
+------------------------------------------
+Student:   stud3 (Poster Presentation)
+Evaluator: eval3
+Poster:    p3
+Title:     Reading
+Detailed Scores:
+   - Problem Clarity: 10/10
+   - Methodology:     10/10
+   - Results:         10/10
+   - Presentation:    10/10
+OVERALL SCORE: 10/100
+Comments: very good
 ------------------------------------------
 
 DATA ANALYTICS:
@@ -87,12 +82,12 @@ Average Score:  8.33
 3. Presentation of Awards:
 
 - Best Oral: stud1 - Health Care (Score: 10)
-- Best Poster: stud2 - Learning (Score: 10)
-- People's Choice: stud3 - Reading (Score: 5)
+- Best Poster: stud3 - Reading (Score: 10)
+- People's Choice: stud2 - Learning (Score: 5)
 
 4. Keynote Presentation by Winners
 5. Closing Ceremony and Refreshments
 
 
 ==========================================
-Report Generated on: Sat Feb 07 00:49:38 GMT+08:00 2026
+Report Generated on: Sat Feb 07 01:00:59 GMT+08:00 2026
