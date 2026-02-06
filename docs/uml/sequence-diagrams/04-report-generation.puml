@@ -1,0 +1,77 @@
+@startuml report-generation
+!theme plain
+
+title Report Generation & Export Flow
+
+actor Coordinator
+participant "CoordinatorPanel" as CP
+participant "ReportDAO" as RDAO
+participant "Report" as Report
+database "PostgreSQL" as DB
+entity "File System" as FS
+
+== Generate Seminar Schedule Report ==
+Coordinator -> CP : Select seminar from dropdown
+Coordinator -> CP : Click "1. Seminar Schedule"
+
+CP -> RDAO : getSeminarSchedule(seminarId)
+RDAO -> DB : SELECT sessions with students, \n evaluators, poster boards \n WHERE seminar_id = ?
+DB --> RDAO : ResultSet
+RDAO --> CP : Schedule data
+
+CP -> CP : Format schedule content
+CP --> Coordinator : Display schedule in text area
+
+== Generate Evaluation Summary ==
+Coordinator -> CP : Click "2. Evaluation Summary"
+
+CP -> RDAO : getEvaluationSummary(seminarId)
+RDAO -> DB : SELECT submissions with evaluations \n WHERE seminar_id = ?
+DB --> RDAO : ResultSet (scores, comments, evaluators)
+RDAO --> CP : Evaluation data
+
+CP -> CP : Calculate analytics
+note right of CP
+    Analytics:
+    - Total Students
+    - Evaluated Count
+    - Average Score
+end note
+CP --> Coordinator : Display summary with analytics
+
+== Calculate Awards ==
+Coordinator -> CP : Click "3. Calculate Awards"
+
+CP -> RDAO : getAwardWinners(seminarId)
+RDAO -> DB : SELECT Best Oral \n (highest score, type = 'Oral')
+RDAO -> DB : SELECT Best Poster \n (highest score, type = 'Poster')
+RDAO -> DB : SELECT People's Choice \n (3rd highest overall)
+DB --> RDAO : Award winners
+RDAO --> CP : List<Award data>
+
+CP -> CP : Format ceremony agenda
+CP --> Coordinator : Display award winners & agenda
+
+== Compile & Export Report ==
+Coordinator -> CP : Click "4. Save & Compile"
+
+CP -> CP : Combine all sections
+note right of CP
+    Final Report:
+    1. Seminar Schedule
+    2. Evaluation Summary
+    3. Award Winners
+    4. Generation timestamp
+end note
+CP --> Coordinator : Display compiled report
+CP --> Coordinator : Enable "Export" button
+
+Coordinator -> CP : Click "5. Export Report"
+CP -> Report : new SeminarSummaryReport(data)
+Report -> Report : generateContent()
+Report -> FS : exportToFile()
+FS --> Report : File written
+Report --> CP : Success
+CP --> Coordinator : "Report exported to file"
+
+@enduml

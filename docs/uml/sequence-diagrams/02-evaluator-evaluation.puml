@@ -1,0 +1,59 @@
+@startuml evaluator-evaluation
+!theme plain
+
+title Evaluator Submission Evaluation Flow
+
+actor Evaluator
+participant "EvaluatorPanel" as EP
+participant "EvaluationController" as EC
+participant "EvaluationDAO" as EDAO
+participant "AssignmentDAO" as ADAO
+database "PostgreSQL" as DB
+
+== View Assigned Submissions ==
+Evaluator -> EP : Login
+EP -> ADAO : getAssignedSubmissions(evaluatorId)
+ADAO -> DB : SELECT * FROM evaluator_assignments \n WHERE evaluator_id = ?
+DB --> ADAO : ResultSet
+ADAO --> EP : List<Submission>
+EP --> Evaluator : Display assigned submissions
+
+== Evaluate Submission ==
+Evaluator -> EP : Select submission
+EP -> EP : Show evaluation form
+note right of EP
+    Rubric Criteria:
+    - Problem Clarity (0-25)
+    - Methodology (0-25)
+    - Results (0-25)
+    - Presentation (0-25)
+end note
+
+Evaluator -> EP : Enter scores & comments
+Evaluator -> EP : Click "Submit Evaluation"
+
+EP -> EC : submitEvaluation(evaluation)
+EC -> EC : validateScores()
+
+alt Valid scores (0-25 each)
+    EC -> EDAO : save(evaluation)
+    EDAO -> DB : INSERT INTO evaluations \n (submission_id, evaluator_id, \n problem_clarity, methodology, \n results, presentation, \n overall_score, comments)
+    DB --> EDAO : Success
+    EDAO --> EC : true
+    EC --> EP : "Evaluation submitted"
+    EP --> Evaluator : Show success message
+    EP -> EP : Refresh submissions list
+else Invalid scores
+    EC --> EP : "Invalid scores. Must be 0-25"
+    EP --> Evaluator : Show error message
+end
+
+== View Previous Evaluation ==
+Evaluator -> EP : Select evaluated submission
+EP -> EDAO : getEvaluation(submissionId, evaluatorId)
+EDAO -> DB : SELECT * FROM evaluations \n WHERE submission_id = ? AND evaluator_id = ?
+DB --> EDAO : Evaluation
+EDAO --> EP : Evaluation
+EP --> Evaluator : Display evaluation details (read-only)
+
+@enduml
