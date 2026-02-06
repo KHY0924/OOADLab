@@ -5,49 +5,13 @@
 --- SEMINAR SCHEDULE ---
 
 ==========================================
-SESSION: 2026-02-07 01:23:21.519
-Location: Main Hall A
+SESSION: 2026-02-10 09:00:00.0
+Location: North Wing
 ==========================================
-  [Oral] stud1
-     Title:     AI in Healthcare
+  [Oral Presentation] stud1
+     Title:     New
      Evaluator: eval1
      Poster:    P2
-  ------------------------------------------
-  [Oral] stud1
-     Title:     AI in Healthcare
-     Evaluator: eval1
-     Poster:    P1
-  ------------------------------------------
-  [Oral Presentation] stud1
-     Title:     Sample Project 1
-     Evaluator: eval1
-  ------------------------------------------
-  [Oral Presentation] stud3
-     Title:     Sample Project 3
-     Evaluator: eval1
-  ------------------------------------------
-  [Poster] stud3
-     Title:     Solar Panels Efficiency
-     Evaluator: eval1
-     Poster:    Board 001
-  ------------------------------------------
-  [Poster] stud3
-     Title:     Solar Panels Efficiency
-     Evaluator: eval1
-     Poster:    P3
-  ------------------------------------------
-
-==========================================
-SESSION: 2026-02-08 01:23:21.543
-Location: Poster Area B
-==========================================
-  [Oral] stud2
-     Title:     Quantum Algorithms
-     Evaluator: eval1
-  ------------------------------------------
-  [Poster Presentation] stud2
-     Title:     Sample Project 2
-     Evaluator: eval1
   ------------------------------------------
 
 
@@ -55,42 +19,21 @@ Location: Poster Area B
 
 Student:   stud1 (Oral Presentation)
 Evaluator: eval1
-Title:     Sample Project 1
+Poster:    P2
+Title:     New
 Detailed Scores:
-   - Problem Clarity: 22/25
-   - Methodology:     19/25
-   - Results:         21/25
-   - Presentation:    18/25
-OVERALL SCORE: 80/100
-Comments: Good work on Sample Project 1. Keep improving methodology.
-------------------------------------------
-Student:   stud2 (Poster Presentation)
-Evaluator: eval1
-Title:     Sample Project 2
-Detailed Scores:
-   - Problem Clarity: 17/25
-   - Methodology:     18/25
-   - Results:         17/25
-   - Presentation:    25/25
-OVERALL SCORE: 77/100
-Comments: Good work on Sample Project 2. Keep improving methodology.
-------------------------------------------
-Student:   stud3 (Oral Presentation)
-Evaluator: eval1
-Title:     Sample Project 3
-Detailed Scores:
-   - Problem Clarity: 20/25
-   - Methodology:     17/25
-   - Results:         24/25
-   - Presentation:    18/25
-OVERALL SCORE: 79/100
-Comments: Good work on Sample Project 3. Keep improving methodology.
+   - Problem Clarity: 5/25
+   - Methodology:     5/25
+   - Results:         5/25
+   - Presentation:    5/25
+OVERALL SCORE: 5/100
+Comments: 
 ------------------------------------------
 
 DATA ANALYTICS:
-Total Students: 3
-Evaluated:      3
-Average Score:  78.67
+Total Students: 1
+Evaluated:      1
+Average Score:  5.00
 
 
 --- AWARD WINNERS & CEREMONY AGENDA ---
@@ -99,13 +42,11 @@ Average Score:  78.67
 2. Opening Remarks by Faculty Dean
 3. Presentation of Awards:
 
-- Best Oral: stud1 - Sample Project 1 (Score: 80)
-- Best Poster: stud2 - Sample Project 2 (Score: 77)
-- People's Choice: stud2 - Sample Project 2 (Score: 77)
+- Best Oral: stud1 - New (Score: 5)
 
 4. Keynote Presentation by Winners
 5. Closing Ceremony and Refreshments
 
 
 ==========================================
-Report Generated on: Fri Feb 06 01:33:59 GMT+08:00 2026
+Report Generated on: Fri Feb 06 18:53:59 GMT+08:00 2026

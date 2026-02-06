@@ -640,11 +640,10 @@ public class CoordinatorPanel extends JPanel {
     private void showAssignPosterDialog() {
         JComboBox<String> subCombo = new JComboBox<>();
         JComboBox<String> boardCombo = new JComboBox<>();
-        JComboBox<String> sessionCombo = new JComboBox<>();
         List<String> subIds = new ArrayList<>();
         List<String> subTitles = new ArrayList<>();
         List<Integer> boardIds = new ArrayList<>();
-        List<String> posterSessionIds = new ArrayList<>();
+        List<String> boardSessionIds = new ArrayList<>();
 
         List<Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
         for (Submission s : allSubmissions) {
@@ -664,14 +663,7 @@ public class CoordinatorPanel extends JPanel {
                 String assigned = posterService.isBoardAssigned(b.getBoardId()) ? " [ASSIGNED]" : "";
                 boardCombo.addItem(b.getBoardName() + " (" + b.getLocation() + ")" + assigned);
                 boardIds.add(b.getBoardId());
-            }
-
-            List<Session> allSessions = sessionDAO.getAllSessions();
-            for (Session s : allSessions) {
-                if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
-                    sessionCombo.addItem(s.getSessionType() + " at " + s.getLocation());
-                    posterSessionIds.add(s.getSessionID());
-                }
+                boardSessionIds.add(b.getSessionId()); // Store the board's session ID
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -679,8 +671,7 @@ public class CoordinatorPanel extends JPanel {
 
         Object[] message = {
                 "Select Student / Poster Submission:", subCombo,
-                "Select Board ID:", boardCombo,
-                "Select Poster Session:", sessionCombo
+                "Select Board ID:", boardCombo
         };
 
         if (JOptionPane.showConfirmDialog(this, message, "Assign Student to Board",
@@ -698,15 +689,12 @@ public class CoordinatorPanel extends JPanel {
                 }
 
                 try {
-                    int sessIdx = sessionCombo.getSelectedIndex();
-                    String sessionId = null;
-                    if (sessIdx >= 0) {
-                        sessionId = posterSessionIds.get(sessIdx);
-                    }
+                    // Use the board's associated session ID
+                    String sessionId = boardSessionIds.get(bIdx);
 
                     if (sessionId == null) {
                         JOptionPane.showMessageDialog(this,
-                                "Error: No Poster Session selected. Please select a valid Poster session.");
+                                "Error: This board has no associated session. Please edit the board to assign a session first.");
                         return;
                     }
 
