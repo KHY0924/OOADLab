@@ -144,8 +144,8 @@ package "Submission & Evaluation" {
     Seminar "1" -- "0..*" Submission : contains >
 }
 
-' ==================== AWARDS ====================
-package "Awards" {
+' ==================== AWARDS & CEREMONY ====================
+package "Awards & Ceremony" {
     class Award {
         - awardId: String
         - awardType: String
@@ -162,8 +162,73 @@ package "Awards" {
         + setRemarks(remarks: String): void
     }
 
+    class Ceremony {
+        - ceremonyId: String
+        - seminarId: String
+        - ceremonyName: String
+        - scheduledDateTime: LocalDateTime
+        - venue: String
+        - ceremonyStatus: String
+        - awards: List<Award>
+        - remarks: String
+        --
+        + addAward(award: Award): boolean
+        + removeAward(awardId: String): boolean
+        + getAllAwards(): List<Award>
+        + startCeremony(): void
+        + completeCeremony(): void
+        + cancelCeremony(): void
+        + getCeremonyStatus(): String
+    }
+
+    Ceremony "1" o-- "0..*" Award : contains >
     User "1" -- "0..*" Award : receives >
-    Seminar "1" -- "0..*" Award : presents >
+    Seminar "1" -- "0..1" Ceremony : has >
+}
+
+' ==================== PRESENTATION ====================
+package "Presentation" {
+    class PresentationBoard {
+        - boardId: int
+        - boardName: String
+        - location: String
+        - maxPresentations: int
+        - currentPresentations: int
+        - sessionId: String
+        - presentationType: String
+        --
+        + getBoardName(): String
+        + getLocation(): String
+        + isFull(): boolean
+        + getSessionId(): String
+    }
+
+    class Material {
+        - materialId: String
+        - submissionId: String
+        - fileName: String
+        - fileType: String
+        - uploadDate: Timestamp
+        - filePath: String
+        --
+        + getFileName(): String
+        + getFileType(): String
+        + getFilePath(): String
+    }
+
+    class PosterPresentation {
+        - presentationId: String
+        - submissionId: String
+        - boardId: int
+        --
+        + getSubmissionId(): String
+        + getBoardId(): int
+    }
+
+    Session "1" -- "0..*" PresentationBoard : has >
+    Submission "1" -- "0..*" Material : has >
+    Submission "1" -- "0..1" PosterPresentation : displayed on >
+    PresentationBoard "1" -- "0..*" PosterPresentation : hosts >
 }
 
 ' ==================== REPORTS ====================
