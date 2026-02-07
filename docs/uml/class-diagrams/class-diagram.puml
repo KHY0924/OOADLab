@@ -138,9 +138,9 @@ package "Submission & Evaluation" {
         + getTotalScore(): int
     }
 
-    Submission "1" -- "0..*" Evaluation : evaluated by >
-    User "1" -- "0..*" Submission : submits >
-    Evaluator "1" -- "0..*" Evaluation : creates >
+    Submission "1" -- "0..1" Evaluation : evaluated by >
+    User "1" -- "0..1" Submission : submits >
+    Evaluator "1" -- "0..1" Evaluation : creates >
     Seminar "1" -- "0..*" Submission : contains >
 }
 
