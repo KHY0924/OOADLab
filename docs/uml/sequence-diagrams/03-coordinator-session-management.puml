@@ -5,75 +5,156 @@ title Coordinator Session & Assignment Management
 
 actor Coordinator
 participant "CoordinatorPanel" as CP
+participant "SeminarDAO" as SemDAO
 participant "SessionDAO" as SDAO
 participant "UserDAO" as UDAO
 database "PostgreSQL" as DB
 
-== Create New Session ==
-Coordinator -> CP : Click "Add Session"
-CP -> CP : Show session creation dialog
-Coordinator -> CP : Enter details (date, location, type)
-Coordinator -> CP : Select seminar from dropdown
+== Step 1: Create Seminar First ==
+Coordinator -> CP : Click "Add Seminar"
+activate CP
+CP -> CP : Show seminar creation dialog
+Coordinator -> CP : Enter seminar details \n (Location, Date, Semester, Year)
 Coordinator -> CP : Click "OK"
 
-CP -> SDAO : createSession(session)
+CP -> SemDAO : createSeminar(seminar)
+activate SemDAO
+SemDAO -> DB : INSERT INTO seminars \n (title, description, deadline)
+activate DB
+DB --> SemDAO : seminar_id
+deactivate DB
+SemDAO --> CP : Seminar created
+deactivate SemDAO
+CP --> Coordinator : "Seminar created successfully"
+CP -> CP : Refresh seminar dropdown
+deactivate CP
+
+== Step 2: Select Seminar & Create Session ==
+Coordinator -> CP : Select seminar from dropdown
+activate CP
+CP -> CP : Load sessions for selected seminar
+deactivate CP
+
+Coordinator -> CP : Click "Add Session"
+activate CP
+CP -> CP : Show session creation dialog \n (seminar already selected)
+Coordinator -> CP : Enter details (date, location, type)
+Coordinator -> CP : Click "OK"
+
+CP -> SDAO : createSession(seminarId, session)
+activate SDAO
 SDAO -> DB : INSERT INTO sessions \n (seminar_id, session_date, \n location, session_type)
+activate DB
 DB --> SDAO : session_id
+deactivate DB
 SDAO --> CP : Session created
+deactivate SDAO
 CP --> Coordinator : "Session created successfully"
 CP -> CP : Refresh sessions table
+deactivate CP
 
-== Assign Student to Session ==
-Coordinator -> CP : Click "Manage" on session
-CP -> CP : Show management dialog
-Coordinator -> CP : Click "Add Student"
-
-CP -> UDAO : getAvailableStudents()
-UDAO -> DB : SELECT * FROM users \n WHERE role = 'student'
-DB --> UDAO : List<User>
-CP -> SDAO : getStudentIdsInSession(sessionId)
-SDAO -> DB : SELECT student_id FROM session_students
-DB --> SDAO : List<String>
-CP -> CP : Filter out already assigned students
-CP --> Coordinator : Show student dropdown
-
-Coordinator -> CP : Select student
-Coordinator -> CP : Click "OK"
-
-CP -> SDAO : addStudentToSession(sessionId, studentId)
-SDAO -> DB : INSERT INTO session_students \n (session_id, student_id)
-DB --> SDAO : Success
-SDAO --> CP : true
-CP --> Coordinator : "Student added"
-CP -> CP : Refresh student list
-
-== Assign Evaluator to Session ==
-Coordinator -> CP : Click "Add Evaluator"
+== Step 3: Assign Student & Evaluator Together ==
+Coordinator -> CP : Go to "Assign Evaluators" tab
+activate CP
+CP -> CP : Load submissions list
 
 CP -> UDAO : getUsersByRole("evaluator")
-UDAO -> DB : SELECT * FROM users WHERE role = 'evaluator'
-DB --> UDAO : List<Evaluator>
-CP -> SDAO : getEvaluatorIdsInSession(sessionId)
-SDAO -> DB : SELECT evaluator_id FROM session_evaluators
-DB --> SDAO : List<String>
-CP -> CP : Filter out already assigned evaluators
-CP --> Coordinator : Show evaluator dropdown
+activate UDAO
+UDAO -> DB : SELECT * FROM users \n WHERE role = 'evaluator'
+activate DB
+DB --> UDAO : List<User>
+deactivate DB
+UDAO --> CP : List<Evaluator>
+deactivate UDAO
 
-Coordinator -> CP : Select evaluator
-Coordinator -> CP : Click "OK"
+CP -> SDAO : getSessionsBySeminar(seminarId)
+activate SDAO
+SDAO -> DB : SELECT * FROM sessions \n WHERE seminar_id = ?
+activate DB
+DB --> SDAO : List<Session>
+deactivate DB
+SDAO --> CP : List<Session>
+deactivate SDAO
 
-CP -> SDAO : addEvaluatorToSession(sessionId, evaluatorId)
-SDAO -> DB : INSERT INTO session_evaluators \n (session_id, evaluator_id)
+CP --> Coordinator : Show assignment form with \n Student, Session, Evaluator dropdowns
+deactivate CP
+
+Coordinator -> CP : Select Student from dropdown
+activate CP
+deactivate CP
+
+Coordinator -> CP : Select Session from dropdown
+activate CP
+deactivate CP
+
+Coordinator -> CP : Select Evaluator from dropdown
+activate CP
+deactivate CP
+
+Coordinator -> CP : Click "Save Assignment"
+activate CP
+
+CP -> SDAO : addStudentToSession(sessionId, studentId, evaluatorId)
+activate SDAO
+SDAO -> DB : INSERT INTO session_students \n (session_id, student_id, evaluator_id)
+activate DB
 DB --> SDAO : Success
+deactivate DB
 
 note right of SDAO
-    Auto-assign evaluator to 
-    student submissions in session
+    Also creates evaluator_assignment
+    linking evaluator to submission
 end note
 
 SDAO -> DB : INSERT INTO evaluator_assignments \n (evaluator_id, submission_id)
+activate DB
 DB --> SDAO : Success
-SDAO --> CP : true
-CP --> Coordinator : "Evaluator assigned"
+deactivate DB
+SDAO --> CP : Assignment saved
+deactivate SDAO
+
+CP --> Coordinator : "Assignment saved successfully"
+CP -> CP : Refresh assignments list
+deactivate CP
+
+== Step 4: Delete Session ==
+Coordinator -> CP : Go to "Manage Sessions" tab
+activate CP
+CP -> SDAO : getSessionsBySeminar(seminarId)
+activate SDAO
+SDAO -> DB : SELECT * FROM sessions \n WHERE seminar_id = ?
+activate DB
+DB --> SDAO : List<Session>
+deactivate DB
+SDAO --> CP : List<Session>
+deactivate SDAO
+CP --> Coordinator : Show sessions table with \n Edit and Delete buttons
+deactivate CP
+
+Coordinator -> CP : Click "Delete" on session row
+activate CP
+CP -> CP : Show confirmation dialog \n "Are you sure you want to delete this session? \n This action cannot be undone."
+Coordinator -> CP : Click "Yes"
+
+CP -> SDAO : deleteSession(sessionId)
+activate SDAO
+
+note right of SDAO
+    CASCADE deletes related records:
+    - session_students
+    - session_evaluators
+    - evaluator_assignments
+end note
+
+SDAO -> DB : DELETE FROM sessions \n WHERE session_id = ?
+activate DB
+DB --> SDAO : Success
+deactivate DB
+SDAO --> CP : Session deleted
+deactivate SDAO
+
+CP --> Coordinator : "Session deleted successfully"
+CP -> CP : Refresh sessions table
+deactivate CP
 
 @enduml

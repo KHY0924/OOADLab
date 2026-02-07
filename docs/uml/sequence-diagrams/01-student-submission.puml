@@ -19,6 +19,43 @@ DAO --> SC : List<Submission>
 SC --> SP : submissions
 SP --> Student : Display submissions list
 
+== Register Submission ==
+Student -> SP : Click "Register"
+activate SP
+SP -> SP : Show registration dialog
+Student -> SP : Select Seminar from dropdown
+Student -> SP : Enter Title
+Student -> SP : Enter Abstract
+Student -> SP : Enter Supervisor
+Student -> SP : Select Presentation Type \n (Oral/Poster)
+Student -> SP : Click "OK"
+
+SP -> SC : createSubmission(seminarId, studentId, \n title, abstract, supervisor, type)
+activate SC
+SC -> DAO : createSubmission(submission)
+activate DAO
+DAO -> DB : INSERT INTO submissions \n (seminar_id, student_id, title, \n abstract_text, supervisor, presentation_type)
+activate DB
+DB --> DAO : submission_id
+deactivate DB
+
+note right of DAO
+    Auto-assign to matching session
+    (same seminar + same type)
+end note
+
+DAO -> DB : INSERT INTO session_students \n (session_id, student_id)
+activate DB
+DB --> DAO : Success
+deactivate DB
+DAO --> SC : Submission created
+deactivate DAO
+SC --> SP : "Registration successful"
+deactivate SC
+SP --> Student : Show success message
+SP -> SP : Refresh submissions list
+deactivate SP
+
 == Upload Presentation ==
 Student -> SP : Click "Upload"
 SP -> SP : Show file chooser dialog
