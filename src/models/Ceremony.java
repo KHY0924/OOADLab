@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents a Ceremony event that holds and manages awards.
- * Designed to work with Swing UI for displaying ceremony details and awards.
- */
+ 
 public class Ceremony {
     private String ceremonyId;
     private String seminarId;
@@ -35,7 +32,7 @@ public class Ceremony {
         if (award == null) {
             return false;
         }
-        // Check for duplicate award types
+         
         boolean awardTypeExists = awards.stream()
                 .anyMatch(a -> a.getAwardType().equals(award.getAwardType()));
         
@@ -92,7 +89,7 @@ public class Ceremony {
         return "PLANNED".equals(ceremonyStatus);
     }
 
-    // Getters
+     
     public String getCeremonyId() {
         return ceremonyId;
     }
@@ -141,7 +138,7 @@ public class Ceremony {
         this.remarks = remarks;
     }
 
-    @Override // for debugging
+    @Override  
     public String toString() {
         return "Ceremony{" +
                 "ceremonyId='" + ceremonyId + '\'' +

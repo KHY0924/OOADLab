@@ -24,7 +24,7 @@ public class AwardCeremonyTest {
     public static void main(String[] args) {
         System.out.println("Starting Award & Ceremony Module Testing...\n");
 
-        // Test database connection first
+         
         if (!testDatabaseConnection()) {
             System.out.println("[CRITICAL ERROR] Database connection failed. Aborting tests.\n");
             return;
@@ -34,7 +34,7 @@ public class AwardCeremonyTest {
         try {
             conn = DatabaseConnection.getConnection();
             
-            // Initialize services
+             
             CeremonyService ceremonyService = new CeremonyService();
             AwardComputationService awardComputationService = new AwardComputationService();
 
@@ -72,7 +72,7 @@ public class AwardCeremonyTest {
             System.out.println("[CRITICAL ERROR] " + e.getMessage());
             e.printStackTrace();
         } finally {
-            // Always close the connection
+             
             if (conn != null) {
                 try {
                     conn.close();
@@ -84,9 +84,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * Test database connection before running tests
-     */
+     
     private static boolean testDatabaseConnection() {
         System.out.println("Testing database connection...");
         try {
@@ -106,9 +104,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 1: Test ceremony creation and basic operations
-     */
+     
     private static void testCeremonyCreation(CeremonyService ceremonyService, 
                                             String seminarId) {
         System.out.println("1.1 Creating new ceremony...");
@@ -154,9 +150,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 2: Test Best Oral Presentation award computation
-     */
+     
     private static void testBestOralComputation(Connection conn,
                                                AwardComputationService awardService,
                                                String seminarId) {
@@ -194,9 +188,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 3: Test Best Poster Presentation award computation
-     */
+     
     private static void testBestPosterComputation(Connection conn,
                                                  AwardComputationService awardService,
                                                  String seminarId) {
@@ -226,9 +218,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 4: Test People's Choice award computation
-     */
+     
     private static void testPeoplesChoiceComputation(Connection conn,
                                                     AwardComputationService awardService,
                                                     String seminarId) {
@@ -238,10 +228,10 @@ public class AwardCeremonyTest {
         allSubmissions.addAll(createMockOralSubmissions(conn, seminarId));
         allSubmissions.addAll(createMockPosterSubmissions(conn, seminarId));
 
-        // Create mock people's votes
+         
         Map<String, Integer> peopleVotes = new HashMap<>();
         if (!allSubmissions.isEmpty()) {
-            // Give highest votes to first submission
+             
             peopleVotes.put(allSubmissions.get(0).getId(), 150);
             if (allSubmissions.size() > 1) {
                 peopleVotes.put(allSubmissions.get(1).getId(), 100);
@@ -280,9 +270,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 5: Test award assignment to ceremony
-     */
+     
     private static void testAwardAssignmentToCeremony(CeremonyService ceremonyService,
                                                      AwardComputationService awardService,
                                                      Connection conn, String seminarId) {
@@ -351,9 +339,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 6: Test ceremony lifecycle management
-     */
+     
     private static void testCeremonyLifecycle(CeremonyService ceremonyService,
                                              String seminarId) {
         System.out.println("6.1 Creating ceremony for lifecycle testing...");
@@ -372,7 +358,7 @@ public class AwardCeremonyTest {
 
         System.out.println("\n6.2 Testing status transitions...");
         
-        // Add a dummy award first
+         
         Award dummyAward = new Award(
                 "AWD_DUMMY_" + System.currentTimeMillis(),
                 "Best Oral Presentation",
@@ -409,9 +395,7 @@ public class AwardCeremonyTest {
         }
     }
 
-    /**
-     * PHASE 7: Test award removal and ceremony validation
-     */
+     
     private static void testAwardRemovalAndValidation(CeremonyService ceremonyService,
                                                      AwardComputationService awardService,
                                                      Connection conn, String seminarId) {
@@ -510,11 +494,9 @@ public class AwardCeremonyTest {
         }
     }
 
-    // ============= HELPER METHODS =============
+     
 
-    /**
-     * Create users first, then create submissions linked to them
-     */
+     
     private static String createMockUser(Connection conn, String username) {
         try {
             String userId = UUID.randomUUID().toString();
@@ -544,7 +526,7 @@ public class AwardCeremonyTest {
         List<Submission> submissions = new ArrayList<>();
         try {
             for (int i = 1; i <= 3; i++) {
-                // Create user first
+                 
                 String username = "oral_student_" + i + "_" + System.currentTimeMillis();
                 String studentId = createMockUser(conn, username);
                 
@@ -589,7 +571,7 @@ public class AwardCeremonyTest {
         List<Submission> submissions = new ArrayList<>();
         try {
             for (int i = 1; i <= 3; i++) {
-                // Create user first
+                 
                 String username = "poster_student_" + i + "_" + System.currentTimeMillis();
                 String studentId = createMockUser(conn, username);
                 
@@ -635,7 +617,7 @@ public class AwardCeremonyTest {
         try {
             for (Submission submission : submissions) {
                 for (int evaluatorNum = 1; evaluatorNum <= 2; evaluatorNum++) {
-                    // Create evaluator user first
+                     
                     String evalUsername = "evaluator_" + submission.getId().substring(0, 8) + 
                                          "_" + evaluatorNum + "_" + System.currentTimeMillis();
                     String evaluatorId = createMockUser(conn, evalUsername);
@@ -645,7 +627,7 @@ public class AwardCeremonyTest {
                     }
 
                     String evaluationId = UUID.randomUUID().toString();
-                    int score = 75 + (int)(Math.random() * 25); // Random score between 75-100
+                    int score = 75 + (int)(Math.random() * 25);  
 
                     PreparedStatement stmt = conn.prepareStatement(
                         "INSERT INTO evaluations (evaluation_id, submission_id, evaluator_id, " +

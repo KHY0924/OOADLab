@@ -29,7 +29,7 @@ public class Evaluation {
         this.createdAt = createdAt;
     }
 
-    // Comprehensive constructor without Timestamp (for new evaluations)
+     
     public Evaluation(String evaluationId, String submissionId, String evaluatorId,
             int problemClarity, int methodology, int results, int presentation,
             int overallScore, String comments) {
@@ -101,17 +101,17 @@ public class Evaluation {
         this.comments = c;
     }
 
-    // Helper to set all at once from EvaluatorPanel
+     
     public void setRubricScores(int s1, int s2, int s3, int s4) {
         this.problemClarity = s1;
         this.methodology = s2;
         this.results = s3;
         this.presentation = s4;
-        // Each score is 0-10, total 40 max. Multiply by 2.5 to get 100 scale.
+         
         this.overallScore = (int) ((s1 + s2 + s3 + s4) * 2.5);
     }
 
-    // Legacy support for other components
+     
     public int getScore() {
         return overallScore;
     }

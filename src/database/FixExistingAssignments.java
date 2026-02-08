@@ -2,9 +2,7 @@ package database;
 
 import java.sql.*;
 
-/**
- * One-time script to auto-assign existing students to matching sessions
- */
+ 
 public class FixExistingAssignments {
     public static void main(String[] args) {
         System.out.println("=== Auto-assigning existing students to matching sessions ===\n");

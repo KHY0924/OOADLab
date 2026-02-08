@@ -55,7 +55,7 @@ public class Award {
         return remarks;
     }
 
-    // Setters
+     
     public void setAwardDate(LocalDateTime awardDate) {
         this.awardDate = awardDate;
     }

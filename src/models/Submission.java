@@ -6,7 +6,7 @@ public class Submission {
     private String submissionId;
     private String seminarId;
     private String studentId;
-    private String studentName; // Added for display purposes
+    private String studentName;  
     private String title;
     private String abstractText;
     private String supervisor;

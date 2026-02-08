@@ -2,16 +2,13 @@ package database;
 
 import java.sql.*;
 
-/**
- * Clean up session assignments:
- * Students should only be in sessions matching their presentation type
- */
+ 
 public class FixSessionAssignments {
     public static void main(String[] args) {
         System.out.println("=== Fixing Session Assignments ===\n");
 
-        // Remove students from sessions where session_type doesn't match submission
-        // presentation_type
+         
+         
         String sql = "DELETE FROM session_students ss " +
                 "USING submissions sub, sessions s " +
                 "WHERE ss.student_id = sub.student_id " +
@@ -27,7 +24,7 @@ public class FixSessionAssignments {
             int rows = stmt.executeUpdate();
             System.out.println("Removed " + rows + " incorrect session assignment(s).");
 
-            // Show remaining assignments
+             
             System.out.println("\n--- Current Session Assignments ---");
             PreparedStatement showStmt = conn.prepareStatement(
                     "SELECT u.username, sub.presentation_type, s.session_type, s.location " +

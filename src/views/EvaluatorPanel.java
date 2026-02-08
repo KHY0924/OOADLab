@@ -14,13 +14,13 @@ import services.PosterPresentationService;
 public class EvaluatorPanel extends JPanel {
     private MainFrame mainFrame;
     private CardLayout cardLayout;
-    private JPanel listPanel; // Container for CardLayout
+    private JPanel listPanel;  
 
-    // List View Components
+     
     private DefaultTableModel assignedStudentModel;
     private JTable assignmentsTable;
 
-    // Evaluation Form Components
+     
     private JSlider problemSlider;
     private JSlider methodSlider;
     private JSlider resultsSlider;
@@ -28,7 +28,7 @@ public class EvaluatorPanel extends JPanel {
     private JTextArea commentArea;
     private JLabel selectedStudentLabel;
 
-    // State
+     
     private String currentSubmissionId;
     private AssignmentDAO assignmentDAO;
     private EvaluationDAO evaluationDAO;
@@ -44,7 +44,7 @@ public class EvaluatorPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Theme.BG_COLOR);
 
-        // Header
+         
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(Theme.PRIMARY_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -64,7 +64,7 @@ public class EvaluatorPanel extends JPanel {
         headerPanel.add(logoutButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Main Content Area with CardLayout
+         
         cardLayout = new CardLayout();
         listPanel = new JPanel(cardLayout);
         listPanel.setBackground(Theme.BG_COLOR);
@@ -75,7 +75,7 @@ public class EvaluatorPanel extends JPanel {
 
         add(listPanel, BorderLayout.CENTER);
 
-        // Show Dashboard initially
+         
         cardLayout.show(listPanel, "DASHBOARD");
     }
 
@@ -91,7 +91,7 @@ public class EvaluatorPanel extends JPanel {
         JButton viewButton = new JButton("View Assigned Submission");
         Theme.styleButton(viewButton);
         viewButton.setFont(Theme.HEADER_FONT);
-        // Resized for better visibility as requested
+         
         viewButton.setPreferredSize(new Dimension(450, 70));
 
         viewButton.addActionListener(e -> {
@@ -108,7 +108,7 @@ public class EvaluatorPanel extends JPanel {
         panel.setBackground(Theme.BG_COLOR);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Header (Back button removed)
+         
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(Theme.BG_COLOR);
 
@@ -120,24 +120,24 @@ public class EvaluatorPanel extends JPanel {
         topBar.add(label, BorderLayout.WEST);
         panel.add(topBar, BorderLayout.NORTH);
 
-        // Table
-        // Added Student Name column and Action column
+         
+         
         String[] columns = { "Submission ID", "Student Name", "Title", "Action" };
         assignedStudentModel = new DefaultTableModel(new Object[][] {}, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Only button column is editable
+                 
                 return column == 3;
             }
         };
         assignmentsTable = new JTable(assignedStudentModel);
         Theme.styleTable(assignmentsTable);
 
-        // Button Renderer & Editor for "Action" column
+         
         assignmentsTable.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer());
         assignmentsTable.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox()));
 
-        // Adjust column widths
+         
         assignmentsTable.getColumnModel().getColumn(0).setPreferredWidth(100);
         assignmentsTable.getColumnModel().getColumn(1).setPreferredWidth(150);
         assignmentsTable.getColumnModel().getColumn(2).setPreferredWidth(200);
@@ -155,7 +155,7 @@ public class EvaluatorPanel extends JPanel {
         panel.setBackground(Theme.BG_COLOR);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Header
+         
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(Theme.BG_COLOR);
 
@@ -171,7 +171,7 @@ public class EvaluatorPanel extends JPanel {
         topBar.add(backButton, BorderLayout.EAST);
         panel.add(topBar, BorderLayout.NORTH);
 
-        // Form Content
+         
         JPanel formContent = new JPanel(new GridBagLayout());
         formContent.setBackground(Theme.CARD_BG);
         formContent.setBorder(Theme.createCardBorder());
@@ -254,7 +254,7 @@ public class EvaluatorPanel extends JPanel {
             assignedStudentModel.setRowCount(0);
             currentAssignments = assignmentDAO.getAssignmentsForEvaluator(user.getUserId());
             for (Submission s : currentAssignments) {
-                // Populate student name
+                 
                 assignedStudentModel.addRow(new Object[] { s.getId(), s.getStudentName(), s.getTitle(), "Evaluate" });
             }
         }
@@ -262,7 +262,7 @@ public class EvaluatorPanel extends JPanel {
 
     private void openEvaluationForm(String subId, String title) {
         Submission selectedSub = null;
-        // Find student name from loaded assignments
+         
         for (Submission s : currentAssignments) {
             if (s.getId().equals(subId)) {
                 selectedSub = s;
@@ -273,7 +273,7 @@ public class EvaluatorPanel extends JPanel {
         if (selectedSub == null)
             return;
 
-        // Validation: If it's a poster, it must be assigned to a board
+         
         String type = selectedSub.getPresentationType();
         if (type != null && type.toLowerCase().contains("poster")) {
             if (!posterService.isSubmissionAssigned(subId)) {
@@ -288,7 +288,7 @@ public class EvaluatorPanel extends JPanel {
         currentSubmissionId = subId;
         selectedStudentLabel.setText("Evaluating: " + selectedSub.getStudentName() + " - " + title);
 
-        // Clear sliders and text
+         
         problemSlider.setValue(5);
         methodSlider.setValue(5);
         resultsSlider.setValue(5);
@@ -318,7 +318,7 @@ public class EvaluatorPanel extends JPanel {
         return p;
     }
 
-    // --- Inner Classes for Table Button ---
+     
 
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
@@ -358,9 +358,9 @@ public class EvaluatorPanel extends JPanel {
 
         public Object getCellEditorValue() {
             if (isPushed) {
-                // Perform action
+                 
                 int row = assignmentsTable.getSelectedRow();
-                // Columns: 0=ID, 1=Name, 2=Title, 3=Action
+                 
                 if (row >= 0 && row < assignmentsTable.getRowCount()) {
                     String subId = (String) assignmentsTable.getValueAt(row, 0);
                     String title = (String) assignmentsTable.getValueAt(row, 2);

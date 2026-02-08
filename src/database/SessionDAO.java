@@ -14,7 +14,7 @@ public class SessionDAO {
 
     public List<Session> getAllSessions() {
         List<Session> sessions = new ArrayList<>();
-        // Query to fetch session and all its evaluators
+         
         String sql = "SELECT s.*, u.username as evaluator_name, u.user_id as eval_id " +
                 "FROM sessions s " +
                 "LEFT JOIN session_evaluators se ON s.session_id = se.session_id " +
@@ -50,8 +50,8 @@ public class SessionDAO {
 
     public List<Session> getUnassignedSessions() {
         List<Session> sessions = new ArrayList<>();
-        // Now showing all sessions so coordinator can manage assignments even after
-        // evaluator is set
+         
+         
         String sql = "SELECT s.* FROM sessions s";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
@@ -65,7 +65,7 @@ public class SessionDAO {
 
                 Session session = new Session(id, loc, new models.DateAndTime(date.toLocalDateTime().toLocalDate(),
                         date.toLocalDateTime().toLocalTime()), type);
-                // evaluatorName and evaluatorId are null by definition of the query
+                 
                 sessions.add(session);
             }
         } catch (SQLException e) {
@@ -212,7 +212,7 @@ public class SessionDAO {
             stmt.setString(2, studentId);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                // Already exists, just return or silently fail
+                 
             }
         }
     }
@@ -269,14 +269,14 @@ public class SessionDAO {
     }
 
     public void assignEvaluator(String evaluatorID, String studentID) throws SQLException {
-        // Check if evaluator is already assigned
+         
         String checkSql = "SELECT 1 FROM evaluator_assignments WHERE evaluator_id = ?::uuid";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement checkStmt = conn.prepareStatement(checkSql);
         checkStmt.setString(1, evaluatorID);
         ResultSet rs = checkStmt.executeQuery();
         if (rs.next()) {
-            // Already assigned
+             
             rs.close();
             checkStmt.close();
             throw new SQLException("Evaluator already assigned");
@@ -284,14 +284,14 @@ public class SessionDAO {
         rs.close();
         checkStmt.close();
 
-        // Find submission for student
+         
         String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
         PreparedStatement subStmt = conn.prepareStatement(subSql);
         subStmt.setString(1, studentID);
         ResultSet subRs = subStmt.executeQuery();
         if (subRs.next()) {
             String submissionId = subRs.getString("submission_id");
-            // Assign
+             
             String assignSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid)";
             PreparedStatement assignStmt = conn.prepareStatement(assignSql);
             assignStmt.setString(1, evaluatorID);
@@ -335,7 +335,7 @@ public class SessionDAO {
     }
 
     public void assignEvaluatorToSession(String sessionId, String evaluatorId) throws SQLException {
-        // 1. Get all students in this session
+         
         String getStudentsSql = "SELECT student_id FROM session_students WHERE session_id = ?::uuid";
         List<String> studentIds = new ArrayList<>();
 
@@ -352,16 +352,16 @@ public class SessionDAO {
             throw new SQLException("No students found in this session.");
         }
 
-        // 2. For each student, find their submission and assign the evaluator
-        // We reuse the existing logic but handle it in a batch or loop
+         
+         
         int assignedCount = 0;
         try (Connection conn = DatabaseConnection.getConnection()) {
             String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
             String assignSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid) ON CONFLICT DO NOTHING";
-            // Note: simple schema might not have unique constraint properly set for ON
-            // CONFLICT,
-            // so we might need check-then-insert or just catch exception.
-            // existing assignEvaluator throws if exists. let's try to be robust.
+             
+             
+             
+             
 
             PreparedStatement subStmt = conn.prepareStatement(subSql);
             PreparedStatement assignStmt = conn.prepareStatement(assignSql);
@@ -372,7 +372,7 @@ public class SessionDAO {
                 if (subRs.next()) {
                     String submissionId = subRs.getString("submission_id");
 
-                    // Check if already assigned to THIS evaluator
+                     
                     String checkSql = "SELECT 1 FROM evaluator_assignments WHERE evaluator_id = ?::uuid AND submission_id = ?::uuid";
                     PreparedStatement checkStmt = conn.prepareStatement(checkSql);
                     checkStmt.setString(1, evaluatorId);
@@ -392,7 +392,7 @@ public class SessionDAO {
             subStmt.close();
             assignStmt.close();
 
-            // 3. Update the session table itself with the evaluator_id
+             
             String updateSessionSql = "UPDATE sessions SET evaluator_id = ?::uuid WHERE session_id = ?::uuid";
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSessionSql)) {
                 updateStmt.setString(1, evaluatorId);
@@ -402,8 +402,8 @@ public class SessionDAO {
         }
 
         if (assignedCount == 0 && !studentIds.isEmpty()) {
-            // Maybe they were all already assigned or no submissions found
-            // Just return silently or log
+             
+             
         }
     }
 
@@ -480,7 +480,7 @@ public class SessionDAO {
             stmt.executeUpdate();
         }
 
-        // Also sync with evaluator_assignments for the scoring system
+         
         if (evaluatorId != null && !evaluatorId.isEmpty()) {
             String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
             try (Connection conn = DatabaseConnection.getConnection();
@@ -489,13 +489,13 @@ public class SessionDAO {
                 ResultSet rs = subStmt.executeQuery();
                 if (rs.next()) {
                     String submissionId = rs.getString("submission_id");
-                    // Remove existing assignments for this student to ensure 1:1
+                     
                     String delSql = "DELETE FROM evaluator_assignments WHERE submission_id = ?::uuid";
                     try (PreparedStatement delStmt = conn.prepareStatement(delSql)) {
                         delStmt.setString(1, submissionId);
                         delStmt.executeUpdate();
                     }
-                    // Add new assignment
+                     
                     String insSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid)";
                     try (PreparedStatement insStmt = conn.prepareStatement(insSql)) {
                         insStmt.setString(1, evaluatorId);

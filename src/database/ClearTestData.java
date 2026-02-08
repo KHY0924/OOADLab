@@ -7,7 +7,7 @@ public class ClearTestData {
     public static void main(String[] args) {
         System.out.println("=== Clearing ALL tables except USERS ===\n");
 
-        // Order matters due to foreign key constraints
+         
         String[] tablesToClear = {
                 "evaluation_criteria",
                 "poster_presentations",
@@ -36,7 +36,7 @@ public class ClearTestData {
                 }
             }
 
-            // Reset sequences for SERIAL columns
+             
             stmt.executeUpdate("ALTER SEQUENCE presentation_boards_board_id_seq RESTART WITH 1");
             stmt.executeUpdate("ALTER SEQUENCE poster_presentations_presentation_id_seq RESTART WITH 1");
             stmt.executeUpdate("ALTER SEQUENCE evaluation_criteria_criteria_id_seq RESTART WITH 1");

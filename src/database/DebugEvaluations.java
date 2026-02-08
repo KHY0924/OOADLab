@@ -8,7 +8,7 @@ public class DebugEvaluations {
 
         try (Connection conn = DatabaseConnection.getConnection()) {
 
-            // 1. All Submissions
+             
             System.out.println("--- ALL SUBMISSIONS ---");
             PreparedStatement stmt1 = conn.prepareStatement(
                     "SELECT sub.submission_id, u.username, sub.title, sub.presentation_type " +
@@ -21,7 +21,7 @@ public class DebugEvaluations {
                         " | ID: " + rs1.getString("submission_id"));
             }
 
-            // 2. All Evaluations
+             
             System.out.println("\n--- ALL EVALUATIONS ---");
             PreparedStatement stmt2 = conn.prepareStatement(
                     "SELECT e.evaluation_id, e.submission_id, e.evaluator_id, " +
@@ -39,7 +39,7 @@ public class DebugEvaluations {
                         " | SubID: " + rs2.getString("submission_id"));
             }
 
-            // 3. Evaluation Summary Query (same as report)
+             
             System.out.println("\n--- EVALUATION SUMMARY QUERY RESULT ---");
             String seminarId = null;
             PreparedStatement stmtSem = conn.prepareStatement("SELECT seminar_id FROM seminars LIMIT 1");

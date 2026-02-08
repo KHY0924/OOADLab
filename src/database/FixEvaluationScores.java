@@ -2,11 +2,7 @@ package database;
 
 import java.sql.*;
 
-/**
- * Fix existing evaluation scores to use the correct calculation:
- * overall_score = (problem_clarity + methodology + results + presentation) *
- * 2.5
- */
+ 
 public class FixEvaluationScores {
     public static void main(String[] args) {
         System.out.println("=== Fixing Evaluation Overall Scores ===\n");
@@ -20,7 +16,7 @@ public class FixEvaluationScores {
             int rows = stmt.executeUpdate();
             System.out.println("Fixed " + rows + " evaluation(s).");
 
-            // Show updated scores
+             
             System.out.println("\n--- Updated Evaluations ---");
             PreparedStatement showStmt = conn.prepareStatement(
                     "SELECT e.problem_clarity, e.methodology, e.results, e.presentation, " +

@@ -10,11 +10,11 @@ public class FixPresentationBoards {
 
             System.out.println("Adding missing columns to presentation_boards...");
 
-            // Add session_id column
+             
             stmt.execute(
                     "ALTER TABLE presentation_boards ADD COLUMN IF NOT EXISTS session_id UUID REFERENCES sessions(session_id) ON DELETE CASCADE");
 
-            // Add presentation_type column
+             
             stmt.execute(
                     "ALTER TABLE presentation_boards ADD COLUMN IF NOT EXISTS presentation_type VARCHAR(50)");
 

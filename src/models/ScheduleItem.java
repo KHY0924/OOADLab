@@ -20,7 +20,7 @@ public class ScheduleItem {
         this.studentID = studentID;
     }
 
-    // Getters
+     
     public String getSessionID() { return sessionID; }
     public LocalDate getDate() { return date; }
     public LocalTime getTime() { return time; }

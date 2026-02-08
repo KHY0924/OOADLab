@@ -51,8 +51,8 @@ public class ReportController {
 
     private void generateEvaluationReport() {
         EvaluationDAO evaluationDAO = new EvaluationDAO();
-        // Get all evaluations - need to add getAllEvaluations to EvaluationDAO
-        // For now, print summary
+         
+         
         int totalEvaluations = getTotalEvaluations();
         System.out.println("--- Evaluations ---");
         System.out.println("Total Evaluations: " + totalEvaluations);
@@ -61,7 +61,7 @@ public class ReportController {
     }
 
     private void generateMaterialReport() {
-        // Get all materials - need to query directly
+         
         System.out.println("--- Materials ---");
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();

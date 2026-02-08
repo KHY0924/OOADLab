@@ -9,7 +9,7 @@ public class SeedReportData {
         try (Connection conn = DatabaseConnection.getConnection()) {
             System.out.println("Seeding data for seminar: " + targetSeminarId);
 
-            // Create 2 sessions for this seminar
+             
             System.out.println("Creating sessions...");
 
             PreparedStatement insertSession = conn.prepareStatement(
@@ -29,14 +29,14 @@ public class SeedReportData {
             String sessionId2 = rs.next() ? rs.getString(1) : null;
             System.out.println("  Created Session 2: " + sessionId2);
 
-            // Get evaluator and students
+             
             String evaluatorId = null;
             rs = conn.createStatement().executeQuery("SELECT user_id FROM users WHERE role = 'evaluator' LIMIT 1");
             if (rs.next())
                 evaluatorId = rs.getString(1);
             System.out.println("Evaluator: " + evaluatorId);
 
-            // Get students with submissions for this seminar OR create sample submissions
+             
             rs = conn.createStatement().executeQuery(
                     "SELECT s.student_id, s.title FROM submissions s WHERE s.seminar_id = '" + targetSeminarId + "'");
 
@@ -68,7 +68,7 @@ public class SeedReportData {
                 while (rs.next()) {
                     String studentId = rs.getString(1);
 
-                    // Create submission
+                     
                     PreparedStatement ps = conn.prepareStatement(
                             "INSERT INTO submissions (seminar_id, student_id, title, abstract_text, supervisor, presentation_type) "
                                     +
@@ -81,7 +81,7 @@ public class SeedReportData {
                     ps.setString(6, i % 2 == 0 ? "Poster Presentation" : "Oral Presentation");
                     ps.executeUpdate();
 
-                    // Assign to session
+                     
                     assignStudent.setString(1, i % 2 == 0 ? sessionId2 : sessionId1);
                     assignStudent.setString(2, studentId);
                     assignStudent.setString(3, evaluatorId);

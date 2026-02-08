@@ -15,7 +15,7 @@ public class MigrateEvaluators {
             stmt.execute(sql);
             System.out.println("Table session_evaluators created successfully.");
 
-            // Optional: Migrating existing data if any
+             
             String migrateSql = "INSERT INTO session_evaluators (session_id, evaluator_id) " +
                     "SELECT session_id, evaluator_id FROM sessions WHERE evaluator_id IS NOT NULL " +
                     "ON CONFLICT DO NOTHING;";

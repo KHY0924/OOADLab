@@ -21,15 +21,11 @@ public class SubmissionDAO {
             stmt.executeUpdate();
         }
 
-        // Auto-assign student to matching session (same seminar + same type)
+         
         autoAssignToSession(seminarId, studentId, presentationType);
     }
 
-    /**
-     * Automatically assigns a student to an existing session that matches:
-     * - Same seminar_id
-     * - Same session_type (e.g., "Oral Presentation" or "Poster Presentation")
-     */
+     
     private void autoAssignToSession(String seminarId, String studentId, String presentationType) {
         String findSessionSql = "SELECT session_id FROM sessions WHERE seminar_id = ?::uuid AND session_type ILIKE ? LIMIT 1";
         String insertSql = "INSERT INTO session_students (session_id, student_id) VALUES (?::uuid, ?::uuid) ON CONFLICT DO NOTHING";
@@ -37,8 +33,8 @@ public class SubmissionDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement findStmt = conn.prepareStatement(findSessionSql)) {
 
-            // Match presentation type to session type (e.g., "Oral Presentation" matches
-            // "Oral%")
+             
+             
             String typePattern = "%" + presentationType.split(" ")[0] + "%";
             findStmt.setString(1, seminarId);
             findStmt.setString(2, typePattern);
@@ -47,7 +43,7 @@ public class SubmissionDAO {
             if (rs.next()) {
                 String sessionId = rs.getString("session_id");
 
-                // Assign student to the found session
+                 
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setString(1, sessionId);
                     insertStmt.setString(2, studentId);

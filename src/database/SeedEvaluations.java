@@ -9,7 +9,7 @@ public class SeedEvaluations {
         try (Connection conn = DatabaseConnection.getConnection()) {
             System.out.println("Seeding evaluations for seminar: " + targetSeminarId);
 
-            // Get evaluator
+             
             String evaluatorId = null;
             ResultSet rs = conn.createStatement().executeQuery(
                     "SELECT user_id FROM users WHERE role = 'evaluator' LIMIT 1");
@@ -17,7 +17,7 @@ public class SeedEvaluations {
                 evaluatorId = rs.getString(1);
             System.out.println("Evaluator ID: " + evaluatorId);
 
-            // Get submissions for this seminar
+             
             rs = conn.createStatement().executeQuery(
                     "SELECT submission_id, title FROM submissions WHERE seminar_id = '" + targetSeminarId + "'");
 
@@ -33,7 +33,7 @@ public class SeedEvaluations {
                 String submissionId = rs.getString("submission_id");
                 String title = rs.getString("title");
 
-                // Generate random scores between 15-25 for each criterion
+                 
                 int clarity = 15 + rand.nextInt(11);
                 int methodology = 15 + rand.nextInt(11);
                 int results = 15 + rand.nextInt(11);

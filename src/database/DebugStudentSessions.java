@@ -8,7 +8,7 @@ public class DebugStudentSessions {
 
         try (Connection conn = DatabaseConnection.getConnection()) {
 
-            // 1. All submissions
+             
             System.out.println("--- ALL SUBMISSIONS ---");
             PreparedStatement stmt1 = conn.prepareStatement(
                     "SELECT sub.submission_id, u.username, sub.title, sub.seminar_id " +
@@ -20,7 +20,7 @@ public class DebugStudentSessions {
                         " | Seminar: " + rs1.getString("seminar_id"));
             }
 
-            // 2. Session-Student assignments
+             
             System.out.println("\n--- SESSION_STUDENTS TABLE ---");
             PreparedStatement stmt2 = conn.prepareStatement(
                     "SELECT ss.session_id, u.username, ss.evaluator_id " +
@@ -37,7 +37,7 @@ public class DebugStudentSessions {
                 System.out.println("(No students assigned to sessions!)");
             }
 
-            // 3. Sessions
+             
             System.out.println("\n--- SESSIONS ---");
             PreparedStatement stmt3 = conn.prepareStatement(
                     "SELECT session_id, location, session_type, seminar_id FROM sessions");

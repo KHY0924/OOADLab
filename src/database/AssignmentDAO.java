@@ -14,8 +14,8 @@ public class AssignmentDAO {
     public List<Submission> getAssignmentsForEvaluator(String evaluatorId) {
         List<Submission> list = new ArrayList<>();
 
-        // Join tables to get assignments
-        // Join tables to get assignments
+         
+         
         String sql = "SELECT s.*, u.username as student_name FROM submissions s " +
                 "JOIN evaluator_assignments ea ON s.submission_id = ea.submission_id " +
                 "JOIN users u ON s.student_id = u.user_id " +

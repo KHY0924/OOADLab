@@ -5,8 +5,8 @@ import java.sql.*;
 public class ReportDAO {
 
     public ResultSet getSeminarSchedule(String seminarId) throws SQLException {
-        // Show ALL students with submissions for this seminar, plus their
-        // session/evaluator assignments if any
+         
+         
         String sql = "SELECT COALESCE(s.session_id::text, 'UNASSIGNED') as session_id, " +
                 "s.session_date, COALESCE(s.location, 'Not Scheduled') as location, " +
                 "sub.title, u.username as student_name, sub.presentation_type, " +
@@ -27,7 +27,7 @@ public class ReportDAO {
     }
 
     public ResultSet getEvaluationSummary(String seminarId) throws SQLException {
-        // Use LEFT JOIN from submissions to ensure ALL students in the seminar appear
+         
         String sql = "SELECT sub.title, u.username as student_name, sub.presentation_type, " +
                 "e.overall_score, e.comments, e.problem_clarity, e.methodology, e.results, e.presentation, " +
                 "eval.username as evaluator_name, pb.board_name " +
@@ -66,8 +66,8 @@ public class ReportDAO {
                 "   JOIN submissions sub ON e.submission_id = sub.submission_id " +
                 "   JOIN users u ON sub.student_id = u.user_id " +
                 "   WHERE sub.seminar_id = ?::uuid " +
-                "   ORDER BY e.overall_score DESC OFFSET 2 LIMIT 1) " + // Simple heuristic for people's choice if no
-                                                                        // voting
+                "   ORDER BY e.overall_score DESC OFFSET 2 LIMIT 1) " +  
+                                                                         
                 ") AS winners";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);

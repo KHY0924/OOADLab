@@ -5,7 +5,7 @@ import java.sql.*;
 public class FixEval3Password {
     public static void main(String[] args) {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // Check current passwords
+             
             System.out.println("--- Current Users ---");
             PreparedStatement checkStmt = conn.prepareStatement(
                     "SELECT username, password, role FROM users ORDER BY role, username");
@@ -15,7 +15,7 @@ public class FixEval3Password {
                         rs.getString("password") + " | " + rs.getString("role"));
             }
 
-            // Update eval3 password to match eval1/eval2
+             
             PreparedStatement getEval1 = conn.prepareStatement(
                     "SELECT password FROM users WHERE username = 'eval1'");
             ResultSet rsEval1 = getEval1.executeQuery();

@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.event.TableModelListener;
-// import javax.swing.event.TableModelEvent; // Removed unused import
+ 
 import java.awt.*;
 
 import models.Submission;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.UUID; // Added missing import
+import java.util.UUID;  
 
 public class CoordinatorPanel extends JPanel {
     private DefaultTableModel sessionModel;
@@ -90,7 +90,7 @@ public class CoordinatorPanel extends JPanel {
         card.setBackground(Theme.CARD_BG);
         card.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
 
-        // Seminar selector panel at the top
+         
         JPanel seminarSelectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         seminarSelectorPanel.setBackground(Theme.CARD_BG);
         seminarSelectorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -103,7 +103,7 @@ public class CoordinatorPanel extends JPanel {
         loadSeminars();
 
         sessionSeminarCombo.addActionListener(e -> {
-            // When seminar is selected, reload sessions for that seminar
+             
             loadSessions();
         });
 
@@ -119,17 +119,17 @@ public class CoordinatorPanel extends JPanel {
         };
         loadSessions();
         JTable table = new JTable(sessionModel);
-        table.setRowHeight(35); // Slightly taller for buttons
+        table.setRowHeight(35);  
         table.setFont(Theme.STANDARD_FONT);
         table.getTableHeader().setFont(Theme.BOLD_FONT);
         table.getTableHeader().setBackground(Theme.UNVERIFIED_BG);
 
-        // Action Column Buttons
+         
         table.getColumnModel().getColumn(4).setCellRenderer(new ActionButtonsRenderer());
         table.getColumnModel().getColumn(4).setCellEditor(new ActionButtonsEditor(new JCheckBox(), table));
         table.getColumnModel().getColumn(0).setMinWidth(0);
-        table.getColumnModel().getColumn(0).setMaxWidth(0); // Hide ID column but keep data
-        table.getColumnModel().getColumn(4).setPreferredWidth(170); // Wider for two buttons
+        table.getColumnModel().getColumn(0).setMaxWidth(0);  
+        table.getColumnModel().getColumn(4).setPreferredWidth(170);  
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -148,7 +148,7 @@ public class CoordinatorPanel extends JPanel {
         Theme.styleButton(addSeminarButton);
         addSeminarButton.addActionListener(e -> {
             showAddSeminarDialog();
-            loadSeminars(); // Refresh seminar dropdown after adding
+            loadSeminars();  
         });
 
         JButton refreshButton = new JButton("Refresh");
@@ -218,7 +218,7 @@ public class CoordinatorPanel extends JPanel {
     }
 
     private void showAddSessionDialog() {
-        // Check if a seminar is selected
+         
         int seminarIdx = sessionSeminarCombo != null ? sessionSeminarCombo.getSelectedIndex() : -1;
         if (seminarIdx < 0 || seminarIdx >= seminarIds.size()) {
             JOptionPane.showMessageDialog(this, "Please select a seminar first.");
@@ -255,11 +255,11 @@ public class CoordinatorPanel extends JPanel {
         JTextField locField = new JTextField();
         JTextField dateField = new JTextField("2026-02-10 09:00");
 
-        // Semester dropdown (1 or 2)
+         
         String[] semesters = { "1", "2" };
         JComboBox<String> semesterCombo = new JComboBox<>(semesters);
 
-        // Year dropdown
+         
         String[] years = { "2024", "2025", "2026", "2027", "2028" };
         JComboBox<String> yearCombo = new JComboBox<>(years);
         yearCombo.setSelectedItem("2026");
@@ -313,7 +313,7 @@ public class CoordinatorPanel extends JPanel {
         table.setFont(Theme.STANDARD_FONT);
         table.getTableHeader().setFont(Theme.BOLD_FONT);
 
-        // Action Column Buttons
+         
         table.getColumnModel().getColumn(4).setCellRenderer(new AssignmentActionRenderer());
         table.getColumnModel().getColumn(4).setCellEditor(new AssignmentActionEditor(new JCheckBox(), table));
         table.getColumnModel().getColumn(0).setMinWidth(0);
@@ -349,7 +349,7 @@ public class CoordinatorPanel extends JPanel {
         assignmentModel.setRowCount(0);
         List<Session> sessions = sessionDAO.getAllSessions();
         for (Session s : sessions) {
-            // We could add student counts here if needed, but for now just show basic info
+             
             assignmentModel.addRow(new Object[] {
                     s.getSessionID(),
                     s.getSessionDate() + " " + s.getSessionTime(),
@@ -364,10 +364,10 @@ public class CoordinatorPanel extends JPanel {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Manage Session Assignments",
                 true);
         dialog.setLayout(new BorderLayout());
-        dialog.setSize(900, 600); // Made it slightly wider for the split pane
+        dialog.setSize(900, 600);  
         dialog.setLocationRelativeTo(this);
 
-        // Directly show the Assignments Overview (Assignment Form + Table)
+         
         JPanel contentPanel = createAssignmentsOverviewPanel(sessionId);
         dialog.add(contentPanel, BorderLayout.CENTER);
 
@@ -386,20 +386,20 @@ public class CoordinatorPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    // Removed unused createManageStudentsPanel and createManageEvaluatorsPanel
-    // methods
-    // ... (Use multi_replace to remove them if I want to be clean, but for now
-    // focus on the requested changes.
-    // Actually, I should probably leave them or remove them? The prompt asks to
-    // remove the *tabs*, not necessarily delete the code, but cleaning is good.
-    // I will just replace the dialog method and the helper function here.
+     
+     
+     
+     
+     
+     
+     
 
-    // Helper to extract ID from display string (e.g., "username (ID: uuid)")
+     
     private String extractIdFromDisplayString(String displayString) {
         int startIndex = displayString.lastIndexOf("(ID: ");
         if (startIndex != -1) {
             int endIndex = displayString.lastIndexOf(")");
-            // "(ID: " is 5 chars long.
+             
             if (endIndex != -1 && endIndex > startIndex + 5) {
                 return displayString.substring(startIndex + 5, endIndex).trim();
             }
@@ -441,7 +441,7 @@ public class CoordinatorPanel extends JPanel {
         JComboBox<String> studentCombo = new JComboBox<>();
         List<String> studentIds = new ArrayList<>();
         try {
-            // Get all students who have submitted, and are not already in this session
+             
             List<models.Submission> submissions = submissionDAO.getAllSubmissionsList();
             List<String> currentStudentIdsInSession = sessionDAO.getStudentIdsInSession(sessionId);
 
@@ -478,7 +478,7 @@ public class CoordinatorPanel extends JPanel {
         JComboBox<String> evalCombo = new JComboBox<>();
         List<String> evalIds = new ArrayList<>();
         try {
-            // Get all evaluators not already assigned to this session
+             
             List<String> currentEvaluatorIdsInSession = sessionDAO.getEvaluatorIdsInSession(sessionId);
             ResultSet rs = userDAO.getUsersByRole("evaluator");
             while (rs.next()) {
@@ -556,26 +556,26 @@ public class CoordinatorPanel extends JPanel {
             };
             JComboBox<String> locCombo = new JComboBox<>(locations);
 
-            // Session Dropdown
+             
             JComboBox<String> sessionBox = new JComboBox<>();
             List<String> sessionIds = new ArrayList<>();
             List<models.Session> sessions = sessionDAO.getAllSessions();
             for (models.Session s : sessions) {
-                // Filter for poster sessions if possible, or show all
+                 
                 if (s.getSessionType() != null && s.getSessionType().toLowerCase().contains("poster")) {
                     sessionBox.addItem(s.getSessionType() + " (" + s.getLocation() + ")");
                     sessionIds.add(s.getSessionID());
                 }
             }
             if (sessionIds.isEmpty()) {
-                // Fallback if no poster sessions found for testing
+                 
                 for (models.Session s : sessions) {
                     sessionBox.addItem(s.getSessionType() + " (" + s.getLocation() + ")");
                     sessionIds.add(s.getSessionID());
                 }
             }
 
-            // Type Dropdown
+             
             String[] types = { "A1 Portrait", "A1 Landscape", "A0 Portrait", "Digital Screen" };
             JComboBox<String> typeBox = new JComboBox<>(types);
 
@@ -598,7 +598,7 @@ public class CoordinatorPanel extends JPanel {
                             : null;
                     String selectedType = (String) typeBox.getSelectedItem();
 
-                    // Default capacity to 1 as per requirements (one student per board)
+                     
                     PresentationBoard board = new PresentationBoard(0, idF.getText(), selectedLoc, 1, 0,
                             selectedSessionId, selectedType);
                     posterService.createBoard(board);
@@ -652,7 +652,7 @@ public class CoordinatorPanel extends JPanel {
             String title = s.getTitle();
             String type = s.getPresentationType();
 
-            // Show all submitted students, but keep type clear
+             
             subCombo.addItem("[" + type + "] " + studentName + ": " + title);
             subIds.add(s.getId());
             subTitles.add(title);
@@ -728,7 +728,7 @@ public class CoordinatorPanel extends JPanel {
         }
     }
 
-    private int currentEditPart = 0; // 1: Schedule, 2: Summary, 3: Awards
+    private int currentEditPart = 0;  
     private String lastSchedule = "";
     private String lastSummary = "";
     private String lastAwards = "";
@@ -812,10 +812,10 @@ public class CoordinatorPanel extends JPanel {
                     String boardName = rs.getString("board_name");
                     String title = rs.getString("title");
 
-                    // New session header
+                     
                     if (!sessionId.equals(currentSessionId)) {
                         if (currentSessionId != null) {
-                            sb.append("\n"); // Add spacing between sessions
+                            sb.append("\n");  
                         }
                         currentSessionId = sessionId;
                         sb.append("==========================================\n");
@@ -824,7 +824,7 @@ public class CoordinatorPanel extends JPanel {
                         sb.append("==========================================\n");
                     }
 
-                    // Student details under session
+                     
                     if (studentName != null) {
                         sb.append("  [").append(pType != null ? pType : "N/A").append("] ").append(studentName)
                                 .append("\n")
@@ -933,11 +933,11 @@ public class CoordinatorPanel extends JPanel {
         JButton awardButton = new JButton("3. Calculate Awards");
         Theme.styleButton(awardButton);
 
-        // Contextual Edit logic
+         
         contextualEditBtn.addActionListener(e -> {
             boolean editing = reportArea.isEditable();
             if (editing) {
-                // Save
+                 
                 String text = reportArea.getText();
                 if (currentEditPart == 1)
                     lastSchedule = text;
@@ -952,7 +952,7 @@ public class CoordinatorPanel extends JPanel {
                 contextualEditBtn.setText(label);
                 contextualEditBtn.setBackground(Color.WHITE);
             } else {
-                // Start Edit
+                 
                 reportArea.setEditable(true);
                 reportArea.requestFocus();
                 contextualEditBtn.setText("Save Changes");
@@ -1044,7 +1044,7 @@ public class CoordinatorPanel extends JPanel {
         footerPanel.add(stepRow1, BorderLayout.NORTH);
         footerPanel.add(stepRow2, BorderLayout.SOUTH);
 
-        // Edit button overlay/sub-panel
+         
         JPanel editOverlayPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         editOverlayPanel.setBackground(Theme.CARD_BG);
         editOverlayPanel.add(contextualEditBtn);
@@ -1102,7 +1102,7 @@ public class CoordinatorPanel extends JPanel {
         }
     }
 
-    // --- Inner Classes for Table Buttons ---
+     
 
     class ActionButtonsRenderer extends JPanel implements TableCellRenderer {
         private JButton editBtn;
@@ -1117,7 +1117,7 @@ public class CoordinatorPanel extends JPanel {
             deleteBtn = new JButton("Delete");
 
             styleMiniButton(editBtn, Theme.PRIMARY_COLOR);
-            styleMiniButton(deleteBtn, new Color(220, 53, 69)); // Red for delete
+            styleMiniButton(deleteBtn, new Color(220, 53, 69));  
 
             add(editBtn);
             add(deleteBtn);
@@ -1296,7 +1296,7 @@ public class CoordinatorPanel extends JPanel {
     private JPanel createAssignmentsOverviewPanel(String sessionId) {
         JPanel panel = new JPanel(new BorderLayout());
 
-        // --- LEFT SIDE: Assignment Form ---
+         
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Theme.CARD_BG);
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1330,7 +1330,7 @@ public class CoordinatorPanel extends JPanel {
         gbc.ipady = 10;
         formPanel.add(saveBtn, gbc);
 
-        // Spacer to push components up
+         
         gbc.gridy = 5;
         gbc.weighty = 1.0;
         formPanel.add(new JPanel() {
@@ -1339,12 +1339,12 @@ public class CoordinatorPanel extends JPanel {
             }
         }, gbc);
 
-        // --- RIGHT SIDE: Table ---
+         
         String[] columns = { "Student", "Submission Title", "Assigned Evaluator", "StudentId" };
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make read-only as we have the form now
+                return false;  
             }
         };
 
@@ -1356,30 +1356,30 @@ public class CoordinatorPanel extends JPanel {
 
         JScrollPane tableScroll = new JScrollPane(table);
 
-        // --- DATA LOADING & ACTIONS ---
+         
         Runnable refreshData = () -> {
             model.setRowCount(0);
             studentCombo.removeAllItems();
             evaluatorCombo.removeAllItems();
 
             try {
-                // 1. Load Table Data (Current Assignments)
+                 
                 List<String[]> overview = sessionDAO.getAssignmentsOverview(sessionId);
                 for (String[] row : overview) {
                     model.addRow(new Object[] { row[0], row[1], row[2], row[4] });
                 }
 
-                // 2. Load Combobox Data (ALL Students & Evaluators)
+                 
 
-                // Load ALL Submissions (Students)
+                 
                 List<models.Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
                 for (models.Submission s : allSubmissions) {
-                    // Format: [Type] Name: Title (ID: uuid)
+                     
                     studentCombo.addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle()
                             + " (ID: " + s.getStudentId() + ")");
                 }
 
-                // Load ALL Evaluators
+                 
                 ResultSet rs = userDAO.getUsersByRole("evaluator");
                 while (rs.next()) {
                     evaluatorCombo.addItem(rs.getString("username") + " (ID: " + rs.getString("user_id") + ")");
@@ -1393,10 +1393,10 @@ public class CoordinatorPanel extends JPanel {
             }
         };
 
-        // Initial Load
+         
         refreshData.run();
 
-        // Save Action
+         
         saveBtn.addActionListener(e -> {
             String selectedStudentRaw = (String) studentCombo.getSelectedItem();
             String selectedEvaluatorRaw = (String) evaluatorCombo.getSelectedItem();
@@ -1411,14 +1411,14 @@ public class CoordinatorPanel extends JPanel {
 
             if (studentId != null && evaluatorId != null) {
                 try {
-                    // Auto-Add Logic: Ensure they are in the session first
+                     
                     sessionDAO.addStudentToSession(sessionId, studentId);
                     sessionDAO.addEvaluatorToSession(sessionId, evaluatorId);
 
-                    // Now Assign
+                     
                     sessionDAO.updateStudentEvaluator(sessionId, studentId, evaluatorId);
                     JOptionPane.showMessageDialog(panel, "Assignment Saved Successfully!");
-                    refreshData.run(); // Refresh UI
+                    refreshData.run();  
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(panel, "Error saving assignment: " + ex.getMessage());
                 }
@@ -1427,10 +1427,10 @@ public class CoordinatorPanel extends JPanel {
             }
         });
 
-        // --- SPLIT PANE ---
+         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, formPanel, tableScroll);
-        splitPane.setDividerLocation(300); // Give form some space
-        splitPane.setResizeWeight(0.0); // Form stays fixed ish
+        splitPane.setDividerLocation(300);  
+        splitPane.setResizeWeight(0.0);  
         splitPane.setOneTouchExpandable(true);
 
         panel.add(splitPane, BorderLayout.CENTER);

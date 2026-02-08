@@ -191,7 +191,7 @@ public class StudentPanel extends JPanel {
             }
 
             try {
-                // Constraint: Check for pending submissions
+                 
                 ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
                 while (rs.next()) {
                     String subId = rs.getString("submission_id");
@@ -199,11 +199,11 @@ public class StudentPanel extends JPanel {
                         JOptionPane.showMessageDialog(this,
                                 "You cannot submit a new application while you have a pending registration.\nPlease wait until your previous submission is graded.",
                                 "Submission Blocked", JOptionPane.WARNING_MESSAGE);
-                        rs.close(); // Close result set before returning
+                        rs.close();  
                         return;
                     }
                 }
-                rs.close(); // Close result set if loop completes
+                rs.close();  
 
                 submissionDAO.createSubmission(
                         selectedSeminar.getSeminarId(),
@@ -270,7 +270,7 @@ public class StudentPanel extends JPanel {
         }
     }
 
-    // Semester options are now dynamic
+     
 
     private JPanel createUploadPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -418,7 +418,7 @@ public class StudentPanel extends JPanel {
                 String supervisor = rs.getString("supervisor");
                 String type = rs.getString("presentation_type");
 
-                // Get Session Info
+                 
                 String venue = "Not Assigned";
                 String time = "-";
                 try (ResultSet rsSess = sessionDAO.findSessionsByStudent(user.getUserId())) {
@@ -428,7 +428,7 @@ public class StudentPanel extends JPanel {
                     }
                 }
 
-                // Get Board ID
+                 
                 String board = "-";
                 if (type.contains("Poster")) {
                     board = posterService.getBoardNameForSubmission(subId);

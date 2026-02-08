@@ -10,7 +10,7 @@ public class MockDataGenerator {
 
     public static void insertMockData() {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // 1. Create Coordinator
+             
             String adminId = UUID.randomUUID().toString();
             if (createUser(conn, adminId, "admin", "password", "coordinator")) {
                 System.out.println("Created coordinator 'admin'");
@@ -18,7 +18,7 @@ public class MockDataGenerator {
                 adminId = getUserId(conn, "admin");
             }
 
-            // 2. Create Evaluators
+             
             String eval1Id = UUID.randomUUID().toString();
             String eval2Id = UUID.randomUUID().toString();
             createUser(conn, eval1Id, "eval1", "password", "evaluator");
@@ -26,7 +26,7 @@ public class MockDataGenerator {
             eval1Id = getUserId(conn, "eval1");
             eval2Id = getUserId(conn, "eval2");
 
-            // 3. Create Students
+             
             String stud1Id = UUID.randomUUID().toString();
             String stud2Id = UUID.randomUUID().toString();
             String stud3Id = UUID.randomUUID().toString();
@@ -43,93 +43,7 @@ public class MockDataGenerator {
             stud4Id = getUserId(conn, "stud4");
             stud5Id = getUserId(conn, "stud5");
 
-            /*
-             * // 4. Create Student Profiles
-             * createProfile(conn, stud1Id, "Student One", "stud1@example.com",
-             * "Computer Science");
-             * createProfile(conn, stud2Id, "Student Two", "stud2@example.com",
-             * "Mathematics");
-             * createProfile(conn, stud3Id, "Student Three", "stud3@example.com",
-             * "Physics");
-             * createProfile(conn, stud4Id, "Student Four", "stud4@example.com", "Biology");
-             * createProfile(conn, stud5Id, "Student Five", "stud5@example.com",
-             * "Chemistry");
-             * 
-             * // 5. Create Seminar
-             * String semId = UUID.randomUUID().toString();
-             * createSeminar(conn, semId, "Grand Hall",
-             * Timestamp.valueOf("2026-06-01 09:00:00"), 1, 2026);
-             * 
-             * // 6. Create Sessions
-             * String sess1Id = UUID.randomUUID().toString();
-             * String sess2Id = UUID.randomUUID().toString();
-             * createSession(conn, sess1Id, semId, "Room 101",
-             * Timestamp.valueOf("2026-06-01 10:00:00"), "Oral");
-             * createSession(conn, sess2Id, semId, "Poster Area A",
-             * Timestamp.valueOf("2026-06-01 13:00:00"), "Poster");
-             * 
-             * // 7. Submissions
-             * String sub1Id = UUID.randomUUID().toString();
-             * String sub2Id = UUID.randomUUID().toString();
-             * String sub3Id = UUID.randomUUID().toString();
-             * createSubmission(conn, sub1Id, semId, stud1Id, "AI in Healthcare",
-             * "Abstract for AI", "Prof. X", "Oral",
-             * "SUBMITTED");
-             * createSubmission(conn, sub2Id, semId, stud2Id, "Quantum Algorithms",
-             * "Abstract for Quantum", "Prof. Y",
-             * "Oral", "EVALUATED");
-             * createSubmission(conn, sub3Id, semId, stud3Id, "Solar Panels Efficiency",
-             * "Abstract for Solar", "Prof. Z",
-             * "Poster", "ASSIGNED");
-             * String sub4Id = UUID.randomUUID().toString();
-             * String sub5Id = UUID.randomUUID().toString();
-             * createSubmission(conn, sub4Id, semId, stud4Id, "Bio-waste Power",
-             * "Abstract for Bio", "Prof. B",
-             * "Poster", "SUBMITTED");
-             * createSubmission(conn, sub5Id, semId, stud5Id, "Chemical Catalysis",
-             * "Abstract for Chem", "Prof. C",
-             * "Poster", "SUBMITTED");
-             * 
-             * // 8. Assignments
-             * assignEvaluator(conn, eval1Id, sub1Id);
-             * assignEvaluator(conn, eval2Id, sub2Id);
-             * assignEvaluator(conn, eval1Id, sub3Id);
-             * 
-             * // 8.5 Assign students to sessions for schedule
-             * addStudentToSession(conn, sess1Id, stud1Id);
-             * addStudentToSession(conn, sess1Id, stud2Id);
-             * addStudentToSession(conn, sess2Id, stud3Id);
-             * addStudentToSession(conn, sess2Id, stud4Id);
-             * addStudentToSession(conn, sess2Id, stud5Id);
-             * 
-             * // 9. Evaluations for all students
-             * createEvaluation(conn, sub1Id, eval1Id, 88,
-             * "Solid presentation and good Q&A.", 22, 21, 22, 23);
-             * createEvaluation(conn, sub2Id, eval2Id, 75, "Great work on quantum theory.",
-             * 18, 17, 19, 21);
-             * createEvaluation(conn, sub3Id, eval1Id, 92,
-             * "Excellent poster design and results.", 23, 23, 23, 23);
-             * createEvaluation(conn, sub4Id, eval2Id, 75,
-             * "Interesting topic, needs more data.", 15, 20, 20, 20);
-             * createEvaluation(conn, sub5Id, eval1Id, 80, "Good chemical analysis.", 20,
-             * 20, 20, 20);
-             * 
-             * // 10. Presentation Boards
-             * int boardId = createBoard(conn, "Board 001", "North Wing", 1, 1);
-             * createBoard(conn, "Board 002", "Exhibition Hall A", 1, 0);
-             * createBoard(conn, "Board 003", "Main Lobby", 1, 0);
-             * 
-             * // 11. Poster Presentation for student 3
-             * int presId = createPosterPresentation(conn, boardId, sub3Id,
-             * "Solar Panels Efficiency", "Poster details",
-             * sess2Id, "PENDING");
-             * 
-             * // 12. Evaluation Criteria
-             * createCriteria(conn, presId, "Originality", "Novelty of the research", 20,
-             * 1);
-             * createCriteria(conn, presId, "Clarity", "Clarity of the presentation", 20,
-             * 1);
-             */
+             
             System.out.println("Base users maintained. Other mock data skipped for testing.");
 
         } catch (SQLException e) {
