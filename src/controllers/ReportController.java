@@ -51,8 +51,6 @@ public class ReportController {
 
     private void generateEvaluationReport() {
         EvaluationDAO evaluationDAO = new EvaluationDAO();
-         
-         
         int totalEvaluations = getTotalEvaluations();
         System.out.println("--- Evaluations ---");
         System.out.println("Total Evaluations: " + totalEvaluations);
@@ -61,7 +59,6 @@ public class ReportController {
     }
 
     private void generateMaterialReport() {
-         
         System.out.println("--- Materials ---");
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
@@ -70,7 +67,7 @@ public class ReportController {
                 System.out.println("Total Materials: " + rs.getInt(1));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error counting materials.");
         }
         System.out.println();
     }
@@ -83,7 +80,7 @@ public class ReportController {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error counting evaluations.");
         }
         return 0;
     }

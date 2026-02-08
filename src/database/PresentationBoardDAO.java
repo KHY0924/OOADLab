@@ -24,7 +24,7 @@ public class PresentationBoardDAO {
             stmt.setString(6, board.getPresentationType());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -46,7 +46,7 @@ public class PresentationBoardDAO {
                         rs.getString("presentation_type"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving board by ID.");
         }
         return null;
     }
@@ -68,7 +68,7 @@ public class PresentationBoardDAO {
                         rs.getString("presentation_type")));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving all boards.");
         }
         return boards;
     }
@@ -87,7 +87,7 @@ public class PresentationBoardDAO {
             stmt.setInt(7, board.getBoardId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -99,7 +99,7 @@ public class PresentationBoardDAO {
             stmt.setInt(1, boardId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }

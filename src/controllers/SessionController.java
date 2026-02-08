@@ -23,11 +23,10 @@ public class SessionController {
 
     public void getSessionInformation(String studentId) {
         try {
-
             sessionDAO.findSessionsByStudent(studentId);
             System.out.println("Retrieved session info for " + studentId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving session info.");
         }
     }
 
@@ -43,7 +42,7 @@ public class SessionController {
             sessionDAO.createSeminar(seminarID, location, timestamp, semester, year);
             System.out.println("Seminar created in database: " + seminarID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error creating seminar.");
         }
     }
 
@@ -60,7 +59,7 @@ public class SessionController {
             sessionDAO.createSession(sessionID, seminarId, location, timestamp, type);
             System.out.println("Session created in database: " + sessionID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error creating session.");
         }
     }
 
@@ -69,7 +68,7 @@ public class SessionController {
             sessionDAO.findBySessionId(sessionID);
             System.out.println("Session: " + sessionID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error viewing session.");
         }
     }
 
@@ -84,7 +83,7 @@ public class SessionController {
             sessionDAO.updateSession(sessionID, location, timestamp, type);
             System.out.println("Session has been updated: " + sessionID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error updating session.");
         }
     }
 
@@ -93,7 +92,7 @@ public class SessionController {
             sessionDAO.assignEvaluator(evaluatorID, studentID);
             System.out.println("Evaluator " + evaluatorID + " assigned to student " + studentID);
         } catch (SQLException e) {
-            System.out.println("Error assigning evaluator: " + e.getMessage());
+            System.out.println("Error assigning evaluator: Database error occurred.");
         }
     }
 
@@ -102,7 +101,7 @@ public class SessionController {
             sessionDAO.deleteSession(sessionID);
             System.out.println("Session " + sessionID + "has been deleted");
         } catch (SQLException e) {
-            System.out.println("Error deleting the session: " + e.getMessage());
+            System.out.println("Error deleting the session: Database error occurred.");
         }
     }
 

@@ -32,10 +32,8 @@ public class Ceremony {
         if (award == null) {
             return false;
         }
-         
         boolean awardTypeExists = awards.stream()
                 .anyMatch(a -> a.getAwardType().equals(award.getAwardType()));
-        
         if (!awardTypeExists) {
             awards.add(award);
             return true;

@@ -14,7 +14,6 @@ public class SessionDAO {
 
     public List<Session> getAllSessions() {
         List<Session> sessions = new ArrayList<>();
-         
         String sql = "SELECT s.*, u.username as evaluator_name, u.user_id as eval_id " +
                 "FROM sessions s " +
                 "LEFT JOIN session_evaluators se ON s.session_id = se.session_id " +
@@ -23,7 +22,6 @@ public class SessionDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
-
             Session currentSession = null;
             while (rs.next()) {
                 String id = rs.getString("session_id");
@@ -35,7 +33,6 @@ public class SessionDAO {
                             date.toLocalDateTime().toLocalTime()), type);
                     sessions.add(currentSession);
                 }
-
                 String evalId = rs.getString("eval_id");
                 String evalName = rs.getString("evaluator_name");
                 if (evalId != null) {
@@ -43,33 +40,28 @@ public class SessionDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving all sessions.");
         }
         return sessions;
     }
 
     public List<Session> getUnassignedSessions() {
         List<Session> sessions = new ArrayList<>();
-         
-         
         String sql = "SELECT s.* FROM sessions s";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
                 String id = rs.getString("session_id");
                 String loc = rs.getString("location");
                 Timestamp date = rs.getTimestamp("session_date");
                 String type = rs.getString("session_type");
-
                 Session session = new Session(id, loc, new models.DateAndTime(date.toLocalDateTime().toLocalDate(),
                         date.toLocalDateTime().toLocalTime()), type);
-                 
                 sessions.add(session);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving unassigned sessions.");
         }
         return sessions;
     }
@@ -97,7 +89,6 @@ public class SessionDAO {
                             date.toLocalDateTime().toLocalTime()), type);
                     sessions.add(currentSession);
                 }
-
                 String evalId = rs.getString("eval_id");
                 String evalName = rs.getString("evaluator_name");
                 if (evalId != null) {
@@ -105,7 +96,7 @@ public class SessionDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return sessions;
     }
@@ -170,20 +161,18 @@ public class SessionDAO {
                 Timestamp ts = rs.getTimestamp("seminar_date");
                 int semester = rs.getInt("semester");
                 int year = rs.getInt("year");
-
                 models.DateAndTime dt = null;
                 if (ts != null) {
                     LocalDateTime ldt = ts.toLocalDateTime();
                     dt = new models.DateAndTime(ldt.toLocalDate(), ldt.toLocalTime());
                 }
-
                 seminars.add(new Seminar(id, loc, dt, semester, year));
             }
             if (!rs.isClosed()) {
                 rs.getStatement().getConnection().close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return seminars;
     }
@@ -212,7 +201,6 @@ public class SessionDAO {
             stmt.setString(2, studentId);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                 
             }
         }
     }
@@ -269,29 +257,24 @@ public class SessionDAO {
     }
 
     public void assignEvaluator(String evaluatorID, String studentID) throws SQLException {
-         
         String checkSql = "SELECT 1 FROM evaluator_assignments WHERE evaluator_id = ?::uuid";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement checkStmt = conn.prepareStatement(checkSql);
         checkStmt.setString(1, evaluatorID);
         ResultSet rs = checkStmt.executeQuery();
         if (rs.next()) {
-             
             rs.close();
             checkStmt.close();
             throw new SQLException("Evaluator already assigned");
         }
         rs.close();
         checkStmt.close();
-
-         
         String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
         PreparedStatement subStmt = conn.prepareStatement(subSql);
         subStmt.setString(1, studentID);
         ResultSet subRs = subStmt.executeQuery();
         if (subRs.next()) {
             String submissionId = subRs.getString("submission_id");
-             
             String assignSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid)";
             PreparedStatement assignStmt = conn.prepareStatement(assignSql);
             assignStmt.setString(1, evaluatorID);
@@ -317,7 +300,6 @@ public class SessionDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 String sessionID = rs.getString("session_id");
                 Timestamp sessionDate = rs.getTimestamp("session_date");
@@ -329,16 +311,14 @@ public class SessionDAO {
                 schedule.add(new ScheduleItem(sessionID, date, time, venue, evaluatorID, studentID));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return schedule;
     }
 
     public void assignEvaluatorToSession(String sessionId, String evaluatorId) throws SQLException {
-         
         String getStudentsSql = "SELECT student_id FROM session_students WHERE session_id = ?::uuid";
         List<String> studentIds = new ArrayList<>();
-
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(getStudentsSql)) {
             stmt.setString(1, sessionId);
@@ -347,38 +327,25 @@ public class SessionDAO {
                 studentIds.add(rs.getString("student_id"));
             }
         }
-
         if (studentIds.isEmpty()) {
             throw new SQLException("No students found in this session.");
         }
-
-         
-         
         int assignedCount = 0;
         try (Connection conn = DatabaseConnection.getConnection()) {
             String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
             String assignSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid) ON CONFLICT DO NOTHING";
-             
-             
-             
-             
-
             PreparedStatement subStmt = conn.prepareStatement(subSql);
             PreparedStatement assignStmt = conn.prepareStatement(assignSql);
-
             for (String studentId : studentIds) {
                 subStmt.setString(1, studentId);
                 ResultSet subRs = subStmt.executeQuery();
                 if (subRs.next()) {
                     String submissionId = subRs.getString("submission_id");
-
-                     
                     String checkSql = "SELECT 1 FROM evaluator_assignments WHERE evaluator_id = ?::uuid AND submission_id = ?::uuid";
                     PreparedStatement checkStmt = conn.prepareStatement(checkSql);
                     checkStmt.setString(1, evaluatorId);
                     checkStmt.setString(2, submissionId);
                     ResultSet checkRs = checkStmt.executeQuery();
-
                     if (!checkRs.next()) {
                         assignStmt.setString(1, evaluatorId);
                         assignStmt.setString(2, submissionId);
@@ -391,8 +358,6 @@ public class SessionDAO {
             }
             subStmt.close();
             assignStmt.close();
-
-             
             String updateSessionSql = "UPDATE sessions SET evaluator_id = ?::uuid WHERE session_id = ?::uuid";
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSessionSql)) {
                 updateStmt.setString(1, evaluatorId);
@@ -400,10 +365,7 @@ public class SessionDAO {
                 updateStmt.executeUpdate();
             }
         }
-
         if (assignedCount == 0 && !studentIds.isEmpty()) {
-             
-             
         }
     }
 
@@ -431,7 +393,6 @@ public class SessionDAO {
                 ids.add(rs.getString("evaluator_id"));
         }
         return ids;
-
     }
 
     public List<String[]> getAssignmentsOverview(String sessionId) throws SQLException {
@@ -448,7 +409,6 @@ public class SessionDAO {
                 "LEFT JOIN users u_eval ON ss.evaluator_id = u_eval.user_id " +
                 "WHERE ss.session_id = ?::uuid " +
                 "ORDER BY sp.full_name";
-
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, sessionId);
@@ -479,8 +439,6 @@ public class SessionDAO {
             stmt.setString(3, studentId);
             stmt.executeUpdate();
         }
-
-         
         if (evaluatorId != null && !evaluatorId.isEmpty()) {
             String subSql = "SELECT submission_id FROM submissions WHERE student_id = ?::uuid";
             try (Connection conn = DatabaseConnection.getConnection();
@@ -489,13 +447,11 @@ public class SessionDAO {
                 ResultSet rs = subStmt.executeQuery();
                 if (rs.next()) {
                     String submissionId = rs.getString("submission_id");
-                     
                     String delSql = "DELETE FROM evaluator_assignments WHERE submission_id = ?::uuid";
                     try (PreparedStatement delStmt = conn.prepareStatement(delSql)) {
                         delStmt.setString(1, submissionId);
                         delStmt.executeUpdate();
                     }
-                     
                     String insSql = "INSERT INTO evaluator_assignments (evaluator_id, submission_id) VALUES (?::uuid, ?::uuid)";
                     try (PreparedStatement insStmt = conn.prepareStatement(insSql)) {
                         insStmt.setString(1, evaluatorId);

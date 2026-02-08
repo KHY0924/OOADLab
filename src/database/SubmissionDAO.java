@@ -20,30 +20,20 @@ public class SubmissionDAO {
             stmt.setString(6, presentationType);
             stmt.executeUpdate();
         }
-
-         
         autoAssignToSession(seminarId, studentId, presentationType);
     }
 
-     
     private void autoAssignToSession(String seminarId, String studentId, String presentationType) {
         String findSessionSql = "SELECT session_id FROM sessions WHERE seminar_id = ?::uuid AND session_type ILIKE ? LIMIT 1";
         String insertSql = "INSERT INTO session_students (session_id, student_id) VALUES (?::uuid, ?::uuid) ON CONFLICT DO NOTHING";
-
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement findStmt = conn.prepareStatement(findSessionSql)) {
-
-             
-             
             String typePattern = "%" + presentationType.split(" ")[0] + "%";
             findStmt.setString(1, seminarId);
             findStmt.setString(2, typePattern);
-
             ResultSet rs = findStmt.executeQuery();
             if (rs.next()) {
                 String sessionId = rs.getString("session_id");
-
-                 
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setString(1, sessionId);
                     insertStmt.setString(2, studentId);
@@ -55,7 +45,7 @@ public class SubmissionDAO {
                 System.out.println("[SubmissionDAO] No matching session found for type: " + presentationType);
             }
         } catch (SQLException e) {
-            System.err.println("[SubmissionDAO] Auto-assign failed: " + e.getMessage());
+            System.err.println("[SubmissionDAO] Auto-assign failed: Database error.");
         }
     }
 
@@ -119,14 +109,13 @@ public class SubmissionDAO {
                 String supervisor = rs.getString("supervisor");
                 String presentationType = rs.getString("presentation_type");
                 String studentName = rs.getString("student_name");
-
                 Submission sub = new Submission(submissionId, seminarId, studentId, title, abstractText, supervisor,
                         presentationType);
                 sub.setStudentName(studentName);
                 submissions.add(sub);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving submissions list.");
         }
         return submissions;
     }

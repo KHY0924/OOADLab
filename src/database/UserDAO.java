@@ -21,7 +21,6 @@ public class UserDAO {
 
     public ResultSet findByUsername(String uname) throws SQLException {
         String q = "SELECT * FROM users WHERE username = ?";
-
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement pst = con.prepareStatement(q);
         pst.setString(1, uname);
@@ -38,7 +37,6 @@ public class UserDAO {
 
     public ResultSet findByUserId(String userId) throws SQLException {
         String q = "SELECT * FROM users WHERE user_id = ?::uuid";
-
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement pst = con.prepareStatement(q);
         pst.setString(1, userId);
@@ -59,7 +57,7 @@ public class UserDAO {
                 users.add(new User(userId, username, password, role));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving all users.");
         }
         return users;
     }

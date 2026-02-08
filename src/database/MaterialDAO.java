@@ -25,7 +25,7 @@ public class MaterialDAO {
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error creating materials table.");
         }
     }
 
@@ -60,8 +60,8 @@ public class MaterialDAO {
                             rs.getString("file_path")));
                 }
             }
+            System.out.println("Error retrieving materials.");
         }
         return materials;
     }
 }
-

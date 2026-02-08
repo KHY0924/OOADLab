@@ -102,7 +102,6 @@ public class PosterPresentationService {
     public boolean assignPresentationToBoard(int presentationId, int boardId) {
         PosterPresentation presentation = presentationDAO.getPresentationById(presentationId);
         PresentationBoard board = boardDAO.getBoardById(boardId);
-
         if (presentation != null && board != null && !board.isFull()) {
             presentation.setBoardId(boardId);
             board.setCurrentPresentations(board.getCurrentPresentations() + 1);

@@ -107,7 +107,6 @@ public class Evaluation {
         this.methodology = s2;
         this.results = s3;
         this.presentation = s4;
-         
         this.overallScore = (int) ((s1 + s2 + s3 + s4) * 2.5);
     }
 

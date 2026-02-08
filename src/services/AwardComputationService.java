@@ -22,19 +22,15 @@ public class AwardComputationService {
         if (!isValidInput(oralSubmissions, evaluations)) {
             return null;
         }
-
         Map<String, Double> submissionScores = calculateAverageScores(oralSubmissions, evaluations);
-        
         String winningSubmissionId = submissionScores.entrySet().stream()
                 .filter(entry -> entry.getValue() >= MIN_SCORE_THRESHOLD)
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-
         if (winningSubmissionId == null) {
             return null;
         }
-
         Submission winningSubmission = findSubmissionById(oralSubmissions, winningSubmissionId);
         return winningSubmission != null ? createAward(BEST_ORAL, winningSubmission) : null;
     }
@@ -45,19 +41,15 @@ public class AwardComputationService {
         if (!isValidInput(posterSubmissions, evaluations)) {
             return null;
         }
-
         Map<String, Double> submissionScores = calculateAverageScores(posterSubmissions, evaluations);
-        
         String winningSubmissionId = submissionScores.entrySet().stream()
                 .filter(entry -> entry.getValue() >= MIN_SCORE_THRESHOLD)
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-
         if (winningSubmissionId == null) {
             return null;
         }
-
         Submission winningSubmission = findSubmissionById(posterSubmissions, winningSubmissionId);
         return winningSubmission != null ? createAward(BEST_POSTER, winningSubmission) : null;
     }
@@ -69,17 +61,14 @@ public class AwardComputationService {
             peopleVotes == null || peopleVotes.isEmpty()) {
             return null;
         }
-
         String winningSubmissionId = peopleVotes.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-
         if (winningSubmissionId == null) {
             return null;
         }
-
         Submission winningSubmission = findSubmissionById(allSubmissions, winningSubmissionId);
         return winningSubmission != null ? createAward(PEOPLES_CHOICE, winningSubmission) : null;
     }
@@ -88,11 +77,9 @@ public class AwardComputationService {
     private Map<String, Double> calculateAverageScores(List<Submission> submissions,
                                                        List<Evaluation> evaluations) {
         Map<String, List<Integer>> submissionEvaluations = new HashMap<>();
-
         for (Submission submission : submissions) {
             submissionEvaluations.put(submission.getId(), new ArrayList<>());
         }
-
         for (Evaluation evaluation : evaluations) {
             submissionEvaluations.computeIfPresent(evaluation.getSubmissionId(),
                     (key, scores) -> {
@@ -100,7 +87,6 @@ public class AwardComputationService {
                         return scores;
                     });
         }
-
         Map<String, Double> averageScores = new HashMap<>();
         for (Map.Entry<String, List<Integer>> entry : submissionEvaluations.entrySet()) {
             double average = entry.getValue().isEmpty() ? 0 :
@@ -110,7 +96,6 @@ public class AwardComputationService {
                             .orElse(0);
             averageScores.put(entry.getKey(), average);
         }
-
         return averageScores;
     }
 

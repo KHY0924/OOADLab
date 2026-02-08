@@ -63,14 +63,12 @@ public class CeremonyService {
         if (!ceremony.canAddAwards()) {
             return false;
         }
-
         Award bestOral = awardComputationService.computeBestOralPresentation(
                 oralSubmissions, evaluations);
         Award bestPoster = awardComputationService.computeBestPosterPresentation(
                 posterSubmissions, evaluations);
         Award peoplesChoice = awardComputationService.computePeoplesChoice(
                 getMergedSubmissions(oralSubmissions, posterSubmissions), peopleVotes);
-
         boolean allAssigned = true;
         if (bestOral != null) {
             allAssigned &= ceremony.addAward(bestOral);
@@ -81,7 +79,6 @@ public class CeremonyService {
         if (peoplesChoice != null) {
             allAssigned &= ceremony.addAward(peoplesChoice);
         }
-
         return allAssigned;
     }
 

@@ -21,21 +21,16 @@ public class UserController {
 
     public void registerUser(String username, String password, String fullName, String email, String major) {
         try {
-
             String userId = java.util.UUID.randomUUID().toString();
-
             userDAO.createUser(userId, username, password, "student");
-
             profileDAO.createProfile(userId, fullName, email, major);
-
             System.out.println("User registered successfully: " + username);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error registering user: Database error.");
             System.err.println("Registration failed.");
         }
     }
 
     private void fillStudentProfile(String userId, String fullName, String email, String major) {
-
     }
 }

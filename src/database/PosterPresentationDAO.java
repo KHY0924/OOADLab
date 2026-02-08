@@ -24,7 +24,7 @@ public class PosterPresentationDAO {
             stmt.setString(6, presentation.getStatus());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error creating poster presentation.");
             return false;
         }
     }
@@ -46,7 +46,7 @@ public class PosterPresentationDAO {
                         rs.getString("status"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving presentation by ID.");
         }
         return null;
     }
@@ -69,7 +69,7 @@ public class PosterPresentationDAO {
                         rs.getString("status")));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving presentations for board.");
         }
         return presentations;
     }
@@ -91,7 +91,7 @@ public class PosterPresentationDAO {
                         rs.getString("status"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving presentation for board.");
         }
         return null;
     }
@@ -110,7 +110,7 @@ public class PosterPresentationDAO {
             stmt.setInt(7, presentation.getPresentationId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error updating poster presentation.");
             return false;
         }
     }
@@ -128,7 +128,7 @@ public class PosterPresentationDAO {
                 return rs.getString("username");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving student name for board.");
         }
         return "Unassigned";
     }
@@ -141,7 +141,7 @@ public class PosterPresentationDAO {
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error checking submission assignment.");
             return false;
         }
     }
@@ -153,7 +153,7 @@ public class PosterPresentationDAO {
             stmt.setInt(1, presentationId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error deleting presentation.");
             return false;
         }
     }
@@ -170,7 +170,7 @@ public class PosterPresentationDAO {
                 return rs.getString("board_name");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving board name.");
         }
         return "Not Assigned";
     }

@@ -38,7 +38,6 @@ public class DatabaseConnection {
     }
 
     public static Connection getConnection() throws SQLException {
-
         try {
             Class.forName("org.postgresql.Driver");
             String url = "jdbc:postgresql://" + getEnv("DB_HOST") + ":" + getEnv("DB_PORT") + "/"
@@ -54,7 +53,7 @@ public class DatabaseConnection {
             try {
                 connection.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println("Error closing database connection.");
             }
         }
     }
@@ -66,7 +65,7 @@ public class DatabaseConnection {
             conn.close();
             return isValid;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }
