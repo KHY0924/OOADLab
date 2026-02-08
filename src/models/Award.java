@@ -12,8 +12,7 @@ public class Award {
     private LocalDateTime awardDate;
     private String remarks;
 
-    public Award(String awardId, String awardType, String studentId, String studentName,
-                 String submissionTitle, String seminarId) {
+    public Award(String awardId, String awardType, String studentId, String studentName, String submissionTitle, String seminarId) {
         this.awardId = awardId;
         this.awardType = awardType;
         this.studentId = studentId;
@@ -55,7 +54,7 @@ public class Award {
         return remarks;
     }
 
-    // Setters
+
     public void setAwardDate(LocalDateTime awardDate) {
         this.awardDate = awardDate;
     }
@@ -67,10 +66,10 @@ public class Award {
     @Override
     public String toString() {
         return "Award{" +
-                "awardId='" + awardId + '\'' +
-                ", awardType='" + awardType + '\'' +
-                ", studentName='" + studentName + '\'' +
-                ", submissionTitle='" + submissionTitle + '\'' +
-                '}';
+        "awardId='" + awardId + '\'' +
+        ", awardType='" + awardType + '\'' +
+        ", studentName='" + studentName + '\'' +
+        ", submissionTitle='" + submissionTitle + '\'' +
+        '}';
     }
 }

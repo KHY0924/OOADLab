@@ -1,4 +1,4 @@
--- Users table
+ 
 CREATE TABLE IF NOT EXISTS users (
     user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Student Profiles table
+ 
 CREATE TABLE IF NOT EXISTS student_profiles (
     profile_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS student_profiles (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Seminars table (must be created before submissions which references it)
+ 
 CREATE TABLE IF NOT EXISTS Seminars (
     seminar_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location VARCHAR(100),
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS Seminars (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Submissions table (FIXED: status column added here)
+ 
 CREATE TABLE IF NOT EXISTS submissions (
     submission_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     seminar_id UUID REFERENCES Seminars(seminar_id) ON DELETE CASCADE,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS submissions (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Materials table
+ 
 CREATE TABLE IF NOT EXISTS materials (
     material_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS materials (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Sessions table
+ 
 CREATE TABLE IF NOT EXISTS sessions (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     seminar_id UUID REFERENCES Seminars(seminar_id) ON DELETE CASCADE,
@@ -64,28 +64,28 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Session-Students junction table (many-to-many)
+ 
 CREATE TABLE IF NOT EXISTS session_students (
     session_id UUID REFERENCES sessions(session_id) ON DELETE CASCADE,
     student_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
     PRIMARY KEY (session_id, student_id)
 );
 
--- Session-Evaluators junction table (many-to-many)
+ 
 CREATE TABLE IF NOT EXISTS session_evaluators (
     session_id UUID REFERENCES sessions(session_id) ON DELETE CASCADE,
     evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
     PRIMARY KEY (session_id, evaluator_id)
 );
 
--- Table to link an Evaluator to a Submission 
+ 
 CREATE TABLE IF NOT EXISTS evaluator_assignments (
     assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     evaluator_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
     submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE
 );
 
--- Table to store the Grades you submit
+ 
 CREATE TABLE IF NOT EXISTS evaluations (
     evaluation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID REFERENCES submissions(submission_id) ON DELETE CASCADE,
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS evaluations (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Presentation Boards Table
+ 
 CREATE TABLE IF NOT EXISTS presentation_boards (
     board_id SERIAL PRIMARY KEY,
     board_name VARCHAR(255) NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS presentation_boards (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Poster Presentations Table
+ 
 CREATE TABLE IF NOT EXISTS poster_presentations (
     presentation_id SERIAL PRIMARY KEY,
     board_id INT NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS poster_presentations (
     FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
 );
 
--- Evaluation Criteria Table
+ 
 CREATE TABLE IF NOT EXISTS evaluation_criteria (
     criteria_id SERIAL PRIMARY KEY,
     presentation_id INT NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS evaluation_criteria (
     FOREIGN KEY (presentation_id) REFERENCES poster_presentations(presentation_id) ON DELETE CASCADE
 );
 
--- Schedule table to store session schedules
+ 
 CREATE TABLE IF NOT EXISTS schedule (
     schedule_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID REFERENCES sessions(session_id) ON DELETE CASCADE,

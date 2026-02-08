@@ -23,16 +23,14 @@ public class SessionController {
 
     public void getSessionInformation(String studentId) {
         try {
-
             sessionDAO.findSessionsByStudent(studentId);
             System.out.println("Retrieved session info for " + studentId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error retrieving session info.");
         }
     }
 
-    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute,
-            int semester) {
+    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute, int semester) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -43,13 +41,11 @@ public class SessionController {
             sessionDAO.createSeminar(seminarID, location, timestamp, semester, year);
             System.out.println("Seminar created in database: " + seminarID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error creating seminar.");
         }
     }
 
-    public void createSession(String sessionID, String seminarId, String location, int year, int month, int day,
-            int hour, int minute,
-            String type) {
+    public void createSession(String sessionID, String seminarId, String location, int year, int month, int day, int hour, int minute, String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -60,7 +56,7 @@ public class SessionController {
             sessionDAO.createSession(sessionID, seminarId, location, timestamp, type);
             System.out.println("Session created in database: " + sessionID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error creating session.");
         }
     }
 
@@ -69,12 +65,11 @@ public class SessionController {
             sessionDAO.findBySessionId(sessionID);
             System.out.println("Session: " + sessionID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error viewing session.");
         }
     }
 
-    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute,
-            String type) {
+    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -84,7 +79,7 @@ public class SessionController {
             sessionDAO.updateSession(sessionID, location, timestamp, type);
             System.out.println("Session has been updated: " + sessionID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error updating session.");
         }
     }
 
@@ -93,7 +88,7 @@ public class SessionController {
             sessionDAO.assignEvaluator(evaluatorID, studentID);
             System.out.println("Evaluator " + evaluatorID + " assigned to student " + studentID);
         } catch (SQLException e) {
-            System.out.println("Error assigning evaluator: " + e.getMessage());
+            System.out.println("Error assigning evaluator: Database error occurred.");
         }
     }
 
@@ -102,7 +97,7 @@ public class SessionController {
             sessionDAO.deleteSession(sessionID);
             System.out.println("Session " + sessionID + "has been deleted");
         } catch (SQLException e) {
-            System.out.println("Error deleting the session: " + e.getMessage());
+            System.out.println("Error deleting the session: Database error occurred.");
         }
     }
 

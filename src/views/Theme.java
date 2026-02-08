@@ -33,12 +33,9 @@ public class Theme {
         button.setFont(BOLD_FONT);
         button.setBackground(PRIMARY_COLOR);
         button.setForeground(Color.WHITE);
-
         button.setOpaque(true);
         button.setContentAreaFilled(true);
-
         button.setUI(new BasicButtonUI());
-
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -48,10 +45,8 @@ public class Theme {
         button.setFont(BOLD_FONT);
         button.setBackground(Color.WHITE);
         button.setForeground(PRIMARY_COLOR);
-
         button.setOpaque(true);
         button.setContentAreaFilled(true);
-
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(PRIMARY_COLOR, 1));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -67,9 +62,7 @@ public class Theme {
     }
 
     public static Border createCardBorder() {
-        return BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        return BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1), BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 
     public static void styleTable(javax.swing.JTable table) {

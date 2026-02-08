@@ -19,20 +19,18 @@ public class CeremonyService {
         this.awardComputationService = new AwardComputationService();
     }
 
-    public Ceremony createCeremony(String seminarId, String ceremonyName, 
-                                   LocalDateTime scheduledDateTime, String venue) {
+    public Ceremony createCeremony(String seminarId, String ceremonyName, LocalDateTime scheduledDateTime, String venue) {
         String ceremonyId = "CRM_" + System.currentTimeMillis();
-        Ceremony ceremony = new Ceremony(ceremonyId, seminarId, ceremonyName, 
-                                        scheduledDateTime, venue);
+        Ceremony ceremony = new Ceremony(ceremonyId, seminarId, ceremonyName, scheduledDateTime, venue);
         ceremonies.add(ceremony);
         return ceremony;
     }
 
     public Ceremony getCeremonyById(String ceremonyId) {
         return ceremonies.stream()
-                .filter(c -> c.getCeremonyId().equals(ceremonyId))
-                .findFirst()
-                .orElse(null);
+        .filter(c -> c.getCeremonyId().equals(ceremonyId))
+        .findFirst()
+        .orElse(null);
     }
 
     public List<Ceremony> getCeremoniesBySeminar(String seminarId) {
@@ -55,22 +53,13 @@ public class CeremonyService {
         return statusCeremonies;
     }
 
-    public boolean assignAwardsToCeremony(Ceremony ceremony,
-                                          List<Submission> oralSubmissions,
-                                          List<Submission> posterSubmissions,
-                                          List<Evaluation> evaluations,
-                                          Map<String, Integer> peopleVotes) {
+    public boolean assignAwardsToCeremony(Ceremony ceremony, List<Submission> oralSubmissions, List<Submission> posterSubmissions, List<Evaluation> evaluations, Map<String, Integer> peopleVotes) {
         if (!ceremony.canAddAwards()) {
             return false;
         }
-
-        Award bestOral = awardComputationService.computeBestOralPresentation(
-                oralSubmissions, evaluations);
-        Award bestPoster = awardComputationService.computeBestPosterPresentation(
-                posterSubmissions, evaluations);
-        Award peoplesChoice = awardComputationService.computePeoplesChoice(
-                getMergedSubmissions(oralSubmissions, posterSubmissions), peopleVotes);
-
+        Award bestOral = awardComputationService.computeBestOralPresentation(oralSubmissions, evaluations);
+        Award bestPoster = awardComputationService.computeBestPosterPresentation(posterSubmissions, evaluations);
+        Award peoplesChoice = awardComputationService.computePeoplesChoice(getMergedSubmissions(oralSubmissions, posterSubmissions), peopleVotes);
         boolean allAssigned = true;
         if (bestOral != null) {
             allAssigned &= ceremony.addAward(bestOral);
@@ -81,7 +70,6 @@ public class CeremonyService {
         if (peoplesChoice != null) {
             allAssigned &= ceremony.addAward(peoplesChoice);
         }
-
         return allAssigned;
     }
 
@@ -136,8 +124,7 @@ public class CeremonyService {
         return new ArrayList<>(ceremonies);
     }
 
-    private List<Submission> getMergedSubmissions(List<Submission> oralSubmissions,
-                                                   List<Submission> posterSubmissions) {
+    private List<Submission> getMergedSubmissions(List<Submission> oralSubmissions, List<Submission> posterSubmissions) {
         List<Submission> merged = new ArrayList<>();
         if (oralSubmissions != null) {
             merged.addAll(oralSubmissions);
@@ -150,9 +137,9 @@ public class CeremonyService {
 
     public boolean validateCeremonySetup(String ceremonyId) {
         Ceremony ceremony = getCeremonyById(ceremonyId);
-        return ceremony != null && 
-               ceremony.getAwardCount() > 0 &&
-               ceremony.getScheduledDateTime() != null &&
-               ceremony.getVenue() != null;
+        return ceremony != null &&
+        ceremony.getAwardCount() > 0 &&
+        ceremony.getScheduledDateTime() != null &&
+        ceremony.getVenue() != null;
     }
 }

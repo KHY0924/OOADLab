@@ -13,12 +13,9 @@ public class AuthService {
     public User login(String username, String password) {
         System.out.println("[AuthService] Attempting login for user: " + username);
         String q = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-                PreparedStatement pst = con.prepareStatement(q)) {
-
+        try (Connection con = DatabaseConnection.getConnection(); PreparedStatement pst = con.prepareStatement(q)) {
             pst.setString(1, username);
             pst.setString(2, password);
-
             try (ResultSet res = pst.executeQuery()) {
                 if (res.next()) {
                     String uid = res.getString("user_id");
@@ -30,14 +27,13 @@ public class AuthService {
             }
             System.out.println("[AuthService] Login failed for: " + username + " (Invalid credentials)");
         } catch (SQLException e) {
-            System.err.println("[AuthService] Database error during login: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[AuthService] Database error during login.");
+            System.out.println("Login database error.");
         }
         return null;
     }
 
-    public boolean register(String username, String password, String role, String fullName, String email,
-            String major) {
+    public boolean register(String username, String password, String role, String fullName, String email, String major) {
         try {
             ResultSet chk = uDao.findByUsername(username);
             if (chk.next()) {
@@ -50,7 +46,7 @@ public class AuthService {
             }
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Registration error.");
             return false;
         }
     }

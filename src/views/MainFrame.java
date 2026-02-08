@@ -32,29 +32,22 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
-
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
-
         loginPanel = new LoginPanel(this);
         registerPanel = new RegisterPanel(this);
-
         studentPanel = new StudentPanel(this);
         coordinatorPanel = new CoordinatorPanel(this);
         evaluatorPanel = new EvaluatorPanel(this);
         profilePanel = new ProfilePanel(this);
-
         mainPanel.add(loginPanel, LOGIN_PANEL);
         mainPanel.add(registerPanel, REGISTER_PANEL);
         mainPanel.add(studentPanel, STUDENT_PANEL);
         mainPanel.add(coordinatorPanel, COORDINATOR_PANEL);
         mainPanel.add(evaluatorPanel, EVALUATOR_PANEL);
         mainPanel.add(profilePanel, PROFILE_PANEL);
-
         add(mainPanel);
-
         showPanel(LOGIN_PANEL);
-
         setVisible(true);
     }
 

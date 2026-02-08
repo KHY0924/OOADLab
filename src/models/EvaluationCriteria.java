@@ -8,8 +8,7 @@ public class EvaluationCriteria {
     private int maxScore;
     private int weight;
 
-    public EvaluationCriteria(int criteriaId, int presentationId, String criteriaName, 
-                             String description, int maxScore, int weight) {
+    public EvaluationCriteria(int criteriaId, int presentationId, String criteriaName, String description, int maxScore, int weight) {
         this.criteriaId = criteriaId;
         this.presentationId = presentationId;
         this.criteriaName = criteriaName;
@@ -19,52 +18,52 @@ public class EvaluationCriteria {
     }
 
 
-    public int getCriteriaId() { 
-        return criteriaId; 
+    public int getCriteriaId() {
+        return criteriaId;
     }
 
-    public void setCriteriaId(int criteriaId) { 
-        this.criteriaId = criteriaId; 
+    public void setCriteriaId(int criteriaId) {
+        this.criteriaId = criteriaId;
     }
 
-    public int getPresentationId() { 
-        return presentationId; 
+    public int getPresentationId() {
+        return presentationId;
     }
 
-    public void setPresentationId(int presentationId) { 
-        this.presentationId = presentationId; 
+    public void setPresentationId(int presentationId) {
+        this.presentationId = presentationId;
     }
 
-    public String getCriteriaName() { 
-        return criteriaName; 
+    public String getCriteriaName() {
+        return criteriaName;
     }
 
-    public void setCriteriaName(String criteriaName) { 
-        this.criteriaName = criteriaName; 
+    public void setCriteriaName(String criteriaName) {
+        this.criteriaName = criteriaName;
     }
 
-    public String getDescription() { 
-        return description; 
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescription(String description) { 
-        this.description = description; 
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public int getMaxScore() { 
-        return maxScore; 
+    public int getMaxScore() {
+        return maxScore;
     }
 
-    public void setMaxScore(int maxScore) { 
-        this.maxScore = maxScore; 
+    public void setMaxScore(int maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public int getWeight() { 
-        return weight; 
+    public int getWeight() {
+        return weight;
     }
 
-    public void setWeight(int weight) { 
-        this.weight = weight; 
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
-    
+
 }
