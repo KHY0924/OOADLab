@@ -155,20 +155,20 @@ public class CoordinatorPanel extends JPanel {
         }
         for (Session s : sessions) {
             sessionModel.addRow(new Object[] {
-                    s.getSessionID(),
-                    s.getSessionDate() + " " + s.getSessionTime(),
-                    s.getLocation(),
-                    s.getSessionType(),
-                    "Edit"
+                s.getSessionID(),
+                s.getSessionDate() + " " + s.getSessionTime(),
+                s.getLocation(),
+                s.getSessionType(),
+                "Edit"
             });
         }
     }
 
     public void loadSeminars() {
         if (sessionSeminarCombo != null)
-            sessionSeminarCombo.removeAllItems();
+        sessionSeminarCombo.removeAllItems();
         if (reportSeminarCombo != null)
-            reportSeminarCombo.removeAllItems();
+        reportSeminarCombo.removeAllItems();
         seminarIds.clear();
         try {
             ResultSet rs = sessionDAO.getAllSeminars();
@@ -179,9 +179,9 @@ public class CoordinatorPanel extends JPanel {
                 int year = rs.getInt("year");
                 String displayText = "Semester " + semester + " " + year + " - " + location;
                 if (sessionSeminarCombo != null)
-                    sessionSeminarCombo.addItem(displayText);
+                sessionSeminarCombo.addItem(displayText);
                 if (reportSeminarCombo != null)
-                    reportSeminarCombo.addItem(displayText);
+                reportSeminarCombo.addItem(displayText);
                 seminarIds.add(seminarId);
             }
             rs.getStatement().getConnection().close();
@@ -202,17 +202,16 @@ public class CoordinatorPanel extends JPanel {
         String[] types = { "Oral Presentation", "Poster Presentation" };
         JComboBox<String> typeBox = new JComboBox<>(types);
         Object[] message = {
-                "Location:", locField,
-                "Date (YYYY-MM-DD HH:MM):", dateField,
-                "Type:", typeBox
+            "Location:", locField,
+            "Date (YYYY-MM-DD HH:MM):", dateField,
+            "Type:", typeBox
         };
         int option = JOptionPane.showConfirmDialog(this, message, "Add New Session", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
                 String id = UUID.randomUUID().toString();
                 Timestamp ts = Timestamp.valueOf(dateField.getText() + ":00");
-                sessionDAO.createSession(id, selectedSeminarId, locField.getText(), ts,
-                        (String) typeBox.getSelectedItem());
+                sessionDAO.createSession(id, selectedSeminarId, locField.getText(), ts, (String) typeBox.getSelectedItem());
                 loadSessions();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error adding session: " + ex.getMessage());
@@ -229,10 +228,10 @@ public class CoordinatorPanel extends JPanel {
         JComboBox<String> yearCombo = new JComboBox<>(years);
         yearCombo.setSelectedItem("2026");
         Object[] message = {
-                "Location:", locField,
-                "Date (YYYY-MM-DD HH:MM):", dateField,
-                "Semester:", semesterCombo,
-                "Year:", yearCombo
+            "Location:", locField,
+            "Date (YYYY-MM-DD HH:MM):", dateField,
+            "Semester:", semesterCombo,
+            "Year:", yearCombo
         };
         int option = JOptionPane.showConfirmDialog(this, message, "Add New Seminar", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
@@ -295,23 +294,22 @@ public class CoordinatorPanel extends JPanel {
 
     private void loadUnassignedSessions() {
         if (assignmentModel == null)
-            return;
+        return;
         assignmentModel.setRowCount(0);
         List<Session> sessions = sessionDAO.getAllSessions();
         for (Session s : sessions) {
             assignmentModel.addRow(new Object[] {
-                    s.getSessionID(),
-                    s.getSessionDate() + " " + s.getSessionTime(),
-                    s.getLocation(),
-                    s.getSessionType(),
-                    "Manage"
+                s.getSessionID(),
+                s.getSessionDate() + " " + s.getSessionTime(),
+                s.getLocation(),
+                s.getSessionType(),
+                "Manage"
             });
         }
     }
 
     private void showManageAssignmentsDialog(String sessionId) {
-        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Manage Session Assignments",
-                true);
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Manage Session Assignments", true);
         dialog.setLayout(new BorderLayout());
         dialog.setSize(900, 600);
         dialog.setLocationRelativeTo(this);
@@ -343,9 +341,7 @@ public class CoordinatorPanel extends JPanel {
 
     private void refreshStudentList(String sessionId, DefaultListModel<String> model) {
         model.clear();
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT u.username, u.user_id FROM session_students ss JOIN users u ON ss.student_id = u.user_id WHERE ss.session_id = ?::uuid")) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement("SELECT u.username, u.user_id FROM session_students ss JOIN users u ON ss.student_id = u.user_id WHERE ss.session_id = ?::uuid")) {
             stmt.setString(1, sessionId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -358,9 +354,7 @@ public class CoordinatorPanel extends JPanel {
 
     private void refreshEvaluatorList(String sessionId, DefaultListModel<String> model) {
         model.clear();
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT u.username, u.user_id FROM session_evaluators se JOIN users u ON se.evaluator_id = u.user_id WHERE se.session_id = ?::uuid")) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement("SELECT u.username, u.user_id FROM session_evaluators se JOIN users u ON se.evaluator_id = u.user_id WHERE se.session_id = ?::uuid")) {
             stmt.setString(1, sessionId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -380,7 +374,7 @@ public class CoordinatorPanel extends JPanel {
             for (models.Submission s : submissions) {
                 if (!currentStudentIdsInSession.contains(s.getStudentId())) {
                     studentCombo
-                            .addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle());
+                    .addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle());
                     studentIds.add(s.getStudentId());
                 }
             }
@@ -391,8 +385,7 @@ public class CoordinatorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "No available students to add to this session.");
             return;
         }
-        int option = JOptionPane.showConfirmDialog(this, studentCombo, "Add Student to Session",
-                JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, studentCombo, "Add Student to Session", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION && studentCombo.getSelectedIndex() >= 0) {
             try {
                 sessionDAO.addStudentToSession(sessionId, studentIds.get(studentCombo.getSelectedIndex()));
@@ -425,8 +418,7 @@ public class CoordinatorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "No available evaluators to add to this session.");
             return;
         }
-        int option = JOptionPane.showConfirmDialog(this, evalCombo, "Add Evaluator to Session",
-                JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, evalCombo, "Add Evaluator to Session", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION && evalCombo.getSelectedIndex() >= 0) {
             try {
                 sessionDAO.addEvaluatorToSession(sessionId, evalIds.get(evalCombo.getSelectedIndex()));
@@ -459,11 +451,11 @@ public class CoordinatorPanel extends JPanel {
             for (PresentationBoard b : boards) {
                 String studentName = posterService.getStudentNameForBoard(b.getBoardId());
                 boardModel.addRow(new Object[] {
-                        b.getBoardName(),
-                        b.getLocation(),
-                        studentName,
-                        b.getSessionId(),
-                        b.getPresentationType()
+                    b.getBoardName(),
+                    b.getLocation(),
+                    studentName,
+                    b.getSessionId(),
+                    b.getPresentationType()
                 });
             }
         });
@@ -472,10 +464,10 @@ public class CoordinatorPanel extends JPanel {
         addBoardBtn.addActionListener(e -> {
             JTextField idF = new JTextField();
             String[] locations = {
-                    "North Wing", "South Wing", "East Wing", "West Wing",
-                    "Main Lobby", "Exhibition Hall A", "Exhibition Hall B",
-                    "Level 1 Corridor", "Level 2 Corridor", "Outdoor Plaza",
-                    "Library Atrium", "Science Block Foyer"
+                "North Wing", "South Wing", "East Wing", "West Wing",
+                "Main Lobby", "Exhibition Hall A", "Exhibition Hall B",
+                "Level 1 Corridor", "Level 2 Corridor", "Outdoor Plaza",
+                "Library Atrium", "Science Block Foyer"
             };
             JComboBox<String> locCombo = new JComboBox<>(locations);
             JComboBox<String> sessionBox = new JComboBox<>();
@@ -496,13 +488,12 @@ public class CoordinatorPanel extends JPanel {
             String[] types = { "A1 Portrait", "A1 Landscape", "A0 Portrait", "Digital Screen" };
             JComboBox<String> typeBox = new JComboBox<>(types);
             Object[] msg = {
-                    "Board ID (e.g., P1, P2):", idF,
-                    "Select Location:", locCombo,
-                    "Select Session:", sessionBox,
-                    "Board Type:", typeBox
+                "Board ID (e.g., P1, P2):", idF,
+                "Select Location:", locCombo,
+                "Select Session:", sessionBox,
+                "Board Type:", typeBox
             };
-            if (JOptionPane.showConfirmDialog(this, msg, "Add New Board",
-                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            if (JOptionPane.showConfirmDialog(this, msg, "Add New Board", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 if (idF.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Board ID is required.");
                     return;
@@ -511,10 +502,9 @@ public class CoordinatorPanel extends JPanel {
                     String selectedLoc = (String) locCombo.getSelectedItem();
                     int sessIdx = sessionBox.getSelectedIndex();
                     String selectedSessionId = (sessIdx >= 0 && sessIdx < sessionIds.size()) ? sessionIds.get(sessIdx)
-                            : null;
+                    : null;
                     String selectedType = (String) typeBox.getSelectedItem();
-                    PresentationBoard board = new PresentationBoard(0, idF.getText(), selectedLoc, 1, 0,
-                            selectedSessionId, selectedType);
+                    PresentationBoard board = new PresentationBoard(0, idF.getText(), selectedLoc, 1, 0, selectedSessionId, selectedType);
                     posterService.createBoard(board);
                     posterRefreshBtn.doClick();
                 } catch (Exception ex) {
@@ -530,8 +520,7 @@ public class CoordinatorPanel extends JPanel {
         JButton defineCriteriaBtn = new JButton("Define Criteria");
         Theme.styleSecondaryButton(defineCriteriaBtn);
         defineCriteriaBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this,
-                    "Rubric set: Problem Clarity, Methodology, Results, Presentation (Defaulted)");
+            JOptionPane.showMessageDialog(this, "Rubric set: Problem Clarity, Methodology, Results, Presentation (Defaulted)");
         });
         JPanel btns = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btns.setBackground(Theme.CARD_BG);
@@ -581,12 +570,11 @@ public class CoordinatorPanel extends JPanel {
             System.out.println("Error loading assignment data.");
         }
         Object[] message = {
-                "Select Student / Poster Submission:", subCombo,
-                "Select Board ID:", boardCombo,
-                "Select Poster Session:", sessionCombo
+            "Select Student / Poster Submission:", subCombo,
+            "Select Board ID:", boardCombo,
+            "Select Poster Session:", sessionCombo
         };
-        if (JOptionPane.showConfirmDialog(this, message, "Assign Student to Board",
-                JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if (JOptionPane.showConfirmDialog(this, message, "Assign Student to Board", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             int sIdx = subCombo.getSelectedIndex();
             int bIdx = boardCombo.getSelectedIndex();
             if (sIdx >= 0 && bIdx >= 0) {
@@ -604,12 +592,10 @@ public class CoordinatorPanel extends JPanel {
                         sessionId = posterSessionIds.get(sessIdx);
                     }
                     if (sessionId == null) {
-                        JOptionPane.showMessageDialog(this,
-                                "Error: No Poster Session selected. Please select a valid Poster session.");
+                        JOptionPane.showMessageDialog(this, "Error: No Poster Session selected. Please select a valid Poster session.");
                         return;
                     }
-                    PosterPresentation pp = new PosterPresentation(0, selectedBoardId, selectedSubId,
-                            selectedTitle, "", sessionId, "ASSIGNED");
+                    PosterPresentation pp = new PosterPresentation(0, selectedBoardId, selectedSubId, selectedTitle, "", sessionId, "ASSIGNED");
                     if (posterService.addPresentation(pp)) {
                         JOptionPane.showMessageDialog(this, "Student assigned to board successfully!");
                         if (posterRefreshBtn != null) {
@@ -643,12 +629,7 @@ public class CoordinatorPanel extends JPanel {
         JTextArea reportArea = new JTextArea();
         reportArea.setEditable(false);
         reportArea.setFont(new Font("Consolas", Font.PLAIN, 14));
-        reportArea.setText("--- REPORT GENERATION STEPS ---\n" +
-                "1. Click 'Seminar Schedule' to prepare part 1.\n" +
-                "2. Click 'Evaluation Summary' to prepare part 2.\n" +
-                "3. Click 'Calculate Awards' to prepare part 3.\n" +
-                "4. After all 3 steps, click 'Save & Compile' to finalize.\n" +
-                "5. Finally, click 'Export Report' to save to file.");
+        reportArea.setText("--- REPORT GENERATION STEPS ---\n" + "1. Click 'Seminar Schedule' to prepare part 1.\n" + "2. Click 'Evaluation Summary' to prepare part 2.\n" + "3. Click 'Calculate Awards' to prepare part 3.\n" + "4. After all 3 steps, click 'Save & Compile' to finalize.\n" + "5. Finally, click 'Export Report' to save to file.");
         reportArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel seminarSelectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         seminarSelectorPanel.setBackground(Theme.CARD_BG);
@@ -681,7 +662,7 @@ public class CoordinatorPanel extends JPanel {
         reportButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
             if (idx < 0)
-                return;
+            return;
             String semId = seminarIds.get(idx);
             try {
                 StringBuilder sb = new StringBuilder("--- SEMINAR SCHEDULE ---\n\n");
@@ -707,17 +688,17 @@ public class CoordinatorPanel extends JPanel {
                         sb.append("==========================================\n");
                     }
                     if (studentName != null) {
-                        sb.append("  [").append(pType != null ? pType : "N/A").append("] ").append(studentName)
-                                .append("\n")
-                                .append("     Title:     ").append(title).append("\n")
-                                .append("     Evaluator: ").append(evalName != null ? evalName : "Not Assigned")
-                                .append("\n");
+                        sb.append(" [").append(pType != null ? pType : "N/A").append("] ").append(studentName)
+                        .append("\n")
+                        .append(" Title: ").append(title).append("\n")
+                        .append(" Evaluator: ").append(evalName != null ? evalName : "Not Assigned")
+                        .append("\n");
                         if (boardName != null) {
-                            sb.append("     Poster:    ").append(boardName).append("\n");
+                            sb.append(" Poster: ").append(boardName).append("\n");
                         }
-                        sb.append("  ------------------------------------------\n");
+                        sb.append(" ------------------------------------------\n");
                     } else {
-                        sb.append("  [No students assigned to this session]\n");
+                        sb.append(" [No students assigned to this session]\n");
                     }
                 }
                 if (currentSessionId == null) {
@@ -736,7 +717,7 @@ public class CoordinatorPanel extends JPanel {
                 contextualEditBtn.setBackground(Color.WHITE);
                 rs.getStatement().getConnection().close();
                 if (scheduleDone && summaryDone && awardsDone)
-                    compileButton.setEnabled(true);
+                compileButton.setEnabled(true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
@@ -746,7 +727,7 @@ public class CoordinatorPanel extends JPanel {
         summaryButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
             if (idx < 0)
-                return;
+            return;
             String semId = seminarIds.get(idx);
             try {
                 StringBuilder sb = new StringBuilder("--- EVALUATION SUMMARY & ANALYTICS ---\n\n");
@@ -759,24 +740,24 @@ public class CoordinatorPanel extends JPanel {
                     boolean isEvaluated = !rs.wasNull();
                     String evalName = rs.getString("evaluator_name");
                     String boardName = rs.getString("board_name");
-                    sb.append("Student:   ").append(rs.getString("student_name"))
-                            .append(" (").append(rs.getString("presentation_type")).append(")\n");
+                    sb.append("Student: ").append(rs.getString("student_name"))
+                    .append(" (").append(rs.getString("presentation_type")).append(")\n");
                     if (!isEvaluated) {
-                        sb.append("STATUS:    [PENDING EVALUATION]\n");
+                        sb.append("STATUS: [PENDING EVALUATION]\n");
                         sb.append("Evaluator: ").append(evalName != null ? evalName : "Not Assigned").append("\n");
                     } else {
                         sb.append("Evaluator: ").append(evalName != null ? evalName : "Unknown").append("\n");
                         if (boardName != null) {
-                            sb.append("Poster:    ").append(boardName).append("\n");
+                            sb.append("Poster: ").append(boardName).append("\n");
                         }
-                        sb.append("Title:     ").append(rs.getString("title")).append("\n")
-                                .append("Detailed Scores:\n")
-                                .append("   - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/10\n")
-                                .append("   - Methodology:     ").append(rs.getInt("methodology")).append("/10\n")
-                                .append("   - Results:         ").append(rs.getInt("results")).append("/10\n")
-                                .append("   - Presentation:    ").append(rs.getInt("presentation")).append("/10\n")
-                                .append("OVERALL SCORE: ").append(score).append("/100\n")
-                                .append("Comments: ").append(rs.getString("comments")).append("\n");
+                        sb.append("Title: ").append(rs.getString("title")).append("\n")
+                        .append("Detailed Scores:\n")
+                        .append(" - Problem Clarity: ").append(rs.getInt("problem_clarity")).append("/10\n")
+                        .append(" - Methodology: ").append(rs.getInt("methodology")).append("/10\n")
+                        .append(" - Results: ").append(rs.getInt("results")).append("/10\n")
+                        .append(" - Presentation: ").append(rs.getInt("presentation")).append("/10\n")
+                        .append("OVERALL SCORE: ").append(score).append("/100\n")
+                        .append("Comments: ").append(rs.getString("comments")).append("\n");
                         total += score;
                         evaluatedCount++;
                     }
@@ -786,10 +767,10 @@ public class CoordinatorPanel extends JPanel {
                 if (count > 0) {
                     sb.append("\nDATA ANALYTICS:\n");
                     sb.append("Total Students: ").append(count).append("\n");
-                    sb.append("Evaluated:      ").append(evaluatedCount).append("\n");
+                    sb.append("Evaluated: ").append(evaluatedCount).append("\n");
                     if (evaluatedCount > 0) {
-                        sb.append("Average Score:  ").append(String.format("%.2f", total / evaluatedCount))
-                                .append("\n");
+                        sb.append("Average Score: ").append(String.format("%.2f", total / evaluatedCount))
+                        .append("\n");
                     }
                 }
                 lastSummary = sb.toString();
@@ -802,7 +783,7 @@ public class CoordinatorPanel extends JPanel {
                 contextualEditBtn.setBackground(Color.WHITE);
                 rs.getStatement().getConnection().close();
                 if (scheduleDone && summaryDone && awardsDone)
-                    compileButton.setEnabled(true);
+                compileButton.setEnabled(true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
@@ -814,14 +795,14 @@ public class CoordinatorPanel extends JPanel {
             if (editing) {
                 String text = reportArea.getText();
                 if (currentEditPart == 1)
-                    lastSchedule = text;
+                lastSchedule = text;
                 else if (currentEditPart == 2)
-                    lastSummary = text;
+                lastSummary = text;
                 else if (currentEditPart == 3)
-                    lastAwards = text;
+                lastAwards = text;
                 reportArea.setEditable(false);
                 String label = (currentEditPart == 1) ? "Edit Schedule"
-                        : (currentEditPart == 2) ? "Edit Summary" : "Edit Awards";
+                : (currentEditPart == 2) ? "Edit Summary" : "Edit Awards";
                 contextualEditBtn.setText(label);
                 contextualEditBtn.setBackground(Color.WHITE);
             } else {
@@ -836,7 +817,7 @@ public class CoordinatorPanel extends JPanel {
         awardButton.addActionListener(e -> {
             int idx = reportSeminarCombo.getSelectedIndex();
             if (idx < 0)
-                return;
+            return;
             String semId = seminarIds.get(idx);
             try {
                 StringBuilder sb = new StringBuilder("--- AWARD WINNERS & CEREMONY AGENDA ---\n\n");
@@ -846,9 +827,9 @@ public class CoordinatorPanel extends JPanel {
                 ResultSet rs = reportDAO.getAwardWinners(semId);
                 while (rs.next()) {
                     sb.append("- ").append(rs.getString("award_category")).append(": ")
-                            .append(rs.getString("student_name")).append(" - ")
-                            .append(rs.getString("title")).append(" (Score: ")
-                            .append(rs.getInt("overall_score")).append(")\n");
+                    .append(rs.getString("student_name")).append(" - ")
+                    .append(rs.getString("title")).append(" (Score: ")
+                    .append(rs.getInt("overall_score")).append(")\n");
                 }
                 sb.append("\n4. Keynote Presentation by Winners\n");
                 sb.append("5. Closing Ceremony and Refreshments\n");
@@ -862,7 +843,7 @@ public class CoordinatorPanel extends JPanel {
                 contextualEditBtn.setBackground(Color.WHITE);
                 rs.getStatement().getConnection().close();
                 if (scheduleDone && summaryDone && awardsDone)
-                    compileButton.setEnabled(true);
+                compileButton.setEnabled(true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
@@ -870,7 +851,7 @@ public class CoordinatorPanel extends JPanel {
         compileButton.addActionListener(e -> {
             StringBuilder finalReport = new StringBuilder();
             finalReport.append("==========================================\n");
-            finalReport.append("   OFFICIAL SEMINAR COMPREHENSIVE REPORT  \n");
+            finalReport.append(" OFFICIAL SEMINAR COMPREHENSIVE REPORT \n");
             finalReport.append("==========================================\n\n");
             finalReport.append(lastSchedule).append("\n\n");
             finalReport.append(lastSummary).append("\n\n");
@@ -882,8 +863,7 @@ public class CoordinatorPanel extends JPanel {
             statusLabel.setForeground(new Color(0, 150, 0));
             exportButton.setEnabled(true);
             Theme.styleButton(exportButton);
-            JOptionPane.showMessageDialog(this,
-                    "Report Compiled Successfully!\nYou can now click '5. Export Report' to save the report.");
+            JOptionPane.showMessageDialog(this, "Report Compiled Successfully!\nYou can now click '5. Export Report' to save the report.");
         });
         exportButton.addActionListener(e -> {
             String content = reportArea.getText();
@@ -961,7 +941,6 @@ public class CoordinatorPanel extends JPanel {
     class ActionButtonsRenderer extends JPanel implements TableCellRenderer {
         private JButton editBtn;
         private JButton deleteBtn;
-
         public ActionButtonsRenderer() {
             setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
             setOpaque(true);
@@ -973,7 +952,6 @@ public class CoordinatorPanel extends JPanel {
             add(editBtn);
             add(deleteBtn);
         }
-
         private void styleMiniButton(JButton btn, Color bgColor) {
             btn.setBackground(bgColor);
             btn.setForeground(Color.WHITE);
@@ -981,10 +959,8 @@ public class CoordinatorPanel extends JPanel {
             btn.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
             btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
         }
-
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (isSelected) {
                 setBackground(table.getSelectionBackground());
             } else {
@@ -999,7 +975,6 @@ public class CoordinatorPanel extends JPanel {
         private JButton editBtn;
         private JButton deleteBtn;
         private String sessionId;
-
         public ActionButtonsEditor(JCheckBox checkBox, JTable table) {
             super(checkBox);
             panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
@@ -1014,9 +989,7 @@ public class CoordinatorPanel extends JPanel {
             });
             deleteBtn.addActionListener(e -> {
                 fireEditingStopped();
-                int confirm = JOptionPane.showConfirmDialog(panel,
-                        "Are you sure you want to delete this session?\nThis action cannot be undone.",
-                        "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int confirm = JOptionPane.showConfirmDialog(panel, "Are you sure you want to delete this session?\nThis action cannot be undone.", "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
                         sessionDAO.deleteSession(sessionId);
@@ -1030,7 +1003,6 @@ public class CoordinatorPanel extends JPanel {
             panel.add(editBtn);
             panel.add(deleteBtn);
         }
-
         private void styleMiniButton(JButton btn, Color bgColor) {
             btn.setBackground(bgColor);
             btn.setForeground(Color.WHITE);
@@ -1038,10 +1010,8 @@ public class CoordinatorPanel extends JPanel {
             btn.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
             btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
         }
-
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.sessionId = (String) table.getValueAt(row, 0);
             if (isSelected) {
                 panel.setBackground(table.getSelectionBackground());
@@ -1050,7 +1020,6 @@ public class CoordinatorPanel extends JPanel {
             }
             return panel;
         }
-
         @Override
         public Object getCellEditorValue() {
             return "Edit/Delete";
@@ -1059,7 +1028,6 @@ public class CoordinatorPanel extends JPanel {
 
     class AssignmentActionRenderer extends JPanel implements TableCellRenderer {
         private JButton manageBtn;
-
         public AssignmentActionRenderer() {
             setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
             setOpaque(true);
@@ -1068,7 +1036,6 @@ public class CoordinatorPanel extends JPanel {
             styleMiniButton(manageBtn, Theme.PRIMARY_COLOR);
             add(manageBtn);
         }
-
         private void styleMiniButton(JButton btn, Color bgColor) {
             btn.setBackground(bgColor);
             btn.setForeground(Color.WHITE);
@@ -1076,10 +1043,8 @@ public class CoordinatorPanel extends JPanel {
             btn.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
             btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         }
-
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (isSelected) {
                 setBackground(table.getSelectionBackground());
             } else {
@@ -1093,7 +1058,6 @@ public class CoordinatorPanel extends JPanel {
         private JPanel panel;
         private JButton manageBtn;
         private String sessionId;
-
         public AssignmentActionEditor(JCheckBox checkBox, JTable table) {
             super(checkBox);
             panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
@@ -1106,7 +1070,6 @@ public class CoordinatorPanel extends JPanel {
             });
             panel.add(manageBtn);
         }
-
         private void styleMiniButton(JButton btn, Color bgColor) {
             btn.setBackground(bgColor);
             btn.setForeground(Color.WHITE);
@@ -1114,10 +1077,8 @@ public class CoordinatorPanel extends JPanel {
             btn.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
             btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         }
-
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.sessionId = (String) table.getValueAt(row, 0);
             if (isSelected) {
                 panel.setBackground(table.getSelectionBackground());
@@ -1126,7 +1087,6 @@ public class CoordinatorPanel extends JPanel {
             }
             return panel;
         }
-
         @Override
         public Object getCellEditorValue() {
             return "Assign Student & Evaluator";
@@ -1194,8 +1154,7 @@ public class CoordinatorPanel extends JPanel {
                 }
                 List<models.Submission> allSubmissions = submissionDAO.getAllSubmissionsList();
                 for (models.Submission s : allSubmissions) {
-                    studentCombo.addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle()
-                            + " (ID: " + s.getStudentId() + ")");
+                    studentCombo.addItem("[" + s.getPresentationType() + "] " + s.getStudentName() + ": " + s.getTitle() + " (ID: " + s.getStudentId() + ")");
                 }
                 ResultSet rs = userDAO.getUsersByRole("evaluator");
                 while (rs.next()) {

@@ -41,7 +41,7 @@ public class DatabaseConnection {
         try {
             Class.forName("org.postgresql.Driver");
             String url = "jdbc:postgresql://" + getEnv("DB_HOST") + ":" + getEnv("DB_PORT") + "/"
-                    + getEnv("DB_NAME");
+            + getEnv("DB_NAME");
             return DriverManager.getConnection(url, getEnv("DB_USER"), getEnv("DB_PASSWORD"));
         } catch (ClassNotFoundException e) {
             throw new SQLException("PostgreSQL JDBC Driver not found.", e);

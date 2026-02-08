@@ -30,8 +30,7 @@ public class SessionController {
         }
     }
 
-    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute,
-            int semester) {
+    public void createSeminar(String seminarID, String location, int year, int month, int day, int hour, int minute, int semester) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -46,9 +45,7 @@ public class SessionController {
         }
     }
 
-    public void createSession(String sessionID, String seminarId, String location, int year, int month, int day,
-            int hour, int minute,
-            String type) {
+    public void createSession(String sessionID, String seminarId, String location, int year, int month, int day, int hour, int minute, String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
@@ -72,8 +69,7 @@ public class SessionController {
         }
     }
 
-    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute,
-            String type) {
+    public void updateSession(String sessionID, String location, int year, int month, int day, int hour, int minute, String type) {
         LocalDate date = DateAndTime.dateInput(year, month, day);
         LocalTime time = DateAndTime.timeInput(hour, minute);
         LocalDateTime dateTime = LocalDateTime.of(date, time);

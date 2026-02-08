@@ -15,8 +15,7 @@ public class Evaluation {
     private String comments;
     private Timestamp createdAt;
 
-    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int overallScore, String comments,
-            int problemClarity, int methodology, int results, int presentation, Timestamp createdAt) {
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int overallScore, String comments, int problemClarity, int methodology, int results, int presentation, Timestamp createdAt) {
         this.evaluationId = evaluationId;
         this.submissionId = submissionId;
         this.evaluatorId = evaluatorId;
@@ -29,12 +28,9 @@ public class Evaluation {
         this.createdAt = createdAt;
     }
 
-     
-    public Evaluation(String evaluationId, String submissionId, String evaluatorId,
-            int problemClarity, int methodology, int results, int presentation,
-            int overallScore, String comments) {
-        this(evaluationId, submissionId, evaluatorId, overallScore, comments,
-                problemClarity, methodology, results, presentation, new Timestamp(System.currentTimeMillis()));
+
+    public Evaluation(String evaluationId, String submissionId, String evaluatorId, int problemClarity, int methodology, int results, int presentation, int overallScore, String comments) {
+        this(evaluationId, submissionId, evaluatorId, overallScore, comments, problemClarity, methodology, results, presentation, new Timestamp(System.currentTimeMillis()));
     }
 
     public Evaluation(String submissionId, String evaluatorId) {
@@ -101,7 +97,7 @@ public class Evaluation {
         this.comments = c;
     }
 
-     
+
     public void setRubricScores(int s1, int s2, int s3, int s4) {
         this.problemClarity = s1;
         this.methodology = s2;
@@ -110,7 +106,7 @@ public class Evaluation {
         this.overallScore = (int) ((s1 + s2 + s3 + s4) * 2.5);
     }
 
-     
+
     public int getScore() {
         return overallScore;
     }

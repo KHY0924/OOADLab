@@ -14,13 +14,13 @@ import services.PosterPresentationService;
 public class EvaluatorPanel extends JPanel {
     private MainFrame mainFrame;
     private CardLayout cardLayout;
-    private JPanel listPanel;  
+    private JPanel listPanel;
 
-     
+
     private DefaultTableModel assignedStudentModel;
     private JTable assignmentsTable;
 
-     
+
     private JSlider problemSlider;
     private JSlider methodSlider;
     private JSlider resultsSlider;
@@ -28,7 +28,7 @@ public class EvaluatorPanel extends JPanel {
     private JTextArea commentArea;
     private JLabel selectedStudentLabel;
 
-     
+
     private String currentSubmissionId;
     private AssignmentDAO assignmentDAO;
     private EvaluationDAO evaluationDAO;
@@ -171,21 +171,11 @@ public class EvaluatorPanel extends JPanel {
         Theme.styleButton(submitButton);
         submitButton.addActionListener(e -> {
             if (currentSubmissionId == null)
-                return;
+            return;
             User user = mainFrame.getCurrentUser();
             if (user == null)
-                return;
-            Evaluation eval = new Evaluation(
-                    java.util.UUID.randomUUID().toString(),
-                    currentSubmissionId,
-                    user.getUserId(),
-                    problemSlider.getValue(),
-                    methodSlider.getValue(),
-                    resultsSlider.getValue(),
-                    presentationSlider.getValue(),
-                    (problemSlider.getValue() + methodSlider.getValue() + resultsSlider.getValue()
-                            + presentationSlider.getValue()) / 4,
-                    commentArea.getText());
+            return;
+            Evaluation eval = new Evaluation(java.util.UUID.randomUUID().toString(), currentSubmissionId, user.getUserId(), problemSlider.getValue(), methodSlider.getValue(), resultsSlider.getValue(), presentationSlider.getValue(), (problemSlider.getValue() + methodSlider.getValue() + resultsSlider.getValue() + presentationSlider.getValue()) / 4, commentArea.getText());
             evaluationDAO.saveEvaluation(eval);
             JOptionPane.showMessageDialog(this, "Evaluation Completed");
             cardLayout.show(listPanel, "LIST");
@@ -217,14 +207,11 @@ public class EvaluatorPanel extends JPanel {
             }
         }
         if (selectedSub == null)
-            return;
+        return;
         String type = selectedSub.getPresentationType();
         if (type != null && type.toLowerCase().contains("poster")) {
             if (!posterService.isSubmissionAssigned(subId)) {
-                JOptionPane.showMessageDialog(this,
-                        "Evaluation Blocked: This poster has not been assigned a Board ID by the Coordinator yet.",
-                        "Assignment Required",
-                        JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Evaluation Blocked: This poster has not been assigned a Board ID by the Coordinator yet.", "Assignment Required", JOptionPane.WARNING_MESSAGE);
                 return;
             }
         }
@@ -258,7 +245,7 @@ public class EvaluatorPanel extends JPanel {
         return p;
     }
 
-     
+
 
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
@@ -266,8 +253,7 @@ public class EvaluatorPanel extends JPanel {
             Theme.styleButton(this);
             setFont(new Font("Segoe UI", Font.PLAIN, 12));
         }
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             setText((value == null) ? "Evaluate" : value.toString());
             return this;
         }
@@ -285,8 +271,7 @@ public class EvaluatorPanel extends JPanel {
             button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
             button.addActionListener(e -> fireEditingStopped());
         }
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             label = (value == null) ? "Evaluate" : value.toString();
             button.setText(label);
             isPushed = true;

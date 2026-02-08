@@ -21,9 +21,7 @@ public class EvaluationController {
         return assignmentRepo.getAssignmentsForEvaluator(evaluatorId);
     }
 
-    public void submitEvaluation(String submissionId, String evaluatorId,
-            int score1, int score2, int score3, int score4,
-            String comments) {
+    public void submitEvaluation(String submissionId, String evaluatorId, int score1, int score2, int score3, int score4, String comments) {
         Evaluation eval = new Evaluation(submissionId, evaluatorId);
         eval.setRubricScores(score1, score2, score3, score4);
         eval.setComments(comments);

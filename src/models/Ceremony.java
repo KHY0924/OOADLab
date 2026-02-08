@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
- 
+
 public class Ceremony {
     private String ceremonyId;
     private String seminarId;
@@ -16,8 +16,7 @@ public class Ceremony {
     private LocalDateTime createdDateTime;
     private String remarks;
 
-    public Ceremony(String ceremonyId, String seminarId, String ceremonyName, 
-                    LocalDateTime scheduledDateTime, String venue) {
+    public Ceremony(String ceremonyId, String seminarId, String ceremonyName, LocalDateTime scheduledDateTime, String venue) {
         this.ceremonyId = ceremonyId;
         this.seminarId = seminarId;
         this.ceremonyName = ceremonyName;
@@ -33,7 +32,7 @@ public class Ceremony {
             return false;
         }
         boolean awardTypeExists = awards.stream()
-                .anyMatch(a -> a.getAwardType().equals(award.getAwardType()));
+        .anyMatch(a -> a.getAwardType().equals(award.getAwardType()));
         if (!awardTypeExists) {
             awards.add(award);
             return true;
@@ -47,16 +46,16 @@ public class Ceremony {
 
     public Award getAwardById(String awardId) {
         return awards.stream()
-                .filter(award -> award.getAwardId().equals(awardId))
-                .findFirst()
-                .orElse(null);
+        .filter(award -> award.getAwardId().equals(awardId))
+        .findFirst()
+        .orElse(null);
     }
 
     public Award getAwardByType(String awardType) {
         return awards.stream()
-                .filter(award -> award.getAwardType().equals(awardType))
-                .findFirst()
-                .orElse(null);
+        .filter(award -> award.getAwardType().equals(awardType))
+        .findFirst()
+        .orElse(null);
     }
 
     public List<Award> getAllAwards() {
@@ -87,7 +86,7 @@ public class Ceremony {
         return "PLANNED".equals(ceremonyStatus);
     }
 
-     
+
     public String getCeremonyId() {
         return ceremonyId;
     }
@@ -136,15 +135,15 @@ public class Ceremony {
         this.remarks = remarks;
     }
 
-    @Override  
+    @Override
     public String toString() {
         return "Ceremony{" +
-                "ceremonyId='" + ceremonyId + '\'' +
-                ", ceremonyName='" + ceremonyName + '\'' +
-                ", scheduledDateTime=" + scheduledDateTime +
-                ", venue='" + venue + '\'' +
-                ", status='" + ceremonyStatus + '\'' +
-                ", awardCount=" + awards.size() +
-                '}';
+        "ceremonyId='" + ceremonyId + '\'' +
+        ", ceremonyName='" + ceremonyName + '\'' +
+        ", scheduledDateTime=" + scheduledDateTime +
+        ", venue='" + venue + '\'' +
+        ", status='" + ceremonyStatus + '\'' +
+        ", awardCount=" + awards.size() +
+        '}';
     }
 }

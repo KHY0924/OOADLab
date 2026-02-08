@@ -62,9 +62,7 @@ public class Theme {
     }
 
     public static Border createCardBorder() {
-        return BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        return BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1), BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 
     public static void styleTable(javax.swing.JTable table) {

@@ -73,16 +73,16 @@ public class LoginPanel extends JPanel {
                 String role = user.getRole() != null ? user.getRole().toLowerCase() : "";
                 switch (role) {
                     case "student":
-                        mainFrame.showPanel(MainFrame.STUDENT_PANEL);
-                        break;
+                    mainFrame.showPanel(MainFrame.STUDENT_PANEL);
+                    break;
                     case "coordinator":
-                        mainFrame.showPanel(MainFrame.COORDINATOR_PANEL);
-                        break;
+                    mainFrame.showPanel(MainFrame.COORDINATOR_PANEL);
+                    break;
                     case "evaluator":
-                        mainFrame.showPanel(MainFrame.EVALUATOR_PANEL);
-                        break;
+                    mainFrame.showPanel(MainFrame.EVALUATOR_PANEL);
+                    break;
                     default:
-                        JOptionPane.showMessageDialog(this, "Unknown role: " + role);
+                    JOptionPane.showMessageDialog(this, "Unknown role: " + role);
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid credentials");

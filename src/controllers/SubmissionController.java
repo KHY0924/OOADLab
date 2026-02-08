@@ -6,8 +6,7 @@ import java.sql.SQLException;
 public class SubmissionController {
     private SubmissionDAO submissionDAO = new SubmissionDAO();
 
-    public void registerForSeminar(String seminarId, String studentId, String title, String abstractText,
-            String supervisor, String type) {
+    public void registerForSeminar(String seminarId, String studentId, String title, String abstractText, String supervisor, String type) {
         try {
             submissionDAO.createSubmission(seminarId, studentId, title, abstractText, supervisor, type);
             System.out.println("Submission registered for " + studentId);

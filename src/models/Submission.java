@@ -6,7 +6,7 @@ public class Submission {
     private String submissionId;
     private String seminarId;
     private String studentId;
-    private String studentName;  
+    private String studentName;
     private String title;
     private String abstractText;
     private String supervisor;
@@ -14,8 +14,7 @@ public class Submission {
     private String filePath;
     private LocalDateTime deadline;
 
-    public Submission(String submissionId, String seminarId, String studentId, String title, String abstractText,
-            String supervisor, String presentationType) {
+    public Submission(String submissionId, String seminarId, String studentId, String title, String abstractText, String supervisor, String presentationType) {
         this.submissionId = submissionId;
         this.seminarId = seminarId;
         this.studentId = studentId;
@@ -107,10 +106,10 @@ public class Submission {
     @Override
     public String toString() {
         return "Submission{" +
-                "submissionId='" + submissionId + '\'' +
-                ", title='" + title + '\'' +
-                ", studentName='" + studentName + '\'' +
-                ", presentationType='" + presentationType + '\'' +
-                '}';
+        "submissionId='" + submissionId + '\'' +
+        ", title='" + title + '\'' +
+        ", studentName='" + studentName + '\'' +
+        ", presentationType='" + presentationType + '\'' +
+        '}';
     }
 }

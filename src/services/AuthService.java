@@ -13,8 +13,7 @@ public class AuthService {
     public User login(String username, String password) {
         System.out.println("[AuthService] Attempting login for user: " + username);
         String q = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-                PreparedStatement pst = con.prepareStatement(q)) {
+        try (Connection con = DatabaseConnection.getConnection(); PreparedStatement pst = con.prepareStatement(q)) {
             pst.setString(1, username);
             pst.setString(2, password);
             try (ResultSet res = pst.executeQuery()) {
@@ -34,8 +33,7 @@ public class AuthService {
         return null;
     }
 
-    public boolean register(String username, String password, String role, String fullName, String email,
-            String major) {
+    public boolean register(String username, String password, String role, String fullName, String email, String major) {
         try {
             ResultSet chk = uDao.findByUsername(username);
             if (chk.next()) {

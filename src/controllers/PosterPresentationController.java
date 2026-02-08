@@ -13,10 +13,8 @@ public class PosterPresentationController {
         this.service = new PosterPresentationService();
     }
 
-    public boolean createPresentation(int boardId, String submissionId, String title,
-            String description, String sessionId, String status) {
-        PosterPresentation presentation = new PosterPresentation(
-                0, boardId, submissionId, title, description, sessionId, status);
+    public boolean createPresentation(int boardId, String submissionId, String title, String description, String sessionId, String status) {
+        PosterPresentation presentation = new PosterPresentation(0, boardId, submissionId, title, description, sessionId, status);
         return service.addPresentation(presentation);
     }
 
@@ -37,10 +35,8 @@ public class PosterPresentationController {
         return service.createBoard(board);
     }
 
-    public boolean addEvaluationCriteria(int presentationId, String criteriaName,
-            String description, int maxScore, int weight) {
-        EvaluationCriteria criteria = new EvaluationCriteria(
-                0, presentationId, criteriaName, description, maxScore, weight);
+    public boolean addEvaluationCriteria(int presentationId, String criteriaName, String description, int maxScore, int weight) {
+        EvaluationCriteria criteria = new EvaluationCriteria(0, presentationId, criteriaName, description, maxScore, weight);
         return service.addCriteria(criteria);
     }
 
@@ -71,8 +67,7 @@ public class PosterPresentationController {
         return service.deleteBoard(boardId);
     }
 
-    public boolean updateEvaluationCriteria(int criteriaId, String criteriaName,
-            String description, int maxScore, int weight) {
+    public boolean updateEvaluationCriteria(int criteriaId, String criteriaName, String description, int maxScore, int weight) {
         EvaluationCriteria criteria = service.getCriteriaById(criteriaId);
         if (criteria != null) {
             criteria.setCriteriaName(criteriaName);

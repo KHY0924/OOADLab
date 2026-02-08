@@ -139,11 +139,11 @@ public class StudentPanel extends JPanel {
         JLabel supervisorLabel = new JLabel("Supervisor Name");
         Theme.styleLabel(supervisorLabel, false);
         String[] supervisors = {
-                "Dr. Ahmad Albab",
-                "Prof. Tan Mei Ling",
-                "Dr. Siti Nurhaliza",
-                "Mr. Muthusamy",
-                "Dr. Wong Wei Hong"
+            "Dr. Ahmad Albab",
+            "Prof. Tan Mei Ling",
+            "Dr. Siti Nurhaliza",
+            "Mr. Muthusamy",
+            "Dr. Wong Wei Hong"
         };
         supervisorField = new JComboBox<>(supervisors);
         supervisorField.setFont(Theme.STANDARD_FONT);
@@ -172,21 +172,13 @@ public class StudentPanel extends JPanel {
                 while (rs.next()) {
                     String subId = rs.getString("submission_id");
                     if (!evaluationDAO.isEvaluated(subId)) {
-                        JOptionPane.showMessageDialog(this,
-                                "You cannot submit a new application while you have a pending registration.\nPlease wait until your previous submission is graded.",
-                                "Submission Blocked", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "You cannot submit a new application while you have a pending registration.\nPlease wait until your previous submission is graded.", "Submission Blocked", JOptionPane.WARNING_MESSAGE);
                         rs.close();
                         return;
                     }
                 }
                 rs.close();
-                submissionDAO.createSubmission(
-                        selectedSeminar.getSeminarId(),
-                        user.getUserId(),
-                        titleField.getText(),
-                        abstractArea.getText(),
-                        (String) supervisorField.getSelectedItem(),
-                        (String) typeCombo.getSelectedItem());
+                submissionDAO.createSubmission(selectedSeminar.getSeminarId(), user.getUserId(), titleField.getText(), abstractArea.getText(), (String) supervisorField.getSelectedItem(), (String) typeCombo.getSelectedItem());
                 JOptionPane.showMessageDialog(this, "Registration Submitted Successfully!");
                 titleField.setText("");
                 abstractArea.setText("");
@@ -304,7 +296,7 @@ public class StudentPanel extends JPanel {
     private void refreshMaterials() {
         User user = mainFrame.getCurrentUser();
         if (user == null)
-            return;
+        return;
         materialModel.setRowCount(0);
         try {
             ResultSet rs = submissionDAO.findByStudentId(user.getUserId());
@@ -313,10 +305,10 @@ public class StudentPanel extends JPanel {
                 List<Material> materials = materialDAO.getMaterialsBySubmissionId(subId);
                 for (Material m : materials) {
                     materialModel.addRow(new Object[] {
-                            m.getFileName(),
-                            m.getFileType(),
-                            m.getUploadDate(),
-                            m.getFilePath()
+                        m.getFileName(),
+                        m.getFileType(),
+                        m.getUploadDate(),
+                        m.getFilePath()
                     });
                 }
             }
@@ -331,7 +323,7 @@ public class StudentPanel extends JPanel {
         wrapper.setBackground(Theme.BG_COLOR);
         wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         String[] columns = { "Registration ID", "Research Title", "Supervisor", "Type", "Venue", "Time", "Board",
-                "Status" };
+            "Status" };
         statusModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -351,7 +343,7 @@ public class StudentPanel extends JPanel {
     private void refreshStatus() {
         User user = mainFrame.getCurrentUser();
         if (user == null)
-            return;
+        return;
         statusModel.setRowCount(0);
         try {
             ResultSet rs = submissionDAO.findByStudentId(user.getUserId());

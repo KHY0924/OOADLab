@@ -9,8 +9,7 @@ public class PosterPresentation {
     private String sessionId;
     private String status;
 
-    public PosterPresentation(int presentationId, int boardId, String submissionId,
-            String title, String description, String sessionId, String status) {
+    public PosterPresentation(int presentationId, int boardId, String submissionId, String title, String description, String sessionId, String status) {
         this.presentationId = presentationId;
         this.boardId = boardId;
         this.submissionId = submissionId;

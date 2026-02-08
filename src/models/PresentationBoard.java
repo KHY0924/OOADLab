@@ -9,9 +9,7 @@ public class PresentationBoard {
     private String sessionId;
     private String presentationType;
 
-    public PresentationBoard(int boardId, String boardName, String location,
-            int maxPresentations, int currentPresentations,
-            String sessionId, String presentationType) {
+    public PresentationBoard(int boardId, String boardName, String location, int maxPresentations, int currentPresentations, String sessionId, String presentationType) {
         this.boardId = boardId;
         this.boardName = boardName;
         this.location = location;

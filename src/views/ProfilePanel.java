@@ -81,7 +81,7 @@ public class ProfilePanel extends JPanel {
     public void loadProfile() {
         User user = mainFrame.getCurrentUser();
         if (user == null)
-            return;
+        return;
         try {
             ResultSet rs = profileDAO.findByUserId(user.getUserId());
             if (rs.next()) {
@@ -99,10 +99,9 @@ public class ProfilePanel extends JPanel {
     private void saveProfile() {
         User user = mainFrame.getCurrentUser();
         if (user == null)
-            return;
+        return;
         try {
-            profileDAO.updateProfile(user.getUserId(), fullNameField.getText(), emailField.getText(),
-                    majorField.getText());
+            profileDAO.updateProfile(user.getUserId(), fullNameField.getText(), emailField.getText(), majorField.getText());
             JOptionPane.showMessageDialog(this, "Profile Updated Successfully!");
         } catch (SQLException e) {
             System.out.println("Error updating profile.");

@@ -10,8 +10,7 @@ public class Material {
     private Timestamp uploadDate;
     private String filePath;
 
-    public Material(String materialId, String submissionId, String fileName, String fileType, Timestamp uploadDate,
-            String filePath) {
+    public Material(String materialId, String submissionId, String fileName, String fileType, Timestamp uploadDate, String filePath) {
         this.materialId = materialId;
         this.submissionId = submissionId;
         this.fileName = fileName;

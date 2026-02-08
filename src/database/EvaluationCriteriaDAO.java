@@ -14,10 +14,9 @@ public class EvaluationCriteriaDAO {
 
     public boolean createCriteria(EvaluationCriteria criteria) {
         String sql = "INSERT INTO evaluation_criteria (presentation_id, criteria_name, description, max_score, weight) "
-                +
-                "VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = dbConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        +
+        "VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, criteria.getPresentationId());
             stmt.setString(2, criteria.getCriteriaName());
             stmt.setString(3, criteria.getDescription());
@@ -32,18 +31,11 @@ public class EvaluationCriteriaDAO {
 
     public EvaluationCriteria getCriteriaById(int criteriaId) {
         String sql = "SELECT * FROM evaluation_criteria WHERE criteria_id = ?";
-        try (Connection conn = dbConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, criteriaId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new EvaluationCriteria(
-                        rs.getInt("criteria_id"),
-                        rs.getInt("presentation_id"),
-                        rs.getString("criteria_name"),
-                        rs.getString("description"),
-                        rs.getInt("max_score"),
-                        rs.getInt("weight"));
+                return new EvaluationCriteria(rs.getInt("criteria_id"), rs.getInt("presentation_id"), rs.getString("criteria_name"), rs.getString("description"), rs.getInt("max_score"), rs.getInt("weight"));
             }
         } catch (SQLException e) {
             System.out.println("Error retrieving criteria by ID.");
@@ -54,18 +46,11 @@ public class EvaluationCriteriaDAO {
     public List<EvaluationCriteria> getCriteriaByPresentationId(int presentationId) {
         String sql = "SELECT * FROM evaluation_criteria WHERE presentation_id = ?";
         List<EvaluationCriteria> criteriaList = new ArrayList<>();
-        try (Connection conn = dbConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, presentationId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                criteriaList.add(new EvaluationCriteria(
-                        rs.getInt("criteria_id"),
-                        rs.getInt("presentation_id"),
-                        rs.getString("criteria_name"),
-                        rs.getString("description"),
-                        rs.getInt("max_score"),
-                        rs.getInt("weight")));
+                criteriaList.add(new EvaluationCriteria(rs.getInt("criteria_id"), rs.getInt("presentation_id"), rs.getString("criteria_name"), rs.getString("description"), rs.getInt("max_score"), rs.getInt("weight")));
             }
         } catch (SQLException e) {
             System.out.println("Error retrieving criteria list.");
@@ -75,9 +60,8 @@ public class EvaluationCriteriaDAO {
 
     public boolean updateCriteria(EvaluationCriteria criteria) {
         String sql = "UPDATE evaluation_criteria SET presentation_id = ?, criteria_name = ?, " +
-                "description = ?, max_score = ?, weight = ? WHERE criteria_id = ?";
-        try (Connection conn = dbConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        "description = ?, max_score = ?, weight = ? WHERE criteria_id = ?";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, criteria.getPresentationId());
             stmt.setString(2, criteria.getCriteriaName());
             stmt.setString(3, criteria.getDescription());
@@ -93,8 +77,7 @@ public class EvaluationCriteriaDAO {
 
     public boolean deleteCriteria(int criteriaId) {
         String sql = "DELETE FROM evaluation_criteria WHERE criteria_id = ?";
-        try (Connection conn = dbConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, criteriaId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

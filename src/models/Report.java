@@ -27,9 +27,7 @@ public class Report {
         private Map<String, Integer> rubricScores;
         private double finalAverage;
         private List<String> evaluatorComments;
-        public StudentEvaluationReport(String studentId, String studentName, String sessionId,
-                                     String sessionName, Map<String, Integer> rubricScores,
-                                     double finalAverage, List<String> evaluatorComments) {
+        public StudentEvaluationReport(String studentId, String studentName, String sessionId, String sessionName, Map<String, Integer> rubricScores, double finalAverage, List<String> evaluatorComments) {
             super("STUDENT_EVALUATION");
             this.studentId = studentId;
             this.studentName = studentName;
@@ -46,8 +44,7 @@ public class Report {
             sb.append("STUDENT EVALUATION REPORT\n");
             sb.append("========================================\n\n");
             sb.append("Report ID: ").append(getReportId()).append("\n");
-            sb.append("Generated: ").append(getGeneratedDateTime()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\n\n");
+            sb.append("Generated: ").append(getGeneratedDateTime() .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\n\n");
             sb.append("STUDENT INFORMATION\n");
             sb.append("-------------------\n");
             sb.append("Name: ").append(studentName).append("\n");
@@ -92,9 +89,7 @@ public class Report {
         private int totalSessions;
         private double overallAverageScore;
         private List<Award> awardWinners;
-        public SeminarSummaryReport(String seminarId, String seminarTitle, int totalStudents,
-                                   int totalSessions, double overallAverageScore,
-                                   List<Award> awardWinners) {
+        public SeminarSummaryReport(String seminarId, String seminarTitle, int totalStudents, int totalSessions, double overallAverageScore, List<Award> awardWinners) {
             super("SEMINAR_SUMMARY");
             this.seminarId = seminarId;
             this.seminarTitle = seminarTitle;
@@ -110,8 +105,7 @@ public class Report {
             sb.append("OVERALL SEMINAR SUMMARY REPORT\n");
             sb.append("========================================\n\n");
             sb.append("Report ID: ").append(getReportId()).append("\n");
-            sb.append("Generated: ").append(getGeneratedDateTime()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\n\n");
+            sb.append("Generated: ").append(getGeneratedDateTime() .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\n\n");
             sb.append("SEMINAR INFORMATION\n");
             sb.append("-------------------\n");
             sb.append("Seminar Title: ").append(seminarTitle).append("\n");
@@ -124,8 +118,8 @@ public class Report {
             if (awardWinners != null && !awardWinners.isEmpty()) {
                 for (Award award : awardWinners) {
                     sb.append(award.getAwardType()).append("\n");
-                    sb.append("  Winner: ").append(award.getStudentName()).append("\n");
-                    sb.append("  Submission: ").append(award.getSubmissionTitle()).append("\n\n");
+                    sb.append(" Winner: ").append(award.getStudentName()).append("\n");
+                    sb.append(" Submission: ").append(award.getSubmissionTitle()).append("\n\n");
                 }
             } else {
                 sb.append("No awards assigned.\n");
@@ -149,8 +143,8 @@ public class Report {
 
     public void exportToFile() throws IOException {
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-        String fileName = "logs/Report_" + reportType + "_" + 
-                         generatedDateTime.format(fileNameFormatter) + ".txt";
+        String fileName = "logs/Report_" + reportType + "_" +
+        generatedDateTime.format(fileNameFormatter) + ".txt";
         try (FileWriter writer = new FileWriter(fileName)) {
             writer.write(content);
         }

@@ -9,8 +9,7 @@ public class UserDAO {
 
     public void createUser(String uid, String uname, String pwd, String role) throws SQLException {
         String q = "INSERT INTO users (user_id, username, password, role) VALUES (?::uuid, ?, ?, ?)";
-        try (Connection con = DatabaseConnection.getConnection();
-                PreparedStatement pst = con.prepareStatement(q)) {
+        try (Connection con = DatabaseConnection.getConnection(); PreparedStatement pst = con.prepareStatement(q)) {
             pst.setString(1, uid);
             pst.setString(2, uname);
             pst.setString(3, pwd);
@@ -46,9 +45,7 @@ public class UserDAO {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try (Connection conn = DatabaseConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 String userId = rs.getString("user_id");
                 String username = rs.getString("username");
