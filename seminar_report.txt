@@ -6,60 +6,37 @@
 
 ==========================================
 SESSION: 2026-02-10 09:00:00.0
+Location: Dewan
+==========================================
+  [Oral Presentation] stud2
+     Title:     safcsdf
+     Evaluator: Not Assigned
+  ------------------------------------------
+
+==========================================
+SESSION: 2026-02-10 09:00:00.0
 Location: Hall
 ==========================================
-  [Oral Presentation] stud1
-     Title:     Health Care
-     Evaluator: eval1
-     Poster:    p1
-  ------------------------------------------
-  [Oral Presentation] stud2
-     Title:     Learning
-     Evaluator: eval2
-     Poster:    p2
+  [Poster Presentation] stud3
+     Title:     sdfhsd
+     Evaluator: Not Assigned
   ------------------------------------------
 
 ==========================================
 SESSION: 2026-02-10 09:00:00.0
 Location: Dewan
 ==========================================
-  [Poster Presentation] stud3
-     Title:     Reading
+  [Oral Presentation] stud1
+     Title:     vhma
      Evaluator: eval3
-     Poster:    p3
   ------------------------------------------
 
 
 --- EVALUATION SUMMARY & ANALYTICS ---
 
 Student:   stud1 (Oral Presentation)
-Evaluator: eval1
-Poster:    p1
-Title:     Health Care
-Detailed Scores:
-   - Problem Clarity: 10/10
-   - Methodology:     10/10
-   - Results:         10/10
-   - Presentation:    10/10
-OVERALL SCORE: 10/100
-Comments: good
-------------------------------------------
-Student:   stud2 (Oral Presentation)
-Evaluator: eval2
-Poster:    p2
-Title:     Learning
-Detailed Scores:
-   - Problem Clarity: 5/10
-   - Methodology:     5/10
-   - Results:         5/10
-   - Presentation:    5/10
-OVERALL SCORE: 5/100
-Comments: no bad
-------------------------------------------
-Student:   stud3 (Poster Presentation)
 Evaluator: eval3
-Poster:    p3
-Title:     Reading
+Title:     vhma
 Detailed Scores:
    - Problem Clarity: 10/10
    - Methodology:     10/10
@@ -68,11 +45,19 @@ Detailed Scores:
 OVERALL SCORE: 10/100
 Comments: very good
 ------------------------------------------
+Student:   stud3 (Poster Presentation)
+STATUS:    [PENDING EVALUATION]
+Evaluator: Not Assigned
+------------------------------------------
+Student:   stud2 (Oral Presentation)
+STATUS:    [PENDING EVALUATION]
+Evaluator: Not Assigned
+------------------------------------------
 
 DATA ANALYTICS:
 Total Students: 3
-Evaluated:      3
-Average Score:  8.33
+Evaluated:      1
+Average Score:  10.00
 
 
 --- AWARD WINNERS & CEREMONY AGENDA ---
@@ -81,13 +66,11 @@ Average Score:  8.33
 2. Opening Remarks by Faculty Dean
 3. Presentation of Awards:
 
-- Best Oral: stud1 - Health Care (Score: 10)
-- Best Poster: stud3 - Reading (Score: 10)
-- People's Choice: stud2 - Learning (Score: 5)
+- Best Oral: stud1 - vhma (Score: 10)
 
 4. Keynote Presentation by Winners
 5. Closing Ceremony and Refreshments
 
 
 ==========================================
-Report Generated on: Sat Feb 07 01:00:59 GMT+08:00 2026
+Report Generated on: Sun Feb 08 16:11:59 GMT+08:00 2026
